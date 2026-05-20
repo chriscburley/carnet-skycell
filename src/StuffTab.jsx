@@ -313,14 +313,12 @@ function PersoStuff({ persoKey, label, color, light, border, stuff, onUpdate }) 
 }
 
 // ─── ONGLET STUFF PRINCIPAL ───────────────────────────────────────────────────
-export default function StuffTab({ db }) {
-  // stuff[persoKey][slotId] = itemObject
+export default function StuffTab({ db, skydroMeta, cellMeta }) {
   const [stuff, setStuff] = useState({
     sky1:{}, sky2:{}, cell1:{}, cell2:{}
   });
   const [loaded, setLoaded] = useState(false);
 
-  // Firebase sync
   useEffect(() => {
     const unsub = onValue(ref(db, "stuff"), snap => {
       if (snap.exists()) setStuff(snap.val());
@@ -336,11 +334,15 @@ export default function StuffTab({ db }) {
     set(ref(db, "stuff"), next);
   };
 
+  // Récupère les noms depuis les metas
+  const skyPersos = skydroMeta?.persos || [];
+  const cellPersos = cellMeta?.persos || [];
+
   const PERSOS = [
-    { key:"sky1",  label:"Sky — Perso 1",  ...PLAYERS[0] },
-    { key:"sky2",  label:"Sky — Perso 2",  ...PLAYERS[0] },
-    { key:"cell1", label:"Cell — Perso 1", ...PLAYERS[1] },
-    { key:"cell2", label:"Cell — Perso 2", ...PLAYERS[1] },
+    { key:"sky1",  label: skyPersos[0]?.name  || "Sky — Perso 1",  ...PLAYERS[0] },
+    { key:"sky2",  label: skyPersos[1]?.name  || "Sky — Perso 2",  ...PLAYERS[0] },
+    { key:"cell1", label: cellPersos[0]?.name || "Cell — Perso 1", ...PLAYERS[1] },
+    { key:"cell2", label: cellPersos[1]?.name || "Cell — Perso 2", ...PLAYERS[1] },
   ];
 
   if (!loaded) return <div style={{ textAlign:"center", padding:"40px", color:C.textDim, fontSize:13 }}>Chargement…</div>;
