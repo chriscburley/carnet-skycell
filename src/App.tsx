@@ -1856,7 +1856,7 @@ function GlobalSearch() {
                   <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Recette</div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
                     {detail.recipe.map((r,i) => (
-                      <a key={i} href={`https://dofusdb.fr/fr/database/items/${r.item_ankama_id}`} target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", gap:4, padding:"4px 8px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11, textDecoration:"none", border:`1px solid ${C.borderLight}`, transition:"border-color 0.12s" }}
+                        <a key={i} href={`https://dofusdb.fr/fr/database/item/${r.item_ankama_id}`} target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", gap:4, padding:"4px 8px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11, textDecoration:"none", border:`1px solid ${C.borderLight}`, transition:"border-color 0.12s" }}
                         onMouseEnter={e=>e.currentTarget.style.borderColor=C.goldDim}
                         onMouseLeave={e=>e.currentTarget.style.borderColor=C.borderLight}
                       >
@@ -1868,7 +1868,7 @@ function GlobalSearch() {
                   </div>
                 </div>
               )}
-              <a href={`https://dofusdb.fr/fr/${selected?.type?.name_id==="monsters"?"database/monsters":"database/items"}/${selected?.ankama_id}`}
+              <a href={`https://dofusdb.fr/fr/database/${selected?.type?.name_id==="monsters"?"monster":"item"}/${selected?.ankama_id}`}
                 target="_blank" rel="noopener noreferrer"
                 style={{ fontSize:11, color:C.gold, fontFamily:"'Cinzel',serif", textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
                 Voir sur DofusDB →
