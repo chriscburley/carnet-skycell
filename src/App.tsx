@@ -39,7 +39,81 @@ const KAMAS_PALIERS = [
   { label: "200M", val: 200000000 },
 ];
 
-// ─── DONNÉES DUO ─────────────────────────────────────────────────────────────
+// ─── BADGES FAMILIERS ────────────────────────────────────────────────────────
+const FAMILIER_BADGES = [
+  { id: "f1", icon: "🐣", name: "Apprivoiseur",    desc: "5 familiers obtenus",   threshold: 5  },
+  { id: "f2", icon: "🐾", name: "Ami des Bêtes",   desc: "15 familiers obtenus",  threshold: 15 },
+  { id: "f3", icon: "🦁", name: "Dompteur",        desc: "30 familiers obtenus",  threshold: 30 },
+  { id: "f4", icon: "🌿", name: "Gardien du Monde",desc: "50 familiers obtenus",  threshold: 50 },
+  { id: "f5", icon: "✨", name: "Collectionneur",  desc: "Tous les familiers !",  threshold: 999},
+];
+
+const FAMILIERS = [
+  // ── Échange de ressources ───────────────────────────────────────────────
+  { id:"fm1",  name:"Abra Kadabra",   how:"Échange", fun:"Le Sorcier du Sous-Bois",      where:"[-10,-12] — 5x Ambre du Chêne Mou + 5x Racine d'Abraknyde Ancestral", req:"Succès : Vieilles branches" },
+  { id:"fm2",  name:"Atouin",         how:"Échange", fun:"La Carapace Ambitieuse",        where:"[7,-10] Cloaque d'Amakna — 10x Étoffe de Sphincter Cell", req:"Succès : Rats Maknéens" },
+  { id:"fm3",  name:"Bébé Pandawa",   how:"Échange", fun:"Le Tonneau en Couches",         where:"[22,-31] — 20x de chaque Artefact Pandawushu (Bois/Eau/Feu/Roc/Vent)", req:"Succès : Massacre élémentaire" },
+  { id:"fm4",  name:"Bilby",          how:"Échange", fun:"La Gelée de Poche",             where:"[9,28] — 2x Gelée Citron Royale + 2x Bleuet Royale + 2x Menthe Royale + 2x Fraise Royale", req:"Succès : Gelées" },
+  { id:"fm5",  name:"Bisouglours",    how:"Échange", fun:"L'Ours Polaire Câlin",          where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace", req:"Niveau > 79" },
+  { id:"fm6",  name:"Black Tiwabbit", how:"Échange", fun:"Le Lapin des Ténèbres",         where:"[28,-12] à côté du Terrier du Wa Wabbit — 100x Bandeau du Black Tiwabbit", req:"Succès : Wabbits" },
+  { id:"fm7",  name:"Blérodoudou",    how:"Échange", fun:"Le Doudou Givré",               where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace", req:"Niveau > 79" },
+  { id:"fm8",  name:"Bloalak",        how:"Échange", fun:"Le Passionné de Kaliptus",      where:"[-16,3] — 200x Fleur de Kaliptus", req:"Succès : Amateur de Kaliptus" },
+  { id:"fm9",  name:"Blokus",         how:"Échange", fun:"Le Cube Philosophique",         where:"[1,6] Xélorium — 500x Orichor", req:"Aucun" },
+  { id:"fm10", name:"Bontique",       how:"Échange", fun:"Le Guerrier de la Lumière",     where:"[-33,-56] — 20x Aliton", req:"Ordre 1 ou plus" },
+  { id:"fm11", name:"Boskito",        how:"Échange", fun:"L'Insecte des Champs",          where:"[8,-22] dans la grange — 50x Pétale Tournesol Sauvage + 50x Pétale Rose Démoniaque", req:"Succès : Plantes des champs" },
+  { id:"fm12", name:"Bouflux",        how:"Échange", fun:"Le Mouton Électrique",          where:"[-26,36] — 200x Aliton", req:"Ordre 5" },
+  { id:"fm13", name:"Bouftor",        how:"Échange", fun:"Le Bouclier Laineux",           where:"[-33,-56] — 200x Aliton", req:"Ordre 5" },
+  { id:"fm14", name:"Chacha",         how:"Échange", fun:"L'Osseux Attachant",            where:"[10,15] Donjon des Squelettes — 5x Dent de Chafer Ronin", req:"Succès : Chafers" },
+  { id:"fm15", name:"Dorante",        how:"Échange", fun:"La Bougie Vivante",             where:"[-1,32] Donjon des Bworks — ressources de Bwork", req:"Succès : Bworks" },
+  { id:"fm16", name:"Dragoune Rose",  how:"Échange", fun:"La Princesse du Donjon",        where:"[7,-10] Cloaque d'Amakna — 5x Écaille de Sphincter Cell", req:"Succès : Rats Maknéens" },
+  { id:"fm17", name:"Flamboyard",     how:"Échange", fun:"Le Géant en Réduction",         where:"[14,-56] Frigost — 15x Dent du Koulosse", req:"Succès : Monstres de Frigost" },
+  { id:"fm18", name:"Gavé",           how:"Échange", fun:"Le Glouton Satisfait",          where:"[9,28] — 2x Gelée Royale de chaque couleur", req:"Succès : Gelées" },
+  { id:"fm19", name:"Givrefoux",      how:"Échange", fun:"Le Renard de Glace",            where:"[-60,-3] Frigost Crevasse Perge — 50x Laine de Tengu + 5x Os de Fuji", req:"Succès : Tengu Schwein" },
+  { id:"fm20", name:"Grossepioche",   how:"Échange", fun:"Le Mineur de Fond",             where:"[13,21] Donjon des Forgerons — 5x Croc du Coffre des Forgerons", req:"Succès : Forgerons" },
+  { id:"fm21", name:"Kanigrou",       how:"Échange", fun:"Le Kangourou Boxeur",           where:"[-3,0] Cania — 20x Pince de Kanigrou", req:"Succès : Kanigrous" },
+  { id:"fm22", name:"Léopardo",       how:"Échange", fun:"Le Fauve des Neiges",           where:"Pont de Grobe Frigost — 50x Os de Fantôme Nukoui San + 50x Os de Fantôme Pandore", req:"Succès Dofus Émeraude (Léopardo)" },
+  { id:"fm23", name:"Mékrabe",        how:"Échange", fun:"Le Crabe Métallique",           where:"[-3,-53] Frigost — 20x Pince de Mékrabe", req:"Succès : Se Jeter à l'Eau (Merkator)" },
+  { id:"fm24", name:"Minoskour",      how:"Échange", fun:"Le Taureau Miniature",          where:"[-74,-38] Frigost — 20x Corne de Minoskour", req:"Succès : Minotoror" },
+  { id:"fm25", name:"Nomoon",         how:"Échange", fun:"L'Araignée de Poche",           where:"[-3,-16] Donjon Abraknydes — 5x Toile d'Abraknyde Ancestral", req:"Succès : Abraknydes" },
+  { id:"fm26", name:"Ouassingue",     how:"Échange", fun:"Le Mouton en Laine",            where:"[-26,36] — 5x Laine de Bouftou Royal", req:"Succès : Bouftous" },
+  { id:"fm27", name:"Phortiche",      how:"Échange", fun:"Le Costaud de Poche",           where:"[1,6] Xélorium Enutrosor — 500x Orichor", req:"Aucun" },
+  { id:"fm28", name:"Pioute Jaune",   how:"Échange", fun:"Le Poussin Solaire",            where:"[4,-22] Poulailler d'Astrub — 50x Plume de Piou Jaune + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm29", name:"Pioute Rose",    how:"Échange", fun:"Le Poussin Romantique",         where:"[5,-17] Maison secrète d'Astrub — 50x Plume de Piou Rose + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm30", name:"Pioute Rouge",   how:"Échange", fun:"Le Poussin Enragé",             where:"[4,-22] Poulailler d'Astrub — 50x Plume de Piou Rouge + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm31", name:"Pioute Bleu",    how:"Échange", fun:"Le Poussin Mélancolique",       where:"[4,-22] Poulailler d'Astrub — 50x Plume de Piou Bleu + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm32", name:"Pioute Vert",    how:"Échange", fun:"Le Poussin Écolo",              where:"[4,-22] Poulailler d'Astrub — 50x Plume de Piou Vert + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm33", name:"Pioute Violet",  how:"Échange", fun:"Le Poussin Mystique",           where:"[4,-22] Poulailler d'Astrub — 50x Plume de Piou Violet + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm34", name:"Pioute Blanc",   how:"Échange", fun:"La Boule de Plumes",            where:"[4,-22] Poulailler d'Astrub — 50x Plume de Piou Blanc + 100x Graine de Sésame", req:"Aucun" },
+  { id:"fm35", name:"Scarapiaf",      how:"Échange", fun:"L'Insecte de Compagnie",        where:"[4,-22] Zone Scarafeuilles — 5x Carapace de Scarafeuille Royal", req:"Succès : Scarafeuilles" },
+  { id:"fm36", name:"Tofurby",        how:"Échange", fun:"La Peluche Électrisée",         where:"[2,-8] Donjon des Tofus — 5x Plume de Tofu Royal", req:"Succès : Tofus" },
+  { id:"fm37", name:"Tofuldi",        how:"Échange", fun:"Le Tofu qui Brille",            where:"[2,-8] Donjon des Tofus — 10x Plume de Tofu Royal", req:"Succès : Tofus" },
+  { id:"fm38", name:"Chacha",         how:"Échange", fun:"Le Squelette de Poche",         where:"[10,15] Cimetière — 5x Dent de Chafer Ronin", req:"Succès : Chafers" },
+  { id:"fm39", name:"Bwaky",          how:"Échange", fun:"Le Barbare Miniature",          where:"[-5,10] Village des Bworks — 5x Peau de Bwork Mage", req:"Succès : Bworks" },
+  // ── Jetons Kolizéum ────────────────────────────────────────────────────
+  { id:"fm40", name:"Balafreux",      how:"Jetons",  fun:"Le Champion des Arènes",        where:"[-13,-29] Kolizéum — 50 000x Kolizéton", req:"Cote solo ou équipe ou duel > 3500" },
+  { id:"fm41", name:"Drakoste",       how:"Jetons",  fun:"Le Dragon d'Élevage",           where:"[-13,-29] Kolizéum — 30 000x Kolizéton", req:"Cote > 2000" },
+  { id:"fm42", name:"Boskitow",       how:"Jetons",  fun:"Le Scarabée Champion",          where:"[-13,-29] Kolizéum — 20 000x Kolizéton", req:"Cote > 1500" },
+  // ── Via quête ou succès ────────────────────────────────────────────────
+  { id:"fm43", name:"Tifoux",         how:"Quête",   fun:"Le Renardeau Elfique",          where:"Zone Sufokia — Quête 'Le Petit Renard des Bois'", req:"Quête Sufokia accessible" },
+  { id:"fm44", name:"Walk",           how:"Quête",   fun:"Le Marcheur Silencieux",        where:"Zone Lac Gelé — apparaît après succès", req:"Succès 'La Marche de l'Empereur' + 'Forage à tous vents'" },
+  { id:"fm45", name:"Tofoudre",       how:"Quête",   fun:"Le Tofu Foudroyant",            where:"[11,8] Zone Feudala — PNJ Tofoudre visible en zone", req:"Succès Tofus en zone Feudala" },
+  { id:"fm46", name:"Bwak Noir",      how:"Quête",   fun:"Le Poulet de la Jungle",        where:"Île Otomaï — échange contre ressources Bwak", req:"Accès Île Otomaï (abonné)" },
+  { id:"fm47", name:"Bloalak Mauvais",how:"Quête",   fun:"Le Kaliptus du Mal",            where:"[-16,3] — 500x Fleur de Kaliptus", req:"Succès : Grand amateur de Kaliptus" },
+  // ── Alliance / Ordre ───────────────────────────────────────────────────
+  { id:"fm48", name:"Bouftique",      how:"Alliance", fun:"La Mascotte de Guilde",        where:"[-33,-56] — 5x Aliton", req:"Ordre 1+" },
+  { id:"fm49", name:"Bouftor Noir",   how:"Alliance", fun:"L'Élite des Arènes",           where:"[-26,36] — 500x Aliton", req:"Ordre 9+" },
+  { id:"fm50", name:"Dragoune Sombre",how:"Alliance", fun:"La Dragonne des Ombres",       where:"[22,-31] Pandala — 30x Artefact Pandawushu total", req:"Succès Pandala + Ordre 3+" },
+];
+
+
+const HOW_COLORS = {
+  "Échange":   { color:"#1a5a8a", bg:"#e8f0f8", border:"#4a8ab8" },
+  "Jetons":    { color:"#6a1a8a", bg:"#f0e8f8", border:"#9a4ab8" },
+  "Quête":     { color:"#7a5a10", bg:"#f8f0d8", border:"#b88a20" },
+  "Alliance":  { color:"#8a3a1a", bg:"#f8ece8", border:"#b86040" },
+};
+
+
 const DUO_DATA = [
   { id: "d_4persos", icon: "👥", title: "Objectifs 4 Persos", objectives: [
     { id: "d_4p1", name: "Les 4 persos atteignent le niveau 50",           desc: "Tout le monde sort des zones de départ", diff: 1 },
@@ -784,10 +858,11 @@ function TabContent({ data, done, toggle, player, meta, onMetaUpdate, notes, onN
   const [section, setSection] = useState("objectifs");
 
   const SECTIONS = player ? [
-    { key:"objectifs", label:"Objectifs" },
-    { key:"stats",     label:"Stats & Persos" },
-    { key:"badges",    label:"Badges" },
-    { key:"notes",     label:"Notes" },
+    { key:"objectifs",  label:"Objectifs" },
+    { key:"stats",      label:"Stats & Persos" },
+    { key:"familiers",  label:"🐾 Familiers" },
+    { key:"badges",     label:"Badges" },
+    { key:"notes",      label:"Notes" },
   ] : [
     { key:"objectifs", label:"Objectifs" },
     { key:"badges",    label:"Badges" },
@@ -841,6 +916,17 @@ function TabContent({ data, done, toggle, player, meta, onMetaUpdate, notes, onN
       )}
 
       {section === "badges" && <BadgesSection soloDone={done} meta={meta} duoDone={duoDone} />}
+
+      {section === "familiers" && player && (
+        <FamiliersSection
+          done={meta?.familiers || {}}
+          toggle={(id) => {
+            const cur = meta?.familiers || {};
+            onMetaUpdate({ ...meta, familiers: { ...cur, [id]: !cur[id] } });
+          }}
+          totalDone={Object.values(meta?.familiers || {}).filter(Boolean).length}
+        />
+      )}
 
       {section === "notes" && (
         <NotesSection notes={notes} author={player ? player.label : "Duo"} onSend={text => onNote(text, player ? player.label : "Duo")} />
@@ -1209,7 +1295,382 @@ function DailyQuestsSection({ playerLabel, playerColor, playerBorder, playerBg, 
   );
 }
 
-// ─── RECAP CARD (sidebar) ────────────────────────────────────────────────────
+// ─── SECTION FAMILIERS ───────────────────────────────────────────────────────
+function FamiliersSection({ done, toggle, totalDone }) {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const HOW_FILTERS = ["all", "Drop boss", "Échange", "Quête", "Drop zone"];
+
+  const filtered = FAMILIERS.filter(f => {
+    const matchFilter = filter === "all" || f.how === filter;
+    const matchSearch = !search || f.name.toLowerCase().includes(search.toLowerCase()) || f.fun.toLowerCase().includes(search.toLowerCase());
+    const matchDone = filter === "done" ? done[f.id] : filter === "todo" ? !done[f.id] : true;
+    return matchFilter && matchSearch && matchDone;
+  });
+
+  const totalFamiliers = FAMILIERS.length;
+  const doneFamiliers = FAMILIERS.filter(f => done[f.id]).length;
+
+  return (
+    <div>
+      {/* Barre de progression globale */}
+      <div className="panel-gold" style={{ padding:"12px 16px", marginBottom:12 }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:C.gold, letterSpacing:1, textTransform:"uppercase" }}>
+            🐾 Collection de Familiers
+          </div>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:14, fontWeight:700, color:C.gold }}>
+            {doneFamiliers}/{totalFamiliers}
+          </div>
+        </div>
+        <div className="prog-track" style={{ height:10, marginBottom:8 }}>
+          <div className="prog-fill" style={{ width:`${Math.round(doneFamiliers/totalFamiliers*100)}%`, background:`linear-gradient(90deg,${C.gold},${C.goldLight})` }} />
+        </div>
+        {/* Badges familiers */}
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+          {FAMILIER_BADGES.map(b => {
+            const unlocked = doneFamiliers >= b.threshold;
+            return (
+              <div key={b.id} title={b.desc} style={{
+                display:"flex", alignItems:"center", gap:4, padding:"3px 9px",
+                borderRadius:20, fontSize:11,
+                background: unlocked ? "rgba(139,94,26,0.15)" : "rgba(0,0,0,0.04)",
+                border:`1px solid ${unlocked ? C.panelBorder : C.borderLight}`,
+                color: unlocked ? C.gold : C.textDim,
+                fontFamily:"'Cinzel',serif", letterSpacing:0.3,
+                filter: unlocked ? "none" : "grayscale(1)", opacity: unlocked ? 1 : 0.45,
+              }}>
+                <span>{b.icon}</span><span>{b.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Filtres */}
+      <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+        {[{key:"all",label:"Tous"},{key:"done",label:"✓ Obtenus"},{key:"todo",label:"À trouver"},
+          ...HOW_FILTERS.filter(f=>f!=="all").map(f=>({key:f,label:f}))
+        ].map(f => (
+          <button key={f.key} className={`filter-btn${filter===f.key?" active":""}`} onClick={()=>setFilter(f.key)} style={{ fontSize:11 }}>
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Recherche */}
+      <input className="meta-input" placeholder="🔍 Rechercher un familier…" value={search} onChange={e=>setSearch(e.target.value)}
+        style={{ marginBottom:12, fontSize:13 }} />
+
+      {/* Liste */}
+      <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
+        {filtered.map(f => {
+          const isDone = done[f.id];
+          const cfg = HOW_COLORS[f.how] || HOW_COLORS["Drop zone"];
+          return (
+            <div key={f.id} onClick={() => toggle(f.id)} style={{
+              display:"grid", gridTemplateColumns:"26px 1fr auto",
+              alignItems:"start", gap:10, padding:"9px 13px",
+              borderRadius:6, cursor:"pointer",
+              background: isDone ? "#eef4ee" : C.bgCard,
+              border:`1px solid ${isDone ? "#4a8a4a" : C.borderLight}`,
+              opacity: isDone ? 0.7 : 1, transition:"all 0.12s",
+            }}>
+              <div style={{
+                width:20, height:20, borderRadius:4, flexShrink:0, marginTop:1,
+                border:`2px solid ${isDone ? "#2a6a2a" : C.goldDim}`,
+                background: isDone ? "#2a6a2a" : "white",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:11, transition:"all 0.2s",
+              }}>
+                {isDone && <span style={{ color:"white" }}>✓</span>}
+              </div>
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:2 }}>
+                  <span style={{ fontSize:13, fontWeight:700, color: isDone ? C.textDim : C.textBright, textDecoration: isDone?"line-through":"none" }}>
+                    {f.fun}
+                  </span>
+                  <span style={{ fontSize:10, padding:"1px 7px", borderRadius:10, background:cfg.bg, color:cfg.color, border:`1px solid ${cfg.border}`, fontFamily:"'Cinzel',serif", fontWeight:600, letterSpacing:0.3 }}>
+                    {f.how}
+                  </span>
+                </div>
+                <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>
+                  {f.name} — {f.where}
+                </div>
+              </div>
+              <div style={{ fontSize:13 }}>🐾</div>
+            </div>
+          );
+        })}
+        {filtered.length === 0 && (
+          <div style={{ fontSize:13, color:C.textDim, fontStyle:"italic", textAlign:"center", padding:16 }}>Aucun familier trouvé.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// ─── ANIMATION BADGE DÉBLOQUÉ ────────────────────────────────────────────────
+function BadgeUnlockOverlay({ badge, onDone }) {
+  const canvasRef = useRef(null);
+  const [phase, setPhase] = useState("in");
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase("hold"), 400);
+    const t2 = setTimeout(() => setPhase("out"), 2800);
+    const t3 = setTimeout(onDone, 3300);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const W = canvas.width, H = canvas.height, cx = W/2, cy = H/2;
+
+    // Feu d'artifice — plusieurs explosions depuis le centre
+    const bursts = Array.from({ length: 6 }, (_, b) => ({
+      delay: b * 8,
+      x: cx + (Math.random()-0.5)*200,
+      y: cy + (Math.random()-0.5)*150,
+      particles: Array.from({ length: 40 }, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 2 + Math.random() * 5;
+        const colors = ["#f5d060","#ffffff","#e8b84b","#ffa040","#ff6060","#60a0ff","#80ff80"];
+        return {
+          vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed - 1,
+          x: 0, y: 0, size: 2+Math.random()*4,
+          color: colors[Math.floor(Math.random()*colors.length)],
+          alpha: 1, decay: 0.015+Math.random()*0.015, gravity: 0.1,
+        };
+      }),
+    }));
+
+    let frame = 0, raf;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      bursts.forEach(burst => {
+        if (frame < burst.delay) return;
+        const f = frame - burst.delay;
+        burst.particles.forEach(p => {
+          if (p.alpha <= 0) return;
+          p.x += p.vx; p.y += p.vy;
+          p.vy += p.gravity; p.vx *= 0.97;
+          p.alpha -= p.decay;
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.alpha);
+          ctx.beginPath();
+          ctx.arc(burst.x+p.x, burst.y+p.y, p.size*p.alpha, 0, Math.PI*2);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.restore();
+        });
+      });
+      frame++;
+      if (frame < 150) raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div style={{
+      position:"fixed", inset:0, zIndex:10002, pointerEvents:"none",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      opacity: phase === "out" ? 0 : 1,
+      transition: phase === "out" ? "opacity 0.5s ease" : "opacity 0.3s ease",
+    }}>
+      <div style={{ position:"absolute", inset:0, background:"rgba(10,8,4,0.82)", backdropFilter:"blur(4px)" }} />
+      <canvas ref={canvasRef} style={{ position:"absolute", inset:0, pointerEvents:"none" }} />
+      <div style={{
+        position:"relative", zIndex:1, textAlign:"center",
+        transform: phase==="in" ? "scale(0.6) translateY(30px)" : "scale(1) translateY(0)",
+        transition:"transform 0.5s cubic-bezier(0.34,1.56,0.64,1)",
+      }}>
+        <div style={{ fontSize:80, marginBottom:12, filter:"drop-shadow(0 0 24px rgba(245,208,96,0.9))" }}>{badge.icon}</div>
+        <div style={{ fontSize:11, color:"#a8c8a8", fontFamily:"'Cinzel',serif", letterSpacing:3, textTransform:"uppercase", marginBottom:8 }}>
+          Badge Débloqué
+        </div>
+        <div style={{
+          fontFamily:"'Cinzel',serif", fontSize:"clamp(20px,4vw,34px)", fontWeight:700,
+          color:"#f5d060", letterSpacing:2, textTransform:"uppercase",
+          textShadow:"0 0 30px rgba(245,208,96,0.9), 0 2px 8px rgba(0,0,0,0.8)",
+          marginBottom:8,
+        }}>{badge.name}</div>
+        <div style={{
+          fontFamily:"'Crimson Pro',serif", fontSize:15, fontStyle:"italic",
+          color:"#f5edd8", opacity:0.85,
+          textShadow:"0 1px 4px rgba(0,0,0,0.6)",
+        }}>{badge.desc}</div>
+      </div>
+    </div>
+  );
+}
+
+
+// ─── FAMILIERS LISTE DUO ─────────────────────────────────────────────────────
+function FamiliersDualList({ skyFams, cellFams, onToggleSky, onToggleCell }) {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [overlay, setOverlay] = useState(null);
+
+  const filtered = FAMILIERS.filter(f => {
+    const skyDone = skyFams[f.id], cellDone = cellFams[f.id];
+    if (filter === "done") return skyDone || cellDone;
+    if (filter === "todo") return !skyDone || !cellDone;
+    if (["Drop boss","Échange","Quête","Drop zone"].includes(filter)) return f.how === filter;
+    if (search) return f.name.toLowerCase().includes(search.toLowerCase()) || f.fun.toLowerCase().includes(search.toLowerCase()) || f.where.toLowerCase().includes(search.toLowerCase());
+    return true;
+  });
+
+  const handleToggle = (f, player) => {
+    if (player === "sky") { const was = skyFams[f.id]; onToggleSky(f.id); if (!was) setOverlay(f); }
+    else { const was = cellFams[f.id]; onToggleCell(f.id); if (!was) setOverlay(f); }
+  };
+
+  return (
+    <div>
+      {overlay && <FamilierCatchOverlay familier={overlay} onDone={() => setOverlay(null)} />}
+      <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+        {[{key:"all",label:"Tous"},{key:"done",label:"✓ Obtenus"},{key:"todo",label:"À trouver"},
+          {key:"Échange",label:"Échange"},{key:"Jetons",label:"Jetons Koli"},{key:"Quête",label:"Quête"},{key:"Alliance",label:"Alliance"},
+        ].map(f => (
+          <button key={f.key} className={`filter-btn${filter===f.key?" active":""}`} onClick={()=>setFilter(f.key)} style={{fontSize:11}}>{f.label}</button>
+        ))}
+      </div>
+      <input className="meta-input" placeholder="🔍 Rechercher…" value={search} onChange={e=>setSearch(e.target.value)} style={{marginBottom:12,fontSize:13}} />
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 52px 52px", gap:8, padding:"6px 12px", marginBottom:4, borderBottom:`1px solid ${C.border}` }}>
+        <div style={{ fontSize:11, color:C.textDim, fontFamily:"'Cinzel',serif" }}>Familier</div>
+        <div style={{ fontSize:11, color:"#2a4a8a", fontFamily:"'Cinzel',serif", textAlign:"center", fontWeight:700 }}>Sky</div>
+        <div style={{ fontSize:11, color:"#7a2a1a", fontFamily:"'Cinzel',serif", textAlign:"center", fontWeight:700 }}>Cell</div>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+        {filtered.map(f => {
+          const sd = skyFams[f.id], cd = cellFams[f.id];
+          const cfg = HOW_COLORS[f.how] || HOW_COLORS["Drop zone"];
+          const both = sd && cd;
+          return (
+            <div key={f.id} style={{ display:"grid", gridTemplateColumns:"1fr 52px 52px", alignItems:"center", gap:8, padding:"9px 12px", borderRadius:6, background:both?"#eef4ee":C.bgCard, border:`1px solid ${both?"#4a8a4a":C.borderLight}`, transition:"all 0.12s" }}>
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:2 }}>
+                  <span style={{ fontSize:13, fontWeight:600, color:both?C.textDim:C.textBright, textDecoration:both?"line-through":"none" }}>{f.fun}</span>
+                  <span style={{ fontSize:9, padding:"1px 6px", borderRadius:10, background:cfg.bg, color:cfg.color, border:`1px solid ${cfg.border}`, fontFamily:"'Cinzel',serif", fontWeight:600 }}>{f.how}</span>
+                </div>
+                <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>{f.name} — {f.where}</div>
+                {f.req && f.req !== "Aucun" && <div style={{ fontSize:10, color:"#8a6a30", marginTop:1 }}>⚠ {f.req}</div>}
+              </div>
+              {[{done:sd,color:"#2a4a8a",border:"#4a6a9a",player:"sky"},{done:cd,color:"#7a2a1a",border:"#9a4a2a",player:"cell"}].map(p => (
+                <div key={p.player} onClick={() => handleToggle(f,p.player)} style={{ display:"flex", justifyContent:"center", cursor:"pointer" }}>
+                  <div style={{ width:26, height:26, borderRadius:5, border:`2px solid ${p.done?p.color:p.border}`, background:p.done?p.color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, transition:"all 0.15s", boxShadow:p.done?`0 0 8px ${p.color}66`:"none" }}>
+                    {p.done && <span style={{color:"white"}}>✓</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── ANIMATION OBTENTION FAMILIER ────────────────────────────────────────────
+function FamilierCatchOverlay({ familier, onDone }) {
+  const canvasRef = useRef(null);
+  const [phase, setPhase] = useState("in");
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase("hold"), 350);
+    const t2 = setTimeout(() => setPhase("out"), 2300);
+    const t3 = setTimeout(onDone, 2800);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const W = canvas.width, H = canvas.height, cx = W/2, cy = H/2;
+    const rings = Array.from({ length: 8 }, (_, i) => ({ delay:i*5, r:0, alpha:0.8, color:i%2===0?"#4aaa5a":"#a0d060" }));
+    let frame = 0, raf;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      rings.forEach(ring => {
+        if (frame < ring.delay) return;
+        ring.r += 5; ring.alpha = Math.max(0, 0.8 - ring.r/300);
+        if (ring.alpha <= 0) return;
+        ctx.beginPath(); ctx.arc(cx, cy, ring.r, 0, Math.PI*2);
+        ctx.strokeStyle = ring.color; ctx.lineWidth = 2.5; ctx.globalAlpha = ring.alpha; ctx.stroke(); ctx.globalAlpha = 1;
+      });
+      frame++; if (frame < 100) raf = requestAnimationFrame(draw);
+    };
+    draw(); return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <div style={{ position:"fixed", inset:0, zIndex:10001, pointerEvents:"none", display:"flex", alignItems:"center", justifyContent:"center", opacity:phase==="out"?0:1, transition:phase==="out"?"opacity 0.5s":"opacity 0.25s" }}>
+      <div style={{ position:"absolute", inset:0, background:"rgba(5,20,5,0.8)", backdropFilter:"blur(3px)" }} />
+      <canvas ref={canvasRef} style={{ position:"absolute", inset:0, pointerEvents:"none" }} />
+      <div style={{ position:"relative", zIndex:1, textAlign:"center", transform:phase==="in"?"scale(0.7)":"scale(1)", transition:"transform 0.4s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        <div style={{ fontSize:64, marginBottom:10, filter:"drop-shadow(0 0 20px rgba(80,200,80,0.7))" }}>🐾</div>
+        <div style={{ fontSize:11, color:"#80c880", fontFamily:"'Cinzel',serif", letterSpacing:3, marginBottom:8 }}>FAMILIER OBTENU</div>
+        <div style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(18px,3.5vw,28px)", fontWeight:700, color:"#c0f0a0", letterSpacing:2, textShadow:"0 0 20px rgba(100,220,80,0.8), 0 2px 6px rgba(0,0,0,0.8)", marginBottom:6 }}>{familier.fun}</div>
+        <div style={{ fontSize:14, color:"#a0d080", fontStyle:"italic" }}>{familier.name}</div>
+      </div>
+    </div>
+  );
+}
+
+function AlmanaxWidget() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+    fetch(`https://api.dofusdu.de/dofus3/v1/fr/almanax/${dateStr}`)
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div style={{ padding:"8px 16px", textAlign:"center", color:"rgba(245,237,216,0.5)", fontSize:12, fontStyle:"italic" }}>
+      Chargement de l'Almanax…
+    </div>
+  );
+  if (!data) return null;
+
+  const bonus = data.bonus?.description || data.bonus?.type?.description || "—";
+  const offrande = data.tribute?.item?.name || "—";
+  const qty = data.tribute?.quantity || 1;
+  const kamas = data.reward_kamas ? `${data.reward_kamas.toLocaleString()} kamas` : "";
+
+  return (
+    <div style={{
+      display:"flex", alignItems:"center", justifyContent:"center",
+      gap:20, flexWrap:"wrap",
+      background:"rgba(0,0,0,0.2)", borderTop:"1px solid rgba(200,146,42,0.2)",
+      padding:"8px 20px",
+    }}>
+      <span style={{ color:"#d4b070", fontFamily:"'Cinzel',serif", fontSize:10, letterSpacing:2, textTransform:"uppercase" }}>☀ Almanax</span>
+      <span style={{ fontSize:12, color:"#f5edd8" }}>
+        <span style={{ color:"#a8c8a8" }}>Offrande : </span>
+        <strong>{qty}× {offrande}</strong>
+      </span>
+      <span style={{ fontSize:12, color:"#f5edd8" }}>
+        <span style={{ color:"#a8c8a8" }}>Bonus : </span>
+        <span style={{ fontStyle:"italic" }}>{bonus}</span>
+      </span>
+      {kamas && <span style={{ fontSize:12, color:"#e8c870" }}>💰 {kamas}</span>}
+    </div>
+  );
+}
+
 function RecapCard({ label, meta, color, colorLight, border }) {
   const persos = meta?.persos || [];
   const kamas = meta?.kamas || 0;
@@ -1317,9 +1778,10 @@ export default function App() {
   };
 
   const TABS = [
-    { key:"duo",    label:"⚔  Duo", active:{ bg:C.bgPanel, border:C.panelBorder, color:C.gold } },
-    { key:"skydro", label:"◈  Sky",  active:{ bg:"#e8f0f8", border:"#4a6a9a",     color:"#2a4a8a" } },
-    { key:"cell",   label:"◈  Cell", active:{ bg:"#f8ede8", border:"#9a4a2a",     color:"#7a2a1a" } },
+    { key:"duo",       label:"⚔  Duo",      active:{ bg:C.bgPanel, border:C.panelBorder, color:C.gold } },
+    { key:"skydro",    label:"◈  Sky",       active:{ bg:"#e8f0f8", border:"#4a6a9a",     color:"#2a4a8a" } },
+    { key:"cell",      label:"◈  Cell",      active:{ bg:"#f8ede8", border:"#9a4a2a",     color:"#7a2a1a" } },
+    { key:"familiers", label:"🐾 Familiers", active:{ bg:"#eaf4ea", border:"#4a8a4a",     color:"#2a6a2a" } },
   ];
 
   const duoAll    = DUO_DATA.flatMap(c=>c.objectives);
@@ -1330,10 +1792,33 @@ export default function App() {
     { key:"cell",   label:"Cell", color:"#7a2a1a" },
   ];
 
+  // ── Badge unlock detection ──
+  const [badgeOverlay, setBadgeOverlay] = useState(null);
+  const [shownBadges, setShownBadges] = useState(new Set());
+
+  useEffect(() => {
+    const allBadges = [
+      ...BADGES.map(b => ({ ...b, unlocked: b.check(skydroDone, skydroMeta, duoDone) || b.check(cellDone, cellMeta, duoDone) })),
+      ...DAILY_BADGES.map(b => ({ ...b, unlocked: skyDailyTotal >= b.threshold || cellDailyTotal >= b.threshold })),
+      ...FAMILIER_BADGES.map(b => ({
+        ...b,
+        unlocked: Object.values(skydroMeta?.familiers||{}).filter(Boolean).length >= b.threshold ||
+                  Object.values(cellMeta?.familiers||{}).filter(Boolean).length >= b.threshold,
+      })),
+    ];
+    allBadges.forEach(b => {
+      if (b.unlocked && !shownBadges.has(b.id)) {
+        setShownBadges(prev => new Set([...prev, b.id]));
+        setBadgeOverlay(b);
+      }
+    });
+  }, [skydroDone, cellDone, skydroMeta, cellMeta, duoDone, skyDailyTotal, cellDailyTotal]);
+
   return (
     <div className="dofus-app">
       <style>{styles}</style>
       {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
+      {badgeOverlay && <BadgeUnlockOverlay badge={badgeOverlay} onDone={() => setBadgeOverlay(null)} />}
 
       {/* HEADER style forum Dofus */}
       <div style={{ background:`linear-gradient(180deg, ${C.headerBg} 0%, ${C.headerBg2} 100%)`, padding:"24px 20px 0", textAlign:"center", boxShadow:"0 3px 10px rgba(42,26,8,0.3)" }}>
@@ -1371,6 +1856,7 @@ export default function App() {
           })}
         </div>
         <div style={{ height:2, background:`linear-gradient(90deg,transparent,${C.panelBorder},transparent)` }} />
+        <AlmanaxWidget />
       </div>
 
       {/* ── LAYOUT 3 COLONNES ── */}
@@ -1391,6 +1877,66 @@ export default function App() {
             {tab==="cell" && <TabContent data={cellData} done={cellDone} toggle={toggleCell} player={PLAYERS[1]}
               meta={cellMeta} onMetaUpdate={updateCellMeta} notes={notes} onNote={sendNote} duoDone={duoDone}
               skydroMeta={skydroMeta} cellMeta={cellMeta} onUpdateSkydro={updateSkydroMeta} onUpdateCell={updateCellMeta} />}
+            {tab==="familiers" && (
+              <div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:16, textAlign:"center" }}>
+                  🐾 Collection de Familiers
+                </div>
+                {/* Barres de progression des deux joueurs */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
+                  {[
+                    { label:"Sky",  fams:skydroMeta?.familiers||{}, color:"#2a4a8a", border:"#4a6a9a", bg:"#e8f0f8" },
+                    { label:"Cell", fams:cellMeta?.familiers||{},   color:"#7a2a1a", border:"#9a4a2a", bg:"#f8ede8" },
+                  ].map(p => {
+                    const cnt = Object.values(p.fams).filter(Boolean).length;
+                    const pct = Math.round(cnt/FAMILIERS.length*100);
+                    return (
+                      <div key={p.label} style={{ background:p.bg, border:`1px solid ${p.border}`, borderRadius:6, padding:"10px 14px" }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:p.color, fontWeight:700 }}>◈ {p.label}</span>
+                          <span style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:p.color }}>{cnt}/{FAMILIERS.length}</span>
+                        </div>
+                        <div className="prog-track" style={{ height:6 }}>
+                          <div className="prog-fill" style={{ width:`${pct}%`, background:p.color }} />
+                        </div>
+                        {/* Badges familiers */}
+                        <div style={{ display:"flex", gap:4, flexWrap:"wrap", marginTop:8 }}>
+                          {FAMILIER_BADGES.map(b => {
+                            const unlocked = cnt >= b.threshold;
+                            return (
+                              <div key={b.id} title={b.desc} style={{
+                                fontSize:10, padding:"2px 7px", borderRadius:10,
+                                background: unlocked ? `${p.color}18` : "transparent",
+                                border:`1px solid ${unlocked ? p.border : C.borderLight}`,
+                                color: unlocked ? p.color : C.textDim,
+                                fontFamily:"'Cinzel',serif",
+                                filter: unlocked ? "none" : "grayscale(1)", opacity: unlocked ? 1 : 0.4,
+                              }}>
+                                {b.icon} {b.name}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Liste des familiers avec 2 colonnes de coches */}
+                <FamiliersDualList
+                  skyFams={skydroMeta?.familiers||{}}
+                  cellFams={cellMeta?.familiers||{}}
+                  onToggleSky={id => {
+                    const cur = skydroMeta?.familiers||{};
+                    updateSkydroMeta({...skydroMeta, familiers:{...cur,[id]:!cur[id]}});
+                  }}
+                  onToggleCell={id => {
+                    const cur = cellMeta?.familiers||{};
+                    updateCellMeta({...cellMeta, familiers:{...cur,[id]:!cur[id]}});
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Quêtes journalières */}
