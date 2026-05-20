@@ -41,11 +41,11 @@ const KAMAS_PALIERS = [
 
 // ─── BADGES FAMILIERS ────────────────────────────────────────────────────────
 const FAMILIER_BADGES = [
-  { id: "f1", icon: "🐣", name: "Apprivoiseur",    desc: "5 familiers obtenus",   threshold: 5  },
-  { id: "f2", icon: "🐾", name: "Ami des Bêtes",   desc: "15 familiers obtenus",  threshold: 15 },
-  { id: "f3", icon: "🦁", name: "Dompteur",        desc: "30 familiers obtenus",  threshold: 30 },
-  { id: "f4", icon: "🌿", name: "Gardien du Monde",desc: "50 familiers obtenus",  threshold: 50 },
-  { id: "f5", icon: "✨", name: "Collectionneur",  desc: "Tous les familiers !",  threshold: 999},
+  { id: "f1", icon: "🐣", name: "Apprivoiseur",     desc: "10 familiers obtenus",   threshold: 10  },
+  { id: "f2", icon: "🐾", name: "Ami des Bêtes",    desc: "25 familiers obtenus",   threshold: 25  },
+  { id: "f3", icon: "🦁", name: "Dompteur",         desc: "40 familiers obtenus",   threshold: 40  },
+  { id: "f4", icon: "🌿", name: "Gardien du Monde", desc: "60 familiers obtenus",   threshold: 60  },
+  { id: "f5", icon: "✨", name: "Collectionneur",   desc: "Les 75 familiers !",     threshold: 75  },
 ];
 
 const FAMILIERS = [
@@ -626,12 +626,26 @@ function SuccesSection({ player, succes, onUpdate }) {
 // ─── SECTION BADGES ──────────────────────────────────────────────────────────
 function BadgesSection({ soloDone, meta, duoDone }) {
   const unlocked = BADGES.filter(b => b.check(soloDone, meta, duoDone));
+  const famCount = Object.values(meta?.familiers || {}).filter(Boolean).length;
   return (
     <div>
       <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>🏅 Badges</div>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))", gap:8 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))", gap:8, marginBottom:20 }}>
         {BADGES.map(b => {
           const isUnlocked = unlocked.some(u => u.id === b.id);
+          return (
+            <div key={b.id} className={`badge-card ${isUnlocked?"unlocked":"locked"}`} title={b.desc}>
+              <div style={{ fontSize:26 }}>{b.icon}</div>
+              <div style={{ fontSize:11, fontFamily:"'Cinzel',serif", color:isUnlocked?C.goldLight:C.textDim, letterSpacing:0.3, lineHeight:1.2, textAlign:"center" }}>{b.name}</div>
+              <div style={{ fontSize:10, color:C.textDim, fontStyle:"italic", textAlign:"center", lineHeight:1.2 }}>{b.desc}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>🐾 Badges Familiers ({famCount}/{FAMILIERS.length})</div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))", gap:8 }}>
+        {FAMILIER_BADGES.map(b => {
+          const isUnlocked = famCount >= b.threshold;
           return (
             <div key={b.id} className={`badge-card ${isUnlocked?"unlocked":"locked"}`} title={b.desc}>
               <div style={{ fontSize:26 }}>{b.icon}</div>
@@ -890,7 +904,6 @@ function TabContent({ data, done, toggle, player, meta, onMetaUpdate, notes, onN
   const SECTIONS = player ? [
     { key:"objectifs",  label:"Objectifs" },
     { key:"stats",      label:"Stats & Persos" },
-    { key:"familiers",  label:"🐾 Familiers" },
     { key:"badges",     label:"Badges" },
     { key:"notes",      label:"Notes" },
   ] : [
@@ -946,17 +959,6 @@ function TabContent({ data, done, toggle, player, meta, onMetaUpdate, notes, onN
       )}
 
       {section === "badges" && <BadgesSection soloDone={done} meta={meta} duoDone={duoDone} />}
-
-      {section === "familiers" && player && (
-        <FamiliersSection
-          done={meta?.familiers || {}}
-          toggle={(id) => {
-            const cur = meta?.familiers || {};
-            onMetaUpdate({ ...meta, familiers: { ...cur, [id]: !cur[id] } });
-          }}
-          totalDone={Object.values(meta?.familiers || {}).filter(Boolean).length}
-        />
-      )}
 
       {section === "notes" && (
         <NotesSection notes={notes} author={player ? player.label : "Duo"} onSend={text => onNote(text, player ? player.label : "Duo")} />
@@ -1655,6 +1657,266 @@ function FamilierCatchOverlay({ familier, onDone }) {
   );
 }
 
+// ─── ENCYCLOPÉDIE ────────────────────────────────────────────────────────────
+const BASE = "https://api.dofusdu.de/dofus3/v1/fr";
+
+function EncyclopedieTab() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [detail, setDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [activeType, setActiveType] = useState("all");
+  const debounceRef = useRef(null);
+
+  const search = async (q) => {
+    if (!q || q.trim().length < 2) { setResults(null); setSelected(null); return; }
+    setLoading(true); setSelected(null); setDetail(null);
+    try {
+      // Recherche globale dofusdude
+      const res = await fetch(`${BASE}/search?query=${encodeURIComponent(q.trim())}&$limit=30&filter[search_index]=items,monsters`);
+      const data = await res.json();
+      const items = (data || []).filter(r => r.type !== "monster");
+      const monsters = (data || []).filter(r => r.type === "monster");
+      setResults({ items, monsters, total: data.length });
+    } catch(e) {
+      setResults({ items:[], monsters:[], total:0, error:true });
+    }
+    setLoading(false);
+  };
+
+  const loadDetail = async (item) => {
+    setSelected(item);
+    setDetail(null);
+    setLoadingDetail(true);
+    try {
+      // Détermine l'endpoint selon le type
+      let url;
+      if (item.type === "monster") {
+        url = `${BASE}/monsters/${item.id}`;
+      } else if (item.type === "equipment") {
+        url = `${BASE}/items/equipment/${item.id}`;
+      } else if (item.type === "weapon") {
+        url = `${BASE}/items/weapons/${item.id}`;
+      } else if (item.type === "resource") {
+        url = `${BASE}/items/resources/${item.id}`;
+      } else if (item.type === "consumable") {
+        url = `${BASE}/items/consumables/${item.id}`;
+      } else {
+        url = `${BASE}/items/equipment/${item.id}`;
+      }
+      const res = await fetch(url);
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      setDetail(d);
+    } catch(e) {
+      setDetail({ error: true });
+    }
+    setLoadingDetail(false);
+  };
+
+  const handleInput = (e) => {
+    const v = e.target.value;
+    setQuery(v);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => search(v), 400);
+  };
+
+  const allResults = results ? [
+    ...( activeType === "all" || activeType === "items"    ? results.items    : []),
+    ...( activeType === "all" || activeType === "monsters" ? results.monsters : []),
+  ] : [];
+
+  return (
+    <div>
+      <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:16, textAlign:"center" }}>
+        📖 Encyclopédie Dofus
+      </div>
+
+      <div style={{ position:"relative", marginBottom:12 }}>
+        <input
+          className="meta-input"
+          placeholder="🔍 Rechercher un item, monstre, boss, équipement…"
+          value={query}
+          onChange={handleInput}
+          style={{ fontSize:14, padding:"10px 16px" }}
+          autoComplete="off"
+        />
+        {loading && <div style={{ position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:13, color:C.textDim }}>⟳</div>}
+      </div>
+
+      {results && (
+        <div style={{ display:"flex", gap:6, marginBottom:14, flexWrap:"wrap" }}>
+          {[
+            { key:"all",      label:`Tout (${results.total})` },
+            { key:"items",    label:`Items (${results.items.length})` },
+            { key:"monsters", label:`Monstres (${results.monsters.length})` },
+          ].map(f => (
+            <button key={f.key} className={`filter-btn${activeType===f.key?" active":""}`} onClick={()=>setActiveType(f.key)} style={{fontSize:12}}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display:"grid", gridTemplateColumns: selected ? "260px 1fr" : "1fr", gap:12, alignItems:"start" }}>
+
+        {/* Liste */}
+        {allResults.length > 0 && (
+          <div style={{ display:"flex", flexDirection:"column", gap:5, maxHeight:580, overflowY:"auto" }}>
+            {allResults.map(r => {
+              const isMonster = r.type === "monster";
+              const isSelected = selected?.id === r.id;
+              return (
+                <div key={`${r.type}-${r.id}`} onClick={() => loadDetail(r)} style={{
+                  display:"flex", alignItems:"center", gap:10, padding:"8px 12px",
+                  borderRadius:6, cursor:"pointer",
+                  background: isSelected ? "rgba(122,74,154,0.12)" : C.bgCard,
+                  border:`1px solid ${isSelected ? "#7a4a9a" : C.borderLight}`,
+                  transition:"all 0.12s",
+                }}>
+                  {r.image_urls?.icon && <img src={r.image_urls.icon} alt={r.name} style={{ width:32, height:32, objectFit:"contain", flexShrink:0, imageRendering:"pixelated" }} onError={e=>e.target.style.display="none"} />}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:600, color:C.textBright, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</div>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:2 }}>
+                      <span style={{ fontSize:10, padding:"1px 6px", borderRadius:10, background:isMonster?"rgba(138,42,42,0.12)":"rgba(42,74,138,0.12)", color:isMonster?"#8a2a2a":"#2a4a8a", fontFamily:"'Cinzel',serif", fontWeight:600 }}>
+                        {isMonster ? "Monstre" : r.type || "Item"}
+                      </span>
+                      {r.level && <span style={{ fontSize:10, color:C.textDim }}>Niv. {r.level}</span>}
+                    </div>
+                  </div>
+                  <span style={{ fontSize:12, color:C.textDim }}>›</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Détail */}
+        {selected && (
+          <div className="panel-gold" style={{ padding:"18px 20px" }}>
+            {loadingDetail ? (
+              <div style={{ textAlign:"center", padding:"30px", color:C.textDim, fontSize:13 }}>Chargement…</div>
+            ) : detail?.error ? (
+              <div style={{ textAlign:"center", padding:"20px", color:"#8a2a2a", fontSize:13 }}>Impossible de charger les détails.</div>
+            ) : detail ? (
+              <>
+                <div style={{ display:"flex", alignItems:"flex-start", gap:14, marginBottom:16 }}>
+                  {(detail.image_urls?.sd || detail.image_urls?.icon) && (
+                    <img src={detail.image_urls.sd || detail.image_urls.icon} alt={detail.name} style={{ width:64, height:64, objectFit:"contain", imageRendering:"pixelated", flexShrink:0 }} onError={e=>e.target.style.display="none"} />
+                  )}
+                  <div>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:16, fontWeight:700, color:C.gold, marginBottom:4 }}>{detail.name}</div>
+                    <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+                      {detail.type?.name && <span style={{ fontSize:11, padding:"2px 8px", borderRadius:10, background:"rgba(139,94,26,0.15)", color:C.gold, fontFamily:"'Cinzel',serif" }}>{detail.type.name}</span>}
+                      {detail.level && <span style={{ fontSize:11, padding:"2px 8px", borderRadius:10, background:"rgba(139,94,26,0.1)", color:C.textDim }}>Niv. {detail.level}</span>}
+                    </div>
+                  </div>
+                </div>
+
+                {detail.description && (
+                  <div style={{ fontSize:12, color:C.textDim, fontStyle:"italic", marginBottom:14, lineHeight:1.5, padding:"8px 12px", background:"rgba(139,94,26,0.05)", borderRadius:6, borderLeft:`3px solid ${C.goldDim}` }}>
+                    {detail.description}
+                  </div>
+                )}
+
+                {/* Effets */}
+                {detail.effects?.length > 0 && (
+                  <div style={{ marginBottom:14 }}>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Effets</div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                      {detail.effects.map((e, i) => (
+                        <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", background:"rgba(139,94,26,0.06)", borderRadius:4, fontSize:12 }}>
+                          <span style={{ color:C.text }}>{e.type?.name || e.label || "Effet"}</span>
+                          <span style={{ color: e.int_minimum >= 0 ? "#2a6a2a" : "#8a2a2a", fontWeight:700 }}>
+                            {e.int_minimum === e.int_maximum ? (e.int_minimum > 0 ? `+${e.int_minimum}` : e.int_minimum) : `${e.int_minimum > 0 ? "+" : ""}${e.int_minimum} à ${e.int_maximum > 0 ? "+" : ""}${e.int_maximum}`}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Résistances monstre */}
+                {detail.resistances && Object.keys(detail.resistances).length > 0 && (
+                  <div style={{ marginBottom:14 }}>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Résistances</div>
+                    <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:4 }}>
+                      {Object.entries(detail.resistances).map(([k, v]) => (
+                        <div key={k} style={{ textAlign:"center", padding:"5px 3px", background:"rgba(139,94,26,0.06)", borderRadius:4 }}>
+                          <div style={{ fontSize:9, color:C.textDim, marginBottom:1, textTransform:"capitalize" }}>{k}</div>
+                          <div style={{ fontSize:12, fontWeight:700, color: v > 0 ? "#2a6a2a" : v < 0 ? "#8a2a2a" : C.textDim }}>{v > 0 ? `+${v}` : v}%</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Drops monstre */}
+                {detail.drops?.length > 0 && (
+                  <div style={{ marginBottom:14 }}>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Drops</div>
+                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
+                      {detail.drops.slice(0,8).map((d,i) => (
+                        <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"3px 8px", background:"rgba(139,94,26,0.06)", borderRadius:4, fontSize:12 }}>
+                          <span style={{ color:C.text }}>{d.item?.name || "Item"}</span>
+                          <span style={{ color:C.textDim }}>{d.drop_chances ? `${d.drop_chances}%` : "?"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recette craft */}
+                {detail.recipe?.length > 0 && (
+                  <div style={{ marginBottom:14 }}>
+                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Recette</div>
+                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+                      {detail.recipe.map((r,i) => (
+                        <div key={i} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", background:"rgba(139,94,26,0.06)", borderRadius:4, fontSize:11 }}>
+                          {r.item?.image_urls?.icon && <img src={r.item.image_urls.icon} style={{ width:20, height:20, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
+                          <span style={{ color:C.text }}>{r.quantity}x {r.item?.name || "Ressource"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <a href={`https://dofusdb.fr/fr/${selected.type === "monster" ? "database/monsters" : "database/items"}/${selected.id}`}
+                  target="_blank" rel="noopener noreferrer"
+                  style={{ display:"inline-block", marginTop:4, fontSize:11, color:C.gold, fontFamily:"'Cinzel',serif", textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
+                  Voir sur DofusDB →
+                </a>
+              </>
+            ) : null}
+          </div>
+        )}
+
+        {!loading && !results && (
+          <div style={{ textAlign:"center", padding:"40px 20px", color:C.textDim, fontStyle:"italic", fontSize:13 }}>
+            Tape le nom d'un item, monstre ou boss pour commencer…
+          </div>
+        )}
+        {!loading && results && results.total === 0 && (
+          <div style={{ textAlign:"center", padding:"30px 20px", color:C.textDim, fontStyle:"italic", fontSize:13 }}>
+            Aucun résultat pour "<strong>{query}</strong>"
+          </div>
+        )}
+        {results?.error && (
+          <div style={{ textAlign:"center", padding:"20px", color:"#8a2a2a", fontSize:13 }}>
+            Erreur de connexion à l'API. Réessaie dans quelques secondes.
+          </div>
+        )}
+      </div>
+
+      <div style={{ fontSize:10, color:C.textDim, textAlign:"center", marginTop:16, fontStyle:"italic" }}>
+        Données fournies par <a href="https://dofusdu.de" target="_blank" rel="noopener noreferrer" style={{color:C.gold}}>dofusdude</a>
+      </div>
+    </div>
+  );
+}
+
 function AlmanaxWidget() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1808,11 +2070,12 @@ export default function App() {
   };
 
   const TABS = [
-    { key:"duo",       label:"⚔  Duo",      active:{ bg:C.bgPanel, border:C.panelBorder, color:C.gold } },
-    { key:"skydro",    label:"◈  Sky",       active:{ bg:"#e8f0f8", border:"#4a6a9a",     color:"#2a4a8a" } },
-    { key:"cell",      label:"◈  Cell",      active:{ bg:"#f8ede8", border:"#9a4a2a",     color:"#7a2a1a" } },
-    { key:"familiers", label:"🐾 Familiers", active:{ bg:"#eaf4ea", border:"#4a8a4a",     color:"#2a6a2a" } },
-    { key:"chasse",    label:"🗺 Chasse",    active:{ bg:"#f8f4e8", border:"#a08020",     color:"#6a4a10" } },
+    { key:"duo",        label:"⚔  Duo",        active:{ bg:C.bgPanel,   border:C.panelBorder, color:C.gold     } },
+    { key:"skydro",     label:"◈  Sky",         active:{ bg:"#e8f0f8",   border:"#4a6a9a",     color:"#2a4a8a"  } },
+    { key:"cell",       label:"◈  Cell",        active:{ bg:"#f8ede8",   border:"#9a4a2a",     color:"#7a2a1a"  } },
+    { key:"familiers",  label:"🐾 Familiers",  active:{ bg:"#eaf4ea",   border:"#4a8a4a",     color:"#2a6a2a"  } },
+    { key:"chasse",     label:"🗺 Chasse",      active:{ bg:"#f8f4e8",   border:"#a08020",     color:"#6a4a10"  } },
+    { key:"encyclopedie",label:"📖 Encyclopédie",active:{ bg:"#f4eaf8", border:"#7a4a9a",     color:"#5a2a8a"  } },
   ];
 
   const duoAll    = DUO_DATA.flatMap(c=>c.objectives);
@@ -1990,6 +2253,7 @@ export default function App() {
                 </div>
               </div>
             )}
+            {tab==="encyclopedie" && <EncyclopedieTab />}
           </div>
           {tab==="skydro" && (
             <DailyQuestsSection
