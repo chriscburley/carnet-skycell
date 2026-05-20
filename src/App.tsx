@@ -1856,10 +1856,14 @@ function GlobalSearch() {
                   <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Recette</div>
                   <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
                     {detail.recipe.map((r,i) => (
-                      <div key={i} style={{ display:"flex", alignItems:"center", gap:3, padding:"2px 7px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11 }}>
-                        {r._img && <img src={r._img} style={{ width:16, height:16, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
+                      <a key={i} href={`https://dofusdb.fr/fr/database/items/${r.item_ankama_id}`} target="_blank" rel="noopener noreferrer" style={{ display:"flex", alignItems:"center", gap:4, padding:"4px 8px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11, textDecoration:"none", border:`1px solid ${C.borderLight}`, transition:"border-color 0.12s" }}
+                        onMouseEnter={e=>e.currentTarget.style.borderColor=C.goldDim}
+                        onMouseLeave={e=>e.currentTarget.style.borderColor=C.borderLight}
+                      >
+                        {r._img && <img src={r._img} style={{ width:18, height:18, imageRendering:"pixelated", flexShrink:0 }} alt="" onError={e=>e.target.style.display="none"} />}
                         <span style={{ color:C.text }}>{r.quantity}× {r._name || `#${r.item_ankama_id}`}</span>
-                      </div>
+                        <span style={{ color:C.goldDim, marginLeft:"auto", fontSize:10 }}>↗</span>
+                      </a>
                     ))}
                   </div>
                 </div>
