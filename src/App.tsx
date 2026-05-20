@@ -2308,7 +2308,7 @@ export default function App() {
                 </div>
               </div>
             )}
-            {tab==="stuff" && <StuffTab />}
+            {tab==="stuff" && <StuffTab db={db} />}
           </div>
           {tab==="skydro" && (
             <DailyQuestsSection
