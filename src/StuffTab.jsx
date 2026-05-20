@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
+import { getApp } from "firebase/app";
 import { getDatabase, ref, onValue, set } from "firebase/database";
 
-const db = getDatabase();
+const db = getDatabase(getApp());
 const BASE = "https://api.dofusdu.de/dofus3/v1/fr";
 
 // ─── SLOTS ────────────────────────────────────────────────────────────────────
