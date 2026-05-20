@@ -849,6 +849,366 @@ function TabContent({ data, done, toggle, player, meta, onMetaUpdate, notes, onN
   );
 }
 
+// ─── BADGES QUÊTES JOURNALIÈRES ──────────────────────────────────────────────
+const DAILY_BADGES = [
+  { id: "dq1",  icon: "🌅", name: "Premier Lever",     desc: "1 quête journalière complétée",    threshold: 1   },
+  { id: "dq2",  icon: "📅", name: "Habitué",           desc: "10 quêtes journalières complétées", threshold: 10  },
+  { id: "dq3",  icon: "🔥", name: "En Feu",            desc: "25 quêtes journalières complétées", threshold: 25  },
+  { id: "dq4",  icon: "💪", name: "Acharné",           desc: "50 quêtes journalières complétées", threshold: 50  },
+  { id: "dq5",  icon: "🏅", name: "Centurion",         desc: "100 quêtes journalières complétées",threshold: 100 },
+  { id: "dq6",  icon: "👑", name: "Légende du Quotidien", desc: "200 quêtes journalières complétées", threshold: 200 },
+];
+
+// ─── BASE DE DONJONS PAR NIVEAU ───────────────────────────────────────────────
+const DUNGEONS_BY_LEVEL = [
+  { min:1,   max:25,  name:"Crypte de Kardorim",          boss:"Kardorim" },
+  { min:1,   max:25,  name:"Grange du Tournesol Affamé",  boss:"Tournesol Affamé" },
+  { min:15,  max:35,  name:"Donjon des Champs",           boss:"Gelée Royale" },
+  { min:20,  max:40,  name:"Château Ensablé",             boss:"Sphincter Cell" },
+  { min:25,  max:45,  name:"Donjon des Bworks",           boss:"Bwork Mage" },
+  { min:30,  max:50,  name:"Donjon des Tofus",            boss:"Tofu Royal" },
+  { min:35,  max:55,  name:"Donjon des Scarafeuilles",    boss:"Scarafeuille Royal" },
+  { min:40,  max:60,  name:"Donjon des Squelettes",       boss:"Chafer Ronin" },
+  { min:40,  max:60,  name:"Cache de Kankreblath",        boss:"Kankreblath" },
+  { min:45,  max:65,  name:"Maison Fantôme",              boss:"Boostache" },
+  { min:45,  max:65,  name:"Donjon des Forgerons",        boss:"Coffre des Forgerons" },
+  { min:45,  max:65,  name:"Grotte Hesque",               boss:"Corailleur Magistral" },
+  { min:50,  max:70,  name:"Donjon des Larves",           boss:"Shin Larve" },
+  { min:50,  max:70,  name:"Caverne des Bulbes",          boss:"Bulbig Brozeur" },
+  { min:50,  max:70,  name:"Nid du Kwakwa",               boss:"Kwakwa" },
+  { min:55,  max:75,  name:"Donjon des Bouftous",         boss:"Bouftou Royal" },
+  { min:55,  max:80,  name:"Château du Wa Wabbit",        boss:"Wa Wabbit" },
+  { min:60,  max:80,  name:"Donjon Abraknydes",           boss:"Abraknyde Ancestral" },
+  { min:65,  max:85,  name:"Forteresse de Kimbo",         boss:"Kimbo" },
+  { min:70,  max:90,  name:"Donjon des Tréants",          boss:"Chêne Mou" },
+  { min:75,  max:95,  name:"Antre du Dragon Cochon",      boss:"Dragon Cochon" },
+  { min:80,  max:100, name:"Donjon du Roi Nidas",         boss:"Roi Nidas" },
+  { min:85,  max:105, name:"Prison du Comte Harebourg",   boss:"Comte Harebourg" },
+  { min:90,  max:110, name:"Donjon du Kanniboul",         boss:"Kanniboul Eth" },
+  { min:95,  max:115, name:"Antre de Malefisk",           boss:"Malefisk" },
+  { min:100, max:120, name:"Temple de Sacrieur",          boss:"Sacrieur Sanguinaire" },
+  { min:100, max:125, name:"Donjon de Bethel",            boss:"Bethel" },
+  { min:110, max:130, name:"Donjon du Sangriard",         boss:"Sangriard" },
+  { min:115, max:135, name:"Tréfonds de Frigost",         boss:"Klime" },
+  { min:120, max:140, name:"Labyrinthe du Minotoror",     boss:"Minotoror" },
+  { min:125, max:145, name:"Tour de Korriandre",          boss:"Korriandre" },
+  { min:130, max:150, name:"Donjon du Skeunk",            boss:"Skeunk" },
+  { min:135, max:155, name:"Antre du Koulosse",           boss:"Koulosse" },
+  { min:140, max:160, name:"Palais de Nileza",            boss:"Nileza" },
+  { min:145, max:165, name:"Tour de Sylargh",             boss:"Sylargh" },
+  { min:150, max:170, name:"Donjon du Bworker",           boss:"Bworker" },
+  { min:155, max:175, name:"Cœur de Buhorado",            boss:"Buhorado" },
+  { min:160, max:180, name:"Repaire de Tengu Schwein",    boss:"Tengu Schwein" },
+  { min:165, max:185, name:"Donjon du Dark Vlad",         boss:"Dark Vlad" },
+  { min:170, max:195, name:"Donjon de Merkator",          boss:"Merkator" },
+  { min:180, max:200, name:"Donjon des Kanigrous",        boss:"Kanigrou" },
+  { min:185, max:200, name:"Donjon du Solar",             boss:"Solar" },
+  { min:190, max:200, name:"Tour de Frigost",             boss:"Missiz Frizz" },
+];
+
+// ─── QUÊTES CRÉATIVES PAR DIFFICULTÉ ─────────────────────────────────────────
+const DAILY_QUESTS = {
+  easy: [
+    { id:"e1",  template: (d) => `Faire le donjon ${d.name} sans utiliser de soin pendant les 3 premières salles`, emoji:"🧪" },
+    { id:"e2",  template: (d) => `Tuer ${d.boss} en moins de 8 tours`, emoji:"⚡" },
+    { id:"e3",  template: (d) => `Finir ${d.name} sans jamais reculer d'une case`, emoji:"🔒" },
+    { id:"e4",  template: (d) => `Entrer dans ${d.name} avec exactement 1 objet de soin dans l'inventaire`, emoji:"🎒" },
+    { id:"e5",  template: (d) => `Faire ${d.name} et finir avec plus de 80% de ses PV`, emoji:"💚" },
+    { id:"e6",  template: (d) => `Tuer ${d.boss} en dernier dans le combat final`, emoji:"🎯" },
+    { id:"e7",  template: (d) => `Faire ${d.name} sans utiliser de sort de zone`, emoji:"🎪" },
+    { id:"e8",  template: (d) => `Finir ${d.name} en commençant chaque combat avec un défi actif`, emoji:"🏆" },
+    { id:"e9",  template: (d) => `Faire ${d.name} sans jamais utiliser plus de 3 PA par tour`, emoji:"🐢" },
+    { id:"e10", template: (d) => `Entrer dans ${d.name} avec un familier équipé`, emoji:"🐾" },
+  ],
+  normal: [
+    { id:"n1",  template: (d) => `Faire ${d.name} en solo`, emoji:"🧍" },
+    { id:"n2",  template: (d) => `Finir ${d.name} sans jamais être en dessous de 50% de PV`, emoji:"❤️" },
+    { id:"n3",  template: (d) => `Battre ${d.boss} sans utiliser de sort offensif au dernier tour`, emoji:"✋" },
+    { id:"n4",  template: (d) => `Faire ${d.name} avec un stuff entièrement crafté`, emoji:"🔨" },
+    { id:"n5",  template: (d) => `Finir ${d.name} en ne tuant que le boss — épargner tous les autres monstres`, emoji:"🕊️" },
+    { id:"n6",  template: (d) => `Faire ${d.name} sans utiliser de sort de déplacement`, emoji:"🧱" },
+    { id:"n7",  template: (d) => `Terminer ${d.name} en ayant accumulé 0 dommage reçu en T1 de chaque combat`, emoji:"🛡️" },
+    { id:"n8",  template: (d) => `Faire ${d.name} avec un équipement d'une classe différente de la tienne`, emoji:"🎭" },
+    { id:"n9",  template: (d) => `Battre ${d.boss} en moins de 3 tours`, emoji:"💥" },
+    { id:"n10", template: (d) => `Faire ${d.name} sans jamais passer son tour`, emoji:"⏩" },
+  ],
+  hard: [
+    { id:"h1",  template: (d) => `Faire ${d.name} en hardcore : si tu meurs, tu recommences`, emoji:"💀" },
+    { id:"h2",  template: (d) => `Battre ${d.boss} en solo sans équipement dans les slots accessoires`, emoji:"🪦" },
+    { id:"h3",  template: (d) => `Faire ${d.name} entier sans jamais utiliser plus de 2 sorts différents`, emoji:"🔂" },
+    { id:"h4",  template: (d) => `Terminer ${d.name} en ayant coché le succès "Mains propres" (0 mort dans l'équipe)`, emoji:"🧤" },
+    { id:"h5",  template: (d) => `Faire ${d.name} en étant 20 niveaux en dessous du niveau recommandé`, emoji:"📉" },
+    { id:"h6",  template: (d) => `Battre ${d.boss} sans jamais infliger plus de 200 dégâts par sort`, emoji:"🪶" },
+    { id:"h7",  template: (d) => `Finir ${d.name} sans utiliser de sorts d'éléments différents`, emoji:"🧊" },
+    { id:"h8",  template: (d) => `Faire ${d.name} en partant avec exactement la moitié de son équipement habituel`, emoji:"✂️" },
+    { id:"h9",  template: (d) => `Battre ${d.boss} en utilisant uniquement des sorts de corps-à-corps`, emoji:"🥊" },
+    { id:"h10", template: (d) => `Faire ${d.name} sans jamais utiliser une case adjacente au boss`, emoji:"🚫" },
+  ],
+};
+
+function getDungeonsForLevel(level) {
+  if (!level || level < 1) return DUNGEONS_BY_LEVEL.slice(0, 5);
+  return DUNGEONS_BY_LEVEL.filter(d => level >= d.min - 15 && level <= d.max + 15);
+}
+
+function getDailyQuests(level, dateKey) {
+  // Seed basé sur la date + niveau pour être reproductible
+  const seed = dateKey.split("-").reduce((a, b) => a * 31 + parseInt(b), level || 1);
+  const rng = (n, offset = 0) => Math.abs((seed * 1664525 + 1013904223 * (n + offset + 1)) & 0x7fffffff) % 1000 / 1000;
+
+  const dungeons = getDungeonsForLevel(level);
+  if (!dungeons.length) return [];
+
+  const pick = (arr, n) => Math.floor(rng(n) * arr.length);
+  const pickQ = (arr, n) => Math.floor(rng(n + 100) * arr.length);
+
+  return [
+    { difficulty:"easy",   color:"#2a7a2a", bg:"#eaf4ea", border:"#4a9a4a", label:"Facile",
+      dungeon: dungeons[pick(dungeons, 0)],
+      quest: DAILY_QUESTS.easy[pickQ(DAILY_QUESTS.easy, 0)] },
+    { difficulty:"normal", color:"#7a5a10", bg:"#f8f0d8", border:"#b88a20", label:"Normal",
+      dungeon: dungeons[pick(dungeons, 1)],
+      quest: DAILY_QUESTS.normal[pickQ(DAILY_QUESTS.normal, 1)] },
+    { difficulty:"hard",   color:"#8a1a1a", bg:"#f8e8e8", border:"#b84040", label:"Difficile",
+      dungeon: dungeons[pick(dungeons, 2)],
+      quest: DAILY_QUESTS.hard[pickQ(DAILY_QUESTS.hard, 2)] },
+  ];
+}
+
+// ─── ANIMATION QUÊTE JOURNALIÈRE ─────────────────────────────────────────────
+function DailyCompleteOverlay({ quest, onDone }) {
+  const canvasRef = useRef(null);
+  const [phase, setPhase] = useState("in");
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase("hold"), 300);
+    const t2 = setTimeout(() => setPhase("out"), 2400);
+    const t3 = setTimeout(onDone, 2900);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const W = canvas.width, H = canvas.height;
+
+    // Spirale de petites étoiles qui convergent vers le centre
+    const stars = Array.from({ length: 80 }, (_, i) => {
+      const angle = (i / 80) * Math.PI * 2 * 3;
+      const startR = 300 + Math.random() * 200;
+      const colors = ["#f5d060","#ffffff","#a8d8ff","#ffb8a0","#c8f8c8"];
+      return {
+        angle, r: startR,
+        targetR: 0,
+        x: W/2 + Math.cos(angle) * startR,
+        y: H/2 + Math.sin(angle) * startR,
+        size: 1.5 + Math.random() * 3,
+        color: colors[i % colors.length],
+        alpha: 0,
+        delay: Math.random() * 20,
+        speed: 4 + Math.random() * 6,
+      };
+    });
+
+    let frame = 0;
+    let raf;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      stars.forEach(s => {
+        if (frame < s.delay) return;
+        s.alpha = Math.min(1, (frame - s.delay) / 15);
+        s.r = Math.max(0, s.r - s.speed);
+        s.x = W/2 + Math.cos(s.angle) * s.r;
+        s.y = H/2 + Math.sin(s.angle) * s.r;
+        if (s.r <= 0) { s.alpha = Math.max(0, s.alpha - 0.05); return; }
+        ctx.save();
+        ctx.globalAlpha = s.alpha * 0.9;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.shadowColor = s.color;
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.restore();
+      });
+      frame++;
+      if (frame < 120) raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const diffColors = { easy:"#2a7a2a", normal:"#7a5a10", hard:"#8a1a1a" };
+  const diffLabels = { easy:"Facile", normal:"Normal", hard:"Difficile" };
+
+  return (
+    <div style={{
+      position:"fixed", inset:0, zIndex:10001, pointerEvents:"none",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      opacity: phase === "out" ? 0 : 1,
+      transition: phase === "out" ? "opacity 0.5s ease" : "opacity 0.25s ease",
+    }}>
+      <div style={{ position:"absolute", inset:0, background:"rgba(20,12,4,0.75)", backdropFilter:"blur(3px)" }} />
+      <canvas ref={canvasRef} style={{ position:"absolute", inset:0, pointerEvents:"none" }} />
+      <div style={{
+        position:"relative", zIndex:1, textAlign:"center",
+        transform: phase === "in" ? "scale(0.8) translateY(20px)" : "scale(1) translateY(0)",
+        transition: "transform 0.4s cubic-bezier(0.34,1.56,0.64,1)",
+      }}>
+        <div style={{ fontSize:60, marginBottom:12, filter:"drop-shadow(0 0 16px rgba(255,255,255,0.5))" }}>{quest.emoji}</div>
+        <div style={{
+          display:"inline-block", padding:"3px 14px", borderRadius:20, marginBottom:10,
+          background: diffColors[quest.difficulty] + "33",
+          border: `1px solid ${diffColors[quest.difficulty]}`,
+          color: quest.difficulty === "easy" ? "#8aca8a" : quest.difficulty === "normal" ? "#e8c870" : "#f89090",
+          fontFamily:"'Cinzel',serif", fontSize:11, letterSpacing:1,
+        }}>
+          {diffLabels[quest.difficulty].toUpperCase()}
+        </div>
+        <div style={{
+          fontFamily:"'Cinzel',serif", fontSize:"clamp(16px,3vw,24px)", fontWeight:700,
+          color:"#f5d060", letterSpacing:1, marginBottom:8,
+          textShadow:"0 0 20px rgba(245,208,96,0.8), 0 2px 6px rgba(0,0,0,0.8)",
+          maxWidth:500, lineHeight:1.4,
+        }}>
+          Quête accomplie !
+        </div>
+        <div style={{
+          fontFamily:"'Crimson Pro',serif", fontSize:15, fontStyle:"italic",
+          color:"#f5edd8", opacity:0.85, maxWidth:420, lineHeight:1.5,
+          textShadow:"0 1px 4px rgba(0,0,0,0.6)",
+        }}>
+          {quest.text}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SECTION QUÊTES JOURNALIÈRES ─────────────────────────────────────────────
+function DailyQuestsSection({ playerLabel, playerColor, playerBorder, playerBg, level, dailyDone, onToggle, totalDone }) {
+  const today = new Date();
+  const dateKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+  const quests = getDailyQuests(level, dateKey);
+  const [overlay, setOverlay] = useState(null);
+
+  const handleCheck = (q, idx) => {
+    const key = `${dateKey}_${idx}`;
+    const wasDone = dailyDone[key];
+    onToggle(key, !wasDone);
+    if (!wasDone) setOverlay({ ...q, text: q.quest.template(q.dungeon), emoji: q.quest.emoji });
+  };
+
+  const unlockedBadges = DAILY_BADGES.filter(b => totalDone >= b.threshold);
+
+  return (
+    <div style={{ marginTop:16 }}>
+      {overlay && <DailyCompleteOverlay quest={overlay} onDone={() => setOverlay(null)} />}
+
+      <div className="panel-gold" style={{ padding:"14px 18px", marginBottom:10 }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:playerColor, letterSpacing:2, textTransform:"uppercase" }}>
+            ☀ Quêtes du Jour — {playerLabel}
+          </div>
+          <div style={{ fontSize:11, color:C.textDim, fontFamily:"'Cinzel',serif" }}>
+            {new Date().toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})}
+          </div>
+        </div>
+
+        {!level ? (
+          <div style={{ fontSize:13, color:C.textDim, fontStyle:"italic", textAlign:"center", padding:"8px 0" }}>
+            Renseigne le niveau de ton perso 1 dans Stats & Persos pour voir tes quêtes !
+          </div>
+        ) : (
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {quests.map((q, idx) => {
+              const key = `${dateKey}_${idx}`;
+              const isDone = dailyDone[key];
+              const text = q.quest.template(q.dungeon);
+              return (
+                <div key={idx} onClick={() => handleCheck(q, idx)} style={{
+                  display:"grid", gridTemplateColumns:"28px 1fr auto",
+                  alignItems:"start", gap:10, padding:"10px 14px",
+                  borderRadius:6, cursor:"pointer",
+                  background: isDone ? "#eef4ee" : q.bg,
+                  border:`1px solid ${isDone ? "#4a8a4a" : q.border}`,
+                  opacity: isDone ? 0.7 : 1,
+                  transition:"all 0.15s",
+                }}>
+                  <div style={{
+                    width:22, height:22, borderRadius:4, flexShrink:0, marginTop:1,
+                    border:`2px solid ${isDone ? "#2a6a2a" : q.border}`,
+                    background: isDone ? "#2a6a2a" : "white",
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    fontSize:13, transition:"all 0.2s",
+                  }}>
+                    {isDone && <span style={{ color:"white" }}>✓</span>}
+                  </div>
+                  <div>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
+                      <span style={{ fontSize:14 }}>{q.quest.emoji}</span>
+                      <span style={{
+                        fontSize:10, padding:"1px 8px", borderRadius:10,
+                        background:`${q.color}22`, color:q.color,
+                        border:`1px solid ${q.border}`, fontFamily:"'Cinzel',serif",
+                        fontWeight:600, letterSpacing:0.5,
+                      }}>{q.label}</span>
+                      <span style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>
+                        {q.dungeon.name}
+                      </span>
+                    </div>
+                    <div style={{
+                      fontSize:13, color: isDone ? C.textDim : C.text,
+                      textDecoration: isDone ? "line-through" : "none",
+                      lineHeight:1.4,
+                    }}>{text}</div>
+                  </div>
+                  <div style={{ fontSize:11, color:C.textDim, fontFamily:"'Cinzel',serif", flexShrink:0, marginTop:2 }}>
+                    {isDone ? "✦" : "○"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Compteur total */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:10, paddingTop:8, borderTop:`1px solid ${C.border}` }}>
+          <div style={{ fontSize:11, color:C.textDim, fontFamily:"'Cinzel',serif" }}>Total complétées</div>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:14, fontWeight:700, color:playerColor }}>{totalDone}</div>
+        </div>
+      </div>
+
+      {/* Badges journaliers */}
+      {unlockedBadges.length > 0 && (
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+          {DAILY_BADGES.map(b => {
+            const unlocked = totalDone >= b.threshold;
+            return (
+              <div key={b.id} title={`${b.name} — ${b.desc}`} style={{
+                display:"flex", alignItems:"center", gap:5, padding:"4px 10px",
+                borderRadius:20, fontSize:11,
+                background: unlocked ? `${playerColor}18` : "rgba(0,0,0,0.04)",
+                border: `1px solid ${unlocked ? playerBorder : C.borderLight}`,
+                color: unlocked ? playerColor : C.textDim,
+                fontFamily:"'Cinzel',serif", letterSpacing:0.3,
+                filter: unlocked ? "none" : "grayscale(1)",
+                opacity: unlocked ? 1 : 0.4,
+              }}>
+                <span>{b.icon}</span>
+                <span>{b.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── RECAP CARD (sidebar) ────────────────────────────────────────────────────
 function RecapCard({ label, meta, color, colorLight, border }) {
   const persos = meta?.persos || [];
@@ -911,6 +1271,8 @@ export default function App() {
   const [skydroMeta, setSkydroMeta] = useState({});
   const [cellMeta, setCellMeta] = useState({});
   const [notes, setNotes] = useState({});
+  const [skyDailyDone, setSkyDailyDone] = useState({});
+  const [cellDailyDone, setCellDailyDone] = useState({});
   const [synced, setSynced] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -927,7 +1289,9 @@ export default function App() {
       onValue(ref(db,"duoMeta"),    s => { if(s.exists()) setDuoMeta(s.val()); }),
       onValue(ref(db,"skydroMeta"), s => { if(s.exists()) setSkydroMeta(s.val()); }),
       onValue(ref(db,"cellMeta"),   s => { if(s.exists()) setCellMeta(s.val()); }),
-      onValue(ref(db,"notes"),    s => { if(s.exists()) setNotes(s.val()); }),
+      onValue(ref(db,"notes"),      s => { if(s.exists()) setNotes(s.val()); }),
+      onValue(ref(db,"skyDaily"),   s => { if(s.exists()) setSkyDailyDone(s.val()); }),
+      onValue(ref(db,"cellDaily"),  s => { if(s.exists()) setCellDailyDone(s.val()); }),
     ];
     setTimeout(() => setSynced(true), 2000);
     return () => unsubs.forEach(u => u());
@@ -940,6 +1304,12 @@ export default function App() {
   const updateDuoMeta    = v => { setDuoMeta(v);    set(ref(db,"duoMeta"),v); };
   const updateSkydroMeta = v => { setSkydroMeta(v); set(ref(db,"skydroMeta"),v); };
   const updateCellMeta   = v => { setCellMeta(v);   set(ref(db,"cellMeta"),v); };
+
+  const toggleSkyDaily  = (key, val) => { const n={...skyDailyDone, [key]:val};  setSkyDailyDone(n);  set(ref(db,"skyDaily"),n); };
+  const toggleCellDaily = (key, val) => { const n={...cellDailyDone,[key]:val};  setCellDailyDone(n); set(ref(db,"cellDaily"),n); };
+
+  const skyDailyTotal  = Object.values(skyDailyDone).filter(Boolean).length;
+  const cellDailyTotal = Object.values(cellDailyDone).filter(Boolean).length;
 
   const sendNote = (text, author) => {
     push(ref(db,"notes"), { text, author, ts: Date.now() });
@@ -1022,6 +1392,24 @@ export default function App() {
               meta={cellMeta} onMetaUpdate={updateCellMeta} notes={notes} onNote={sendNote} duoDone={duoDone}
               skydroMeta={skydroMeta} cellMeta={cellMeta} onUpdateSkydro={updateSkydroMeta} onUpdateCell={updateCellMeta} />}
           </div>
+
+          {/* Quêtes journalières */}
+          {tab==="skydro" && (
+            <DailyQuestsSection
+              playerLabel="Sky" playerColor="#2a4a8a" playerBorder="#4a6a9a" playerBg="#e8f0f8"
+              level={skydroMeta?.persos?.[0]?.level}
+              dailyDone={skyDailyDone} onToggle={toggleSkyDaily}
+              totalDone={skyDailyTotal}
+            />
+          )}
+          {tab==="cell" && (
+            <DailyQuestsSection
+              playerLabel="Cell" playerColor="#7a2a1a" playerBorder="#9a4a2a" playerBg="#f8ede8"
+              level={cellMeta?.persos?.[0]?.level}
+              dailyDone={cellDailyDone} onToggle={toggleCellDaily}
+              totalDone={cellDailyTotal}
+            />
+          )}
           <div style={{ textAlign:"center",marginTop:16,fontSize:12,color:C.goldDim,fontStyle:"italic",fontFamily:"'Crimson Pro',serif" }}>
             ✦ &nbsp;« Le vrai trésor, c'est les monstres qu'on a éliminés en chemin. »&nbsp; ✦
           </div>
