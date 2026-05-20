@@ -1675,18 +1675,25 @@ function EncyclopedieTab() {
     setLoading(true); setSelected(null); setDetail(null);
     try {
       const enc = encodeURIComponent(q.trim());
-      // Équipements et monstres — les seuls endpoints /search qui existent
-      const [eqRes, monRes] = await Promise.all([
-        fetch(`${BASE}/items/equipment/search?query=${enc}&limit=15`),
-        fetch(`${BASE}/monsters/search?query=${enc}&limit=15`),
-      ]);
-      const eqData  = eqRes.ok  ? await eqRes.json()  : [];
-      const monData = monRes.ok ? await monRes.json() : [];
-      const items    = (Array.isArray(eqData)  ? eqData  : eqData.data  || []).map(i => ({ ...i, _kind:"equipment" }));
-      const monsters = (Array.isArray(monData) ? monData : monData.data || []).map(i => ({ ...i, _kind:"monster" }));
-      setResults({ items, monsters, total: items.length + monsters.length });
+      // Recherche globale — couvre items, monstres, sets, etc.
+      const res = await fetch(`${BASE}/search?query=${enc}&limit=30`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const arr = Array.isArray(data) ? data : data.data || [];
+      const items    = arr.filter(r => r.type !== "monster").map(r => ({ ...r, _kind: r.type || "equipment" }));
+      const monsters = arr.filter(r => r.type === "monster").map(r => ({ ...r, _kind: "monster" }));
+      setResults({ items, monsters, total: arr.length });
     } catch(e) {
-      setResults({ items:[], monsters:[], total:0, error:true });
+      // Fallback : recherche séparée équipements seulement
+      try {
+        const enc = encodeURIComponent(q.trim());
+        const eqRes = await fetch(`${BASE}/items/equipment/search?query=${enc}&limit=20`);
+        const eqData = eqRes.ok ? await eqRes.json() : [];
+        const items = (Array.isArray(eqData) ? eqData : eqData.data || []).map(i => ({ ...i, _kind:"equipment" }));
+        setResults({ items, monsters:[], total: items.length });
+      } catch(e2) {
+        setResults({ items:[], monsters:[], total:0, error:true });
+      }
     }
     setLoading(false);
   };
@@ -1696,12 +1703,17 @@ function EncyclopedieTab() {
     setDetail(null);
     setLoadingDetail(true);
     try {
-      let url;
       const kind = item._kind || item.type;
-      if (kind === "monster")   url = `${BASE}/monsters/${item.ankama_id || item.id}`;
-      else if (kind === "weapon") url = `${BASE}/items/weapons/${item.ankama_id || item.id}`;
-      else                      url = `${BASE}/items/equipment/${item.ankama_id || item.id}`;
+      const id = item.ankama_id || item.id;
+      let url;
+      if (kind === "monster") url = `${BASE}/monsters/${id}`;
+      else url = `${BASE}/items/equipment/${id}`;
       const res = await fetch(url);
+      // Si équipement échoue, essaie weapon puis resource
+      if (!res.ok && kind !== "monster") {
+        const res2 = await fetch(`${BASE}/items/weapons/${id}`);
+        if (res2.ok) { setDetail(await res2.json()); setLoadingDetail(false); return; }
+      }
       if (!res.ok) throw new Error();
       setDetail(await res.json());
     } catch(e) {
