@@ -2310,6 +2310,7 @@ export default function App() {
             )}
             {tab==="stuff" && <StuffTab />}
           </div>
+          {tab==="skydro" && (
             <DailyQuestsSection
               playerLabel="Sky" playerColor="#2a4a8a" playerBorder="#4a6a9a" playerBg="#e8f0f8"
               level={skydroMeta?.persos?.[0]?.level}
