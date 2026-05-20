@@ -1701,13 +1701,28 @@ function GlobalSearch() {
     setLoadingDetail(true);
     try {
       const id = item.ankama_id;
-      const isMonster = item.type?.name_id === "monsters";
+      const isMonster = item.type?.name_id === "monsters" || item.type?.id === undefined && item._kind === "monster";
       let res = isMonster
         ? await fetch(`https://api.dofusdu.de/dofus3/v1/fr/monsters/${id}`)
         : await fetch(`https://api.dofusdu.de/dofus3/v1/fr/items/equipment/${id}`);
       if (!res.ok && !isMonster) res = await fetch(`https://api.dofusdu.de/dofus3/v1/fr/items/weapons/${id}`);
       if (!res.ok) throw new Error();
-      setDetail(await res.json());
+      const d = await res.json();
+
+      // Charger les noms des ressources de la recette en parallèle
+      if (d.recipe?.length > 0) {
+        const names = await Promise.all(
+          d.recipe.map(r =>
+            fetch(`https://api.dofusdu.de/dofus3/v1/fr/items/resources/${r.item_ankama_id}`)
+              .then(res => res.ok ? res.json() : null)
+              .then(data => ({ id: r.item_ankama_id, name: data?.name || `#${r.item_ankama_id}`, img: data?.image_urls?.icon || null }))
+              .catch(() => ({ id: r.item_ankama_id, name: `#${r.item_ankama_id}`, img: null }))
+          )
+        );
+        d.recipe = d.recipe.map((r, i) => ({ ...r, _name: names[i]?.name, _img: names[i]?.img }));
+      }
+
+      setDetail(d);
     } catch(e) { setDetail({ error:true }); }
     setLoadingDetail(false);
   };
@@ -1842,8 +1857,8 @@ function GlobalSearch() {
                   <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
                     {detail.recipe.map((r,i) => (
                       <div key={i} style={{ display:"flex", alignItems:"center", gap:3, padding:"2px 7px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11 }}>
-                        {r.item?.image_urls?.icon && <img src={r.item.image_urls.icon} style={{ width:16, height:16, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
-                        <span style={{ color:C.text }}>{r.quantity}× {typeof r.item?.name==="object"?r.item.name?.fr||"":r.item?.name||"Ressource"}</span>
+                        {r._img && <img src={r._img} style={{ width:16, height:16, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
+                        <span style={{ color:C.text }}>{r.quantity}× {r._name || `#${r.item_ankama_id}`}</span>
                       </div>
                     ))}
                   </div>
