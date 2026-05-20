@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, set, push } from "firebase/database";
+import StuffTab from "./StuffTab";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDUtrDc2Nz_HXHxneCxUpU4_FG3ycRghwY",
@@ -1660,72 +1661,38 @@ function FamilierCatchOverlay({ familier, onDone }) {
 // ─── ENCYCLOPÉDIE ────────────────────────────────────────────────────────────
 const BASE = "https://api.dofusdu.de/dofus3/v1/fr";
 
-// ─── BASE DE DONNÉES BOSS ────────────────────────────────────────────────────
+// ─── BASE DE DONNÉES BOSS (mécaniques vérifiées) ────────────────────────────
 const BOSS_DB = [
-  // ─ Niv 10-50 ─
-  { name:"Kardorim",         level:10,  pos:"[5,-1]",    donjon:"Crypte de Kardorim",
-    strat:"Boss simple. Il peut être mis en état de faiblesse, ce qui augmente les dégâts qu'il reçoit. Positionnez-vous autour de lui et tapez fort.", img:"https://api.dofusdu.de/dofus3/v1/img/item/44985-128.png" },
-  { name:"Tournesol Affamé", level:20,  pos:"[7,-24]",   donjon:"Grange du Tournesol Affamé",
-    strat:"Invoque des Tournesols Enragés. Éliminez les invocations en priorité puis concentrez-vous sur le boss. Évitez de rester sur les cases où il pose des pièges.", img:null },
-  { name:"Mob l'Éponge",     level:20,  pos:"[13,-28]",  donjon:"Château Ensablé",
-    strat:"Absorbe les dégâts d'un élément à chaque tour. Changez d'élément régulièrement ou utilisez plusieurs éléments pour contourner ses résistances.", img:null },
-  { name:"Bouftou Royal",    level:30,  pos:"[2,-34]",   donjon:"Cour du Bouftou Royal",
-    strat:"Reçoit un boost de dégâts et de résistances selon sa PV restante. Burst en une fois pour éviter les seuils. Les sorts de poussée sont très efficaces.", img:null },
-  { name:"Kankreblath",      level:40,  pos:"[3,-17]",   donjon:"Cache de Kankreblath",
-    strat:"Peut voler des PA/PM. Gardez vos soigneurs en retrait. Priorité aux monstres qui boostent le boss avant d'attaquer Kankreblath.", img:null },
-  { name:"Bworkette",        level:50,  pos:"[-5,10]",   donjon:"Donjon des Bworks",
-    strat:"Invoque des Bworks qui la soignent. Tuez les invocations en priorité absolue. Elle fuit les corps à corps — utilisez des sorts à distance.", img:null },
-  { name:"Wa Wabbit",        level:60,  pos:"[24,-13]",  donjon:"Château du Wa Wabbit",
-    strat:"Résistances élevées en début de tour. Attaquez en fin de tour. Ses invocations Wabbits peuvent buff ses résistances — éliminez-les rapidement.", img:null },
-  { name:"Gourlo le Terrible",level:70, pos:"[-55,-4]",  donjon:"Cale de l'Arche d'Otomaï",
-    strat:"Fragile mais entouré de monstres dangereux. Nettoyez la salle avant le boss. Il peut attirer les joueurs — restez groupés et soignez en priorité.", img:null },
-  // ─ Niv 80-110 ─
-  { name:"Reine Nyée",       level:90,  pos:"[-6,-15]",  donjon:"Antre de la Reine Nyée",
-    strat:"Invulnérable tant que ses larves sont en vie. Tuez TOUTES les larves d'abord. Elle pose des pièges douloureux — déplacez-vous prudemment.", img:null },
-  { name:"Abraknyde Ancestral",level:90,pos:"[-9,-14]",  donjon:"Domaine Ancestral",
-    strat:"Gagne des résistances à chaque fin de tour. Concentrez vos dégâts sur lui le plus vite possible. Ses toiles immobilisent — prévoyez des sorts de libération.", img:null },
-  { name:"Chouque",          level:90,  pos:"[33,3]",    donjon:"Bateau du Chouque",
-    strat:"Renvoie les dégâts à distance. Utilisez uniquement des sorts corps-à-corps ou de zone. Ses canons tirent en ligne — évitez les alignements.", img:null },
-  { name:"Dragon Cochon",    level:100, pos:"[-1,33]",   donjon:"Antre du Dragon Cochon",
-    strat:"Change d'élément dominant à chaque seuil de PV (75%, 50%, 25%). Adaptez votre élément d'attaque en conséquence. Gardez un soin en réserve pour les transitions.", img:null },
-  { name:"Koulosse",         level:100, pos:"[-17,8]",   donjon:"Caverne du Koulosse",
-    strat:"Ses attaques de zone sont dévastatrices. Dispersez l'équipe sur la map. Un tank en corps-à-corps l'occupe pendant que les autres tapent à distance.", img:null },
-  { name:"Meulou",           level:100, pos:"[-23,0]",   donjon:"Tanière du Meulou",
-    strat:"Très résistant aux dégâts directs. Il faut utiliser les mécaniques de la salle (pièges, levier) pour le blesser. Lisez le succès du boss avant d'entrer.", img:null },
-  { name:"Maître Corbac",    level:110, pos:"[-15,-62]", donjon:"Bibliothèque du Maître Corbac",
-    strat:"Invoque des livres qui soignent le boss. Détruisez les livres en priorité. Il téléporte aléatoirement les joueurs — gardez vos PM en réserve.", img:null },
-  { name:"Blop Multicolore", level:120, pos:"[-25,-17]", donjon:"Antre du Blop Multicolore Royal",
-    strat:"Alterne entre 4 éléments de résistance. Attaquez avec l'élément opposé à celui affiché. Ses Blops colorés boostent ses résistances — tuez-les d'abord.", img:null },
-  { name:"Chêne Mou",        level:140, pos:"[-14,-13]", donjon:"Clairière du Chêne Mou",
-    strat:"Invulnérable sauf aux sorts de feu. Équipez-vous full feu. Il soigne via ses racines — positionnez-vous loin d'elles. Burst pour ne pas prolonger le combat.", img:null },
-  // ─ Niv 150-190 ─
-  { name:"Epave du Grolandais",level:150,pos:"[-60,-84]", donjon:"Épave du Grolandais Violent",
-    strat:"Ben le Ripate reçoit des buffs de ses alliés. Tuez les buffeurs en priorité. Il peut voler la position des joueurs — gardez du recul.", img:null },
-  { name:"Kimbo",            level:160, pos:"[-54,16]",  donjon:"Canopée du Kimbo",
-    strat:"Très mobile, change constamment de position. Sorts de verrouillage indispensables. Ses totems augmentent ses dégâts — détruisez-les immédiatement.", img:null },
-  { name:"Bworker",          level:180, pos:"[-15,14]",  donjon:"Grotte du Bworker",
-    strat:"Immunisé aux dégâts directs au début. Utilisez les mécaniques de la salle pour le rendre vulnérable. Ses bières ivrognent les joueurs — restez à distance.", img:null },
-  { name:"Korriandre",       level:180, pos:"[-73,-69]", donjon:"Antre du Korriandre",
-    strat:"Crée des zones de poison qui persistent. Déplacez-vous constamment. Ses alliés Odorat amplifient ses attaques — neutralisez-les d'abord.", img:null },
-  { name:"Kralamoure Géant", level:180, pos:"[-60,-8]",  donjon:"Antre du Kralamoure Géant",
-    strat:"Reçoit des boost quand des alliés meurent près de lui. Séparez les combats. Éloignez ses sbires avant de les tuer pour éviter les buffs.", img:null },
-  { name:"Kolosso",          level:190, pos:"[-61,-69]", donjon:"Cavernes du Kolosso",
-    strat:"Possède une armure qui absorbe les dégâts. Alternez sorts perforants et sorts normaux pour briser l'armure. Très dangereux au corps-à-corps.", img:null },
-  { name:"Glourséleste",     level:190, pos:"[-63,-75]", donjon:"Antichambre des Gloursons",
-    strat:"Invoque des Gloursons en continu. Ignorez les invocations et focalisez sur le boss. Ses invocations explosent à mort — gardez vos distances.", img:null },
-  // ─ Niv 200 Ultimes ─
-  { name:"Merkator",         level:200, pos:"[21,18]",   donjon:"Aquadôme de Merkator",
-    strat:"Boss ultime. Plusieurs phases : il démarre immunisé puis devient vulnérable selon les mécaniques de la salle. Détruisez les générateurs pour retirer son immunité. Compo optimisée obligatoire.", img:null },
-  { name:"Comte Harebourg",  level:200, pos:"[-61,-79]", donjon:"Donjon du Comte Harebourg",
-    strat:"Boss ultime. Il gèle les cases et crée des zones de glace. Gardez des sorts de dégel. Ses résistances changent selon la température de la salle. Synchronisation d'équipe indispensable.", img:null },
-  { name:"Nileza",           level:200, pos:"[-67,-75]", donjon:"Palais de Nileza",
-    strat:"Boss ultime. Téléporte les joueurs aléatoirement. Sort de zone massif si l'équipe est groupée. Dispersez-vous sur la map et coordonnez les attaques par chat.", img:null },
-  { name:"Sylargh",          level:200, pos:"[-67,-75]", donjon:"Tour de Sylargh",
-    strat:"Boss ultime. Absorbe les dégâts d'un élément par tour. Variez absolument vos éléments d'attaque. Ses tentacules immobilisent et drainent les PA.", img:null },
-  { name:"Bethel",           level:200, pos:"[20,18]",   donjon:"Donjon de Bethel",
-    strat:"Boss ultime. Mécaniques complexes basées sur le placement. Ne jamais être en ligne avec lui. Utilisez des sorts de déplacement pour esquiver ses charges.", img:null },
-  { name:"Klime",            level:200, pos:"[-67,-75]", donjon:"Tréfonds de Frigost",
-    strat:"Boss ultime. Immunisé aux dégâts directs jusqu'à destruction de ses cristaux. Coordonnez la destruction des cristaux simultanément puis burstez en un tour.", img:null },
+  { name:"Bouftou Royal",      level:30,  pos:"[2,-34]",    donjon:"Cour du Bouftou Royal",       guide:"https://www.dofuspourlesnoobs.com/cour-du-bouftou-royal.html",
+    strat:"Invoque des Bouftous qui le soignent. Tuez les invocations en priorité absolue avant d'attaquer le boss. Ses dégâts augmentent avec ses alliés en vie." },
+  { name:"Kankreblath",        level:40,  pos:"[3,-17]",    donjon:"Cache de Kankreblath",        guide:"https://www.dofuspourlesnoobs.com/cache-de-kankreblath.html",
+    strat:"Vole des PA aux joueurs adjacents. Gardez vos soigneurs et personnages à PA critiques loin de lui. Ses alliés Kanniboul le soignent — éliminez-les d'abord." },
+  { name:"Reine Nyée",         level:90,  pos:"[-6,-15]",   donjon:"Antre de la Reine Nyée",      guide:"https://www.dofuspourlesnoobs.com/antre-de-la-reine-nyeacutee.html",
+    strat:"Invulnérable tant que ses larves sont en vie. Tuez TOUTES les larves avant de pouvoir la toucher. Elle pose des pièges au sol — déplacez-vous prudemment." },
+  { name:"Dragon Cochon",      level:100, pos:"[-1,33]",    donjon:"Antre du Dragon Cochon",      guide:"https://www.dofuspourlesnoobs.com/antre-du-dragon-cochon.html",
+    strat:"Change d'élément dominant à chaque seuil de PV (75%, 50%, 25%). Adaptez votre élément d'attaque à chaque transition. Gardez un soin pour les phases de changement." },
+  { name:"Blop Multicolore",   level:120, pos:"[-25,-17]",  donjon:"Antre du Blop Multicolore",   guide:"https://www.dofuspourlesnoobs.com/antre-du-blop-multicolore-royal.html",
+    strat:"Possède 100% de résistance dans un élément par tour — l'élément change à chaque tour dans un ordre fixe (Feu → Eau → Terre → Air). Attaquez avec l'élément non résisté." },
+  { name:"Chêne Mou",          level:140, pos:"[-14,-13]",  donjon:"Clairière du Chêne Mou",      guide:"https://www.dofuspourlesnoobs.com/clairiegravere-du-checircne-mou.html",
+    strat:"Invulnérable à tout sauf au feu. Équipez-vous exclusivement en sorts de feu. Ses racines sur la map soignent le boss si vous marchez dessus — évitez-les." },
+  { name:"Kimbo",              level:160, pos:"[-54,16]",   donjon:"Canopée du Kimbo",            guide:"https://www.dofuspourlesnoobs.com/canopeacutee-du-kimbo.html",
+    strat:"Se téléporte sur la case d'un joueur à chaque début de tour. Le joueur ciblé reçoit ensuite ses attaques au corps-à-corps. Désignez un tank comme cible permanente et gardez les autres loin." },
+  { name:"Bworker",            level:180, pos:"[-15,14]",   donjon:"Grotte du Bworker",           guide:"https://www.dofuspourlesnoobs.com/grotte-du-bworker.html",
+    strat:"Immunisé aux dégâts directs. Pour le rendre vulnérable, il faut le faire boire les bières présentes sur la map (le pousser dessus). Plus il boit, plus il est vulnérable mais aussi dangereux." },
+  { name:"Korriandre",         level:180, pos:"[-73,-69]",  donjon:"Antre du Korriandre",         guide:"https://www.dofuspourlesnoobs.com/antre-du-korriandre.html",
+    strat:"Tous les monstres de la salle partagent leurs PV. Les dégâts infligés à n'importe quel monstre se répartissent sur tous. Ciblez toujours le même monstre pour maximiser l'efficacité." },
+  { name:"Merkator",           level:200, pos:"[21,18]",    donjon:"Aquadôme de Merkator",        guide:"https://www.dofuspourlesnoobs.com/aquadocircme-de-merkator.html",
+    strat:"Boss ultime. Il est immunisé au début. Des Mékrabes sur la map drainent son énergie — poussez-les ou attirez-les vers lui pour le rendre vulnérable. Plusieurs phases avec recharge d'immunité." },
+  { name:"Comte Harebourg",    level:200, pos:"[-61,-79]",  donjon:"Donjon du Comte Harebourg",   guide:"https://www.dofuspourlesnoobs.com/donjon-du-comte-harebourg.html",
+    strat:"Boss ultime. Gèle les cases autour de lui. Ses alliés le soignent et le buffent. Éliminez ses gardes rapidement. Résistances très élevées — compo multi-éléments recommandée." },
+  { name:"Klime",              level:200, pos:"[-67,-75]",  donjon:"Tréfonds de Frigost",         guide:"https://www.dofuspourlesnoobs.com/les-trefonds-de-frigost.html",
+    strat:"Boss ultime. Immunisé aux dégâts directs jusqu'à ce que ses cristaux soient détruits. Il faut détruire les 4 cristaux simultanément en un seul tour pour déclencher sa vulnérabilité, puis burster immédiatement." },
+  { name:"Sylargh",            level:200, pos:"[-67,-75]",  donjon:"Tour de Sylargh",             guide:"https://www.dofuspourlesnoobs.com/tour-de-sylargh.html",
+    strat:"Boss ultime. Absorbe un élément différent chaque tour (ordre cyclique). Variez absolument vos éléments. Ses tentacules drainent des PA — gardez des sorts de contre-attaque." },
+  { name:"Nileza",             level:200, pos:"[-67,-75]",  donjon:"Palais de Nileza",            guide:"https://www.dofuspourlesnoobs.com/palais-de-nileza.html",
+    strat:"Boss ultime. Téléporte les joueurs aléatoirement à chaque tour. Impossible de rester groupé — coordonnez les attaques à distance. Ses alliés Nilezins amplifient ses dégâts." },
+  { name:"Bethel",             level:200, pos:"[20,18]",    donjon:"Donjon de Bethel",            guide:"https://www.dofuspourlesnoobs.com/donjon-de-bethel.html",
+    strat:"Boss ultime. Mécaniques complexes basées sur les cases lumineuses. Positionner les joueurs sur les bonnes cases pour amplifier les dégâts. Ne jamais être en ligne directe avec lui sous peine de subir sa charge." },
 ];
 
 
@@ -1909,7 +1876,7 @@ function GlobalSearch() {
               <div style={{ fontSize:12, color:C.text, lineHeight:1.6, padding:"8px 10px", background:"rgba(139,94,26,0.05)", borderRadius:5, borderLeft:`3px solid ${C.goldDim}` }}>
                 {detail.strat}
               </div>
-              <a href={`https://www.dofuspourlesnoobs.com/donjons.html`} target="_blank" rel="noopener noreferrer"
+              <a href={detail.guide || `https://www.dofuspourlesnoobs.com/donjons.html`} target="_blank" rel="noopener noreferrer"
                 style={{ display:"inline-block", marginTop:10, fontSize:11, color:C.gold, fontFamily:"'Cinzel',serif", textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
                 Guide complet sur DofusPourLesNoobs →
               </a>
@@ -2162,6 +2129,7 @@ export default function App() {
     { key:"cell",       label:"◈  Cell",        active:{ bg:"#f8ede8",   border:"#9a4a2a",     color:"#7a2a1a"  } },
     { key:"familiers",  label:"🐾 Familiers",  active:{ bg:"#eaf4ea",   border:"#4a8a4a",     color:"#2a6a2a"  } },
     { key:"chasse",     label:"🗺 Chasse",      active:{ bg:"#f8f4e8",   border:"#a08020",     color:"#6a4a10"  } },
+    { key:"stuff",      label:"⚔ Stuff",       active:{ bg:"#f0eaf8", border:"#6a4a8a",     color:"#4a2a6a"  } },
   ];
 
   const duoAll    = DUO_DATA.flatMap(c=>c.objectives);
@@ -2340,8 +2308,8 @@ export default function App() {
                 </div>
               </div>
             )}
+            {tab==="stuff" && <StuffTab />}
           </div>
-          {tab==="skydro" && (
             <DailyQuestsSection
               playerLabel="Sky" playerColor="#2a4a8a" playerBorder="#4a6a9a" playerBg="#e8f0f8"
               level={skydroMeta?.persos?.[0]?.level}
