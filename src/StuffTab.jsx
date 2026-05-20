@@ -13,13 +13,12 @@ const SLOTS = [
   { id:"boots",     label:"Bottes",        types:["Bottes"],                     emoji:"👢" },
   { id:"weapon",    label:"Arme",          types:["Épée","Baguette","Arc","Dague","Bâton","Marteau","Hache","Pelle","Faux","Masse","Outil","Lance","Pioche","Bâton à deux mains","Épée à deux mains"],emoji:"⚔️" },
   { id:"shield",    label:"Bouclier",      types:["Bouclier"],                   emoji:"🛡️" },
-  { id:"trophy",    label:"Trophée",       types:["Trophée"],                    emoji:"🏆" },
-  { id:"dofus1",    label:"Dofus 1",       types:["Dofus","Dofawa"],             emoji:"🥚" },
-  { id:"dofus2",    label:"Dofus 2",       types:["Dofus","Dofawa"],             emoji:"🥚" },
-  { id:"dofus3",    label:"Dofus 3",       types:["Dofus","Dofawa"],             emoji:"🥚" },
-  { id:"dofus4",    label:"Dofus 4",       types:["Dofus","Dofawa"],             emoji:"🥚" },
-  { id:"dofus5",    label:"Dofus 5",       types:["Dofus","Dofawa"],             emoji:"🥚" },
-  { id:"dofus6",    label:"Dofus 6",       types:["Dofus","Dofawa"],             emoji:"🥚" },
+  { id:"slot1",     label:"Dofus/Trophée", types:["Dofus","Dofawa","Trophée"],   emoji:"🥚" },
+  { id:"slot2",     label:"Dofus/Trophée", types:["Dofus","Dofawa","Trophée"],   emoji:"🥚" },
+  { id:"slot3",     label:"Dofus/Trophée", types:["Dofus","Dofawa","Trophée"],   emoji:"🥚" },
+  { id:"slot4",     label:"Dofus/Trophée", types:["Dofus","Dofawa","Trophée"],   emoji:"🥚" },
+  { id:"slot5",     label:"Dofus/Trophée", types:["Dofus","Dofawa","Trophée"],   emoji:"🥚" },
+  { id:"slot6",     label:"Dofus/Trophée", types:["Dofus","Dofawa","Trophée"],   emoji:"🥚" },
 ];
 
 const SLOT_LAYOUT = [
@@ -28,8 +27,7 @@ const SLOT_LAYOUT = [
   ["cloak","weapon","shield"],
   ["belt"],
   ["boots"],
-  ["trophy"],
-  ["dofus1","dofus2","dofus3","dofus4","dofus5","dofus6"],
+  ["slot1","slot2","slot3","slot4","slot5","slot6"],
 ];
 
 const PLAYERS = [
