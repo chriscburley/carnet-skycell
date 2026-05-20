@@ -1660,6 +1660,76 @@ function FamilierCatchOverlay({ familier, onDone }) {
 // ─── ENCYCLOPÉDIE ────────────────────────────────────────────────────────────
 const BASE = "https://api.dofusdu.de/dofus3/v1/fr";
 
+// ─── BASE DE DONNÉES BOSS ────────────────────────────────────────────────────
+const BOSS_DB = [
+  // ─ Niv 10-50 ─
+  { name:"Kardorim",         level:10,  pos:"[5,-1]",    donjon:"Crypte de Kardorim",
+    strat:"Boss simple. Il peut être mis en état de faiblesse, ce qui augmente les dégâts qu'il reçoit. Positionnez-vous autour de lui et tapez fort.", img:"https://api.dofusdu.de/dofus3/v1/img/item/44985-128.png" },
+  { name:"Tournesol Affamé", level:20,  pos:"[7,-24]",   donjon:"Grange du Tournesol Affamé",
+    strat:"Invoque des Tournesols Enragés. Éliminez les invocations en priorité puis concentrez-vous sur le boss. Évitez de rester sur les cases où il pose des pièges.", img:null },
+  { name:"Mob l'Éponge",     level:20,  pos:"[13,-28]",  donjon:"Château Ensablé",
+    strat:"Absorbe les dégâts d'un élément à chaque tour. Changez d'élément régulièrement ou utilisez plusieurs éléments pour contourner ses résistances.", img:null },
+  { name:"Bouftou Royal",    level:30,  pos:"[2,-34]",   donjon:"Cour du Bouftou Royal",
+    strat:"Reçoit un boost de dégâts et de résistances selon sa PV restante. Burst en une fois pour éviter les seuils. Les sorts de poussée sont très efficaces.", img:null },
+  { name:"Kankreblath",      level:40,  pos:"[3,-17]",   donjon:"Cache de Kankreblath",
+    strat:"Peut voler des PA/PM. Gardez vos soigneurs en retrait. Priorité aux monstres qui boostent le boss avant d'attaquer Kankreblath.", img:null },
+  { name:"Bworkette",        level:50,  pos:"[-5,10]",   donjon:"Donjon des Bworks",
+    strat:"Invoque des Bworks qui la soignent. Tuez les invocations en priorité absolue. Elle fuit les corps à corps — utilisez des sorts à distance.", img:null },
+  { name:"Wa Wabbit",        level:60,  pos:"[24,-13]",  donjon:"Château du Wa Wabbit",
+    strat:"Résistances élevées en début de tour. Attaquez en fin de tour. Ses invocations Wabbits peuvent buff ses résistances — éliminez-les rapidement.", img:null },
+  { name:"Gourlo le Terrible",level:70, pos:"[-55,-4]",  donjon:"Cale de l'Arche d'Otomaï",
+    strat:"Fragile mais entouré de monstres dangereux. Nettoyez la salle avant le boss. Il peut attirer les joueurs — restez groupés et soignez en priorité.", img:null },
+  // ─ Niv 80-110 ─
+  { name:"Reine Nyée",       level:90,  pos:"[-6,-15]",  donjon:"Antre de la Reine Nyée",
+    strat:"Invulnérable tant que ses larves sont en vie. Tuez TOUTES les larves d'abord. Elle pose des pièges douloureux — déplacez-vous prudemment.", img:null },
+  { name:"Abraknyde Ancestral",level:90,pos:"[-9,-14]",  donjon:"Domaine Ancestral",
+    strat:"Gagne des résistances à chaque fin de tour. Concentrez vos dégâts sur lui le plus vite possible. Ses toiles immobilisent — prévoyez des sorts de libération.", img:null },
+  { name:"Chouque",          level:90,  pos:"[33,3]",    donjon:"Bateau du Chouque",
+    strat:"Renvoie les dégâts à distance. Utilisez uniquement des sorts corps-à-corps ou de zone. Ses canons tirent en ligne — évitez les alignements.", img:null },
+  { name:"Dragon Cochon",    level:100, pos:"[-1,33]",   donjon:"Antre du Dragon Cochon",
+    strat:"Change d'élément dominant à chaque seuil de PV (75%, 50%, 25%). Adaptez votre élément d'attaque en conséquence. Gardez un soin en réserve pour les transitions.", img:null },
+  { name:"Koulosse",         level:100, pos:"[-17,8]",   donjon:"Caverne du Koulosse",
+    strat:"Ses attaques de zone sont dévastatrices. Dispersez l'équipe sur la map. Un tank en corps-à-corps l'occupe pendant que les autres tapent à distance.", img:null },
+  { name:"Meulou",           level:100, pos:"[-23,0]",   donjon:"Tanière du Meulou",
+    strat:"Très résistant aux dégâts directs. Il faut utiliser les mécaniques de la salle (pièges, levier) pour le blesser. Lisez le succès du boss avant d'entrer.", img:null },
+  { name:"Maître Corbac",    level:110, pos:"[-15,-62]", donjon:"Bibliothèque du Maître Corbac",
+    strat:"Invoque des livres qui soignent le boss. Détruisez les livres en priorité. Il téléporte aléatoirement les joueurs — gardez vos PM en réserve.", img:null },
+  { name:"Blop Multicolore", level:120, pos:"[-25,-17]", donjon:"Antre du Blop Multicolore Royal",
+    strat:"Alterne entre 4 éléments de résistance. Attaquez avec l'élément opposé à celui affiché. Ses Blops colorés boostent ses résistances — tuez-les d'abord.", img:null },
+  { name:"Chêne Mou",        level:140, pos:"[-14,-13]", donjon:"Clairière du Chêne Mou",
+    strat:"Invulnérable sauf aux sorts de feu. Équipez-vous full feu. Il soigne via ses racines — positionnez-vous loin d'elles. Burst pour ne pas prolonger le combat.", img:null },
+  // ─ Niv 150-190 ─
+  { name:"Epave du Grolandais",level:150,pos:"[-60,-84]", donjon:"Épave du Grolandais Violent",
+    strat:"Ben le Ripate reçoit des buffs de ses alliés. Tuez les buffeurs en priorité. Il peut voler la position des joueurs — gardez du recul.", img:null },
+  { name:"Kimbo",            level:160, pos:"[-54,16]",  donjon:"Canopée du Kimbo",
+    strat:"Très mobile, change constamment de position. Sorts de verrouillage indispensables. Ses totems augmentent ses dégâts — détruisez-les immédiatement.", img:null },
+  { name:"Bworker",          level:180, pos:"[-15,14]",  donjon:"Grotte du Bworker",
+    strat:"Immunisé aux dégâts directs au début. Utilisez les mécaniques de la salle pour le rendre vulnérable. Ses bières ivrognent les joueurs — restez à distance.", img:null },
+  { name:"Korriandre",       level:180, pos:"[-73,-69]", donjon:"Antre du Korriandre",
+    strat:"Crée des zones de poison qui persistent. Déplacez-vous constamment. Ses alliés Odorat amplifient ses attaques — neutralisez-les d'abord.", img:null },
+  { name:"Kralamoure Géant", level:180, pos:"[-60,-8]",  donjon:"Antre du Kralamoure Géant",
+    strat:"Reçoit des boost quand des alliés meurent près de lui. Séparez les combats. Éloignez ses sbires avant de les tuer pour éviter les buffs.", img:null },
+  { name:"Kolosso",          level:190, pos:"[-61,-69]", donjon:"Cavernes du Kolosso",
+    strat:"Possède une armure qui absorbe les dégâts. Alternez sorts perforants et sorts normaux pour briser l'armure. Très dangereux au corps-à-corps.", img:null },
+  { name:"Glourséleste",     level:190, pos:"[-63,-75]", donjon:"Antichambre des Gloursons",
+    strat:"Invoque des Gloursons en continu. Ignorez les invocations et focalisez sur le boss. Ses invocations explosent à mort — gardez vos distances.", img:null },
+  // ─ Niv 200 Ultimes ─
+  { name:"Merkator",         level:200, pos:"[21,18]",   donjon:"Aquadôme de Merkator",
+    strat:"Boss ultime. Plusieurs phases : il démarre immunisé puis devient vulnérable selon les mécaniques de la salle. Détruisez les générateurs pour retirer son immunité. Compo optimisée obligatoire.", img:null },
+  { name:"Comte Harebourg",  level:200, pos:"[-61,-79]", donjon:"Donjon du Comte Harebourg",
+    strat:"Boss ultime. Il gèle les cases et crée des zones de glace. Gardez des sorts de dégel. Ses résistances changent selon la température de la salle. Synchronisation d'équipe indispensable.", img:null },
+  { name:"Nileza",           level:200, pos:"[-67,-75]", donjon:"Palais de Nileza",
+    strat:"Boss ultime. Téléporte les joueurs aléatoirement. Sort de zone massif si l'équipe est groupée. Dispersez-vous sur la map et coordonnez les attaques par chat.", img:null },
+  { name:"Sylargh",          level:200, pos:"[-67,-75]", donjon:"Tour de Sylargh",
+    strat:"Boss ultime. Absorbe les dégâts d'un élément par tour. Variez absolument vos éléments d'attaque. Ses tentacules immobilisent et drainent les PA.", img:null },
+  { name:"Bethel",           level:200, pos:"[20,18]",   donjon:"Donjon de Bethel",
+    strat:"Boss ultime. Mécaniques complexes basées sur le placement. Ne jamais être en ligne avec lui. Utilisez des sorts de déplacement pour esquiver ses charges.", img:null },
+  { name:"Klime",            level:200, pos:"[-67,-75]", donjon:"Tréfonds de Frigost",
+    strat:"Boss ultime. Immunisé aux dégâts directs jusqu'à destruction de ses cristaux. Coordonnez la destruction des cristaux simultanément puis burstez en un tour.", img:null },
+];
+
+
+
 function GlobalSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
@@ -1681,16 +1751,23 @@ function GlobalSearch() {
   const search = async (q) => {
     if (!q || q.trim().length < 2) { setResults(null); return; }
     setLoading(true); setSelected(null); setDetail(null);
+    const ql = q.trim().toLowerCase();
     try {
-      const res = await fetch(`https://api.dofusdu.de/dofus3/v1/fr/search?query=${encodeURIComponent(q.trim())}&limit=30`);
-      if (!res.ok) throw new Error();
-      const arr = await res.json();
-      // Filtre : équipements et monstres uniquement
-      const items    = arr.filter(r => r.type?.name_id && r.type.name_id.startsWith("items-") && !r.type.name_id.includes("resource") && !r.type.name_id.includes("consumable"));
-      const monsters = arr.filter(r => r.type?.name_id === "monsters");
-      setResults({ items, monsters, all: [...items, ...monsters] });
+      // Recherche locale boss
+      const bosses = BOSS_DB.filter(b =>
+        b.name.toLowerCase().includes(ql) || b.donjon.toLowerCase().includes(ql)
+      ).map(b => ({ ...b, _kind:"boss" }));
+
+      // Recherche API équipements
+      const res = await fetch(`${BASE}/items/equipment/search?query=${encodeURIComponent(q.trim())}&limit=15`);
+      const eqData = res.ok ? await res.json() : [];
+      const items = (Array.isArray(eqData) ? eqData : eqData.data || []).map(i => ({ ...i, _kind:"equipment" }));
+
+      setResults({ items, bosses, all: [...bosses, ...items] });
     } catch(e) {
-      setResults({ items:[], monsters:[], all:[], error:true });
+      const ql2 = q.trim().toLowerCase();
+      const bosses = BOSS_DB.filter(b => b.name.toLowerCase().includes(ql2) || b.donjon.toLowerCase().includes(ql2)).map(b => ({ ...b, _kind:"boss" }));
+      setResults({ items:[], bosses, all:bosses, error: bosses.length === 0 });
     }
     setLoading(false);
   };
@@ -1774,29 +1851,73 @@ function GlobalSearch() {
 
           {/* Liste */}
           {!detail && results.all.map((r, i) => {
-            const isMonster = r.type?.name_id === "monsters";
+            const isBoss = r._kind === "boss";
+            const isEquip = r._kind === "equipment";
+            const name = isBoss ? r.name : (typeof r.name === "object" ? r.name?.fr || "" : r.name || "");
             return (
-              <div key={i} onClick={() => loadDetail(r)} style={{
+              <div key={i} onClick={() => isBoss ? setDetail({ _isBoss:true, ...r }) : loadDetail(r)} style={{
                 display:"flex", alignItems:"center", gap:10, padding:"8px 14px",
                 cursor:"pointer", borderBottom:`1px solid ${C.border}`,
-                background: selected?.ankama_id === r.ankama_id ? "rgba(139,94,26,0.1)" : "transparent",
+                background: selected?.name === r.name ? "rgba(139,94,26,0.1)" : "transparent",
                 transition:"background 0.1s",
               }}
               onMouseEnter={e => e.currentTarget.style.background="rgba(139,94,26,0.08)"}
-              onMouseLeave={e => e.currentTarget.style.background=selected?.ankama_id===r.ankama_id?"rgba(139,94,26,0.1)":"transparent"}
+              onMouseLeave={e => e.currentTarget.style.background="transparent"}
               >
-                {r.image_urls?.icon && <img src={r.image_urls.icon} alt="" style={{ width:28, height:28, objectFit:"contain", imageRendering:"pixelated", flexShrink:0 }} onError={e=>e.target.style.display="none"} />}
+                <div style={{ width:28, height:28, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  {isBoss ? <span style={{ fontSize:18 }}>💀</span>
+                  : r.image_urls?.icon ? <img src={r.image_urls.icon} alt="" style={{ width:28, height:28, objectFit:"contain", imageRendering:"pixelated" }} onError={e=>e.target.style.display="none"} />
+                  : <span style={{ fontSize:16 }}>🗡️</span>}
+                </div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:13, fontWeight:600, color:C.textBright, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{getName(r)}</div>
-                  <div style={{ fontSize:10, color:C.textDim }}>{getTypeName(r)}{r.level ? ` — Niv. ${r.level}` : ""}</div>
+                  <div style={{ fontSize:13, fontWeight:600, color:C.textBright, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{name}</div>
+                  <div style={{ display:"flex", gap:5, alignItems:"center", marginTop:1 }}>
+                    <span style={{ fontSize:9, padding:"1px 5px", borderRadius:8, fontFamily:"'Cinzel',serif", fontWeight:600,
+                      background: isBoss ? "rgba(138,26,26,0.15)" : "rgba(42,74,138,0.12)",
+                      color: isBoss ? "#8a1a1a" : "#2a4a8a",
+                    }}>
+                      {isBoss ? "Boss" : "Équipement"}
+                    </span>
+                    {isBoss && <span style={{ fontSize:10, color:C.textDim }}>Niv. {r.level} — {r.donjon}</span>}
+                    {!isBoss && r.level && <span style={{ fontSize:10, color:C.textDim }}>Niv. {r.level}</span>}
+                  </div>
                 </div>
                 <span style={{ fontSize:11, color:C.textDim }}>›</span>
               </div>
             );
           })}
 
-          {/* Fiche détail */}
-          {detail && !detail.error && (
+          {/* Fiche boss local */}
+          {detail?._isBoss && (
+            <div style={{ padding:"16px" }}>
+              <button onClick={() => { setDetail(null); setSelected(null); }} style={{ background:"none", border:"none", color:C.gold, cursor:"pointer", fontFamily:"'Cinzel',serif", fontSize:11, marginBottom:12 }}>← Retour</button>
+              <div style={{ display:"flex", gap:10, alignItems:"center", marginBottom:12 }}>
+                <span style={{ fontSize:40 }}>💀</span>
+                <div>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:15, fontWeight:700, color:C.gold }}>{detail.name}</div>
+                  <div style={{ display:"flex", gap:6, marginTop:4 }}>
+                    <span style={{ fontSize:10, padding:"1px 7px", borderRadius:10, background:"rgba(138,26,26,0.15)", color:"#8a1a1a", fontFamily:"'Cinzel',serif" }}>Boss</span>
+                    <span style={{ fontSize:10, color:C.textDim }}>Niv. {detail.level}</span>
+                    <span style={{ fontSize:10, color:C.textDim }}>{detail.pos}</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{ fontSize:12, color:C.textDim, marginBottom:10, padding:"4px 8px", background:"rgba(139,94,26,0.05)", borderRadius:4, fontFamily:"'Cinzel',serif", fontSize:10, letterSpacing:0.5 }}>
+                📍 {detail.donjon}
+              </div>
+              <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Stratégie</div>
+              <div style={{ fontSize:12, color:C.text, lineHeight:1.6, padding:"8px 10px", background:"rgba(139,94,26,0.05)", borderRadius:5, borderLeft:`3px solid ${C.goldDim}` }}>
+                {detail.strat}
+              </div>
+              <a href={`https://www.dofuspourlesnoobs.com/donjons.html`} target="_blank" rel="noopener noreferrer"
+                style={{ display:"inline-block", marginTop:10, fontSize:11, color:C.gold, fontFamily:"'Cinzel',serif", textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
+                Guide complet sur DofusPourLesNoobs →
+              </a>
+            </div>
+          )}
+
+          {/* Fiche item API */}
+          {detail && !detail.error && !detail._isBoss && (
             <div style={{ padding:"16px" }}>
               <button onClick={() => { setDetail(null); setSelected(null); }} style={{ background:"none", border:"none", color:C.gold, cursor:"pointer", fontFamily:"'Cinzel',serif", fontSize:11, marginBottom:12 }}>← Retour</button>
               <div style={{ display:"flex", gap:12, marginBottom:12 }}>
