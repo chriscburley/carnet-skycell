@@ -2308,7 +2308,7 @@ export default function App() {
                 </div>
               </div>
             )}
-            {tab==="stuff" && <StuffTab db={db} />}
+            {tab==="stuff" && <StuffTab db={db} skydroMeta={skydroMeta} cellMeta={cellMeta} />}
           </div>
           {tab==="skydro" && (
             <DailyQuestsSection
