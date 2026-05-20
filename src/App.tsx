@@ -1660,40 +1660,37 @@ function FamilierCatchOverlay({ familier, onDone }) {
 // ─── ENCYCLOPÉDIE ────────────────────────────────────────────────────────────
 const BASE = "https://api.dofusdu.de/dofus3/v1/fr";
 
-function EncyclopedieTab() {
+function GlobalSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
-  const [activeType, setActiveType] = useState("all");
+  const [open, setOpen] = useState(false);
   const debounceRef = useRef(null);
+  const panelRef = useRef(null);
+
+  // Ferme au clic extérieur
+  useEffect(() => {
+    const handler = (e) => { if (panelRef.current && !panelRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const search = async (q) => {
-    if (!q || q.trim().length < 2) { setResults(null); setSelected(null); return; }
+    if (!q || q.trim().length < 2) { setResults(null); return; }
     setLoading(true); setSelected(null); setDetail(null);
     try {
-      const enc = encodeURIComponent(q.trim());
-      // Recherche globale — couvre items, monstres, sets, etc.
-      const res = await fetch(`${BASE}/search?query=${enc}&limit=30`);
+      const res = await fetch(`https://api.dofusdu.de/dofus3/v1/fr/search?query=${encodeURIComponent(q.trim())}&limit=30`);
       if (!res.ok) throw new Error();
-      const data = await res.json();
-      const arr = Array.isArray(data) ? data : data.data || [];
-      const items    = arr.filter(r => r.type !== "monster").map(r => ({ ...r, _kind: r.type || "equipment" }));
-      const monsters = arr.filter(r => r.type === "monster").map(r => ({ ...r, _kind: "monster" }));
-      setResults({ items, monsters, total: arr.length });
+      const arr = await res.json();
+      // Filtre : équipements et monstres uniquement
+      const items    = arr.filter(r => r.type?.name_id && r.type.name_id.startsWith("items-") && !r.type.name_id.includes("resource") && !r.type.name_id.includes("consumable"));
+      const monsters = arr.filter(r => r.type?.name_id === "monsters");
+      setResults({ items, monsters, all: [...items, ...monsters] });
     } catch(e) {
-      // Fallback : recherche séparée équipements seulement
-      try {
-        const enc = encodeURIComponent(q.trim());
-        const eqRes = await fetch(`${BASE}/items/equipment/search?query=${enc}&limit=20`);
-        const eqData = eqRes.ok ? await eqRes.json() : [];
-        const items = (Array.isArray(eqData) ? eqData : eqData.data || []).map(i => ({ ...i, _kind:"equipment" }));
-        setResults({ items, monsters:[], total: items.length });
-      } catch(e2) {
-        setResults({ items:[], monsters:[], total:0, error:true });
-      }
+      setResults({ items:[], monsters:[], all:[], error:true });
     }
     setLoading(false);
   };
@@ -1703,224 +1700,166 @@ function EncyclopedieTab() {
     setDetail(null);
     setLoadingDetail(true);
     try {
-      const kind = item._kind || item.type;
-      const id = item.ankama_id || item.id;
-      let url;
-      if (kind === "monster") url = `${BASE}/monsters/${id}`;
-      else url = `${BASE}/items/equipment/${id}`;
-      const res = await fetch(url);
-      // Si équipement échoue, essaie weapon puis resource
-      if (!res.ok && kind !== "monster") {
-        const res2 = await fetch(`${BASE}/items/weapons/${id}`);
-        if (res2.ok) { setDetail(await res2.json()); setLoadingDetail(false); return; }
-      }
+      const id = item.ankama_id;
+      const isMonster = item.type?.name_id === "monsters";
+      let res = isMonster
+        ? await fetch(`https://api.dofusdu.de/dofus3/v1/fr/monsters/${id}`)
+        : await fetch(`https://api.dofusdu.de/dofus3/v1/fr/items/equipment/${id}`);
+      if (!res.ok && !isMonster) res = await fetch(`https://api.dofusdu.de/dofus3/v1/fr/items/weapons/${id}`);
       if (!res.ok) throw new Error();
       setDetail(await res.json());
-    } catch(e) {
-      setDetail({ error: true });
-    }
+    } catch(e) { setDetail({ error:true }); }
     setLoadingDetail(false);
   };
 
   const handleInput = (e) => {
     const v = e.target.value;
     setQuery(v);
+    setOpen(true);
     clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => search(v), 400);
+    debounceRef.current = setTimeout(() => search(v), 350);
   };
 
-  const allResults = results ? [
-    ...( activeType === "all" || activeType === "items"    ? results.items    : []),
-    ...( activeType === "all" || activeType === "monsters" ? results.monsters : []),
-  ] : [];
+  const getName = (r) => typeof r.name === "object" ? r.name?.fr || "" : r.name || "";
+  const getTypeName = (r) => r.type?.name_id === "monsters" ? "Monstre" : (r.type?.name_id || "").replace("items-","").replace("-","  ").replace(/^\w/,c=>c.toUpperCase());
 
   return (
-    <div>
-      <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:16, textAlign:"center" }}>
-        📖 Encyclopédie Dofus
-      </div>
-
-      <div style={{ position:"relative", marginBottom:12 }}>
+    <div ref={panelRef} style={{ position:"relative", maxWidth:600, margin:"0 auto", padding:"0 20px 12px" }}>
+      {/* Barre */}
+      <div style={{ position:"relative" }}>
         <input
-          className="meta-input"
-          placeholder="🔍 Rechercher un item, monstre, boss, équipement…"
           value={query}
           onChange={handleInput}
-          style={{ fontSize:14, padding:"10px 16px" }}
-          autoComplete="off"
+          onFocus={() => results && setOpen(true)}
+          placeholder="🔍 Rechercher un item, monstre, boss…"
+          style={{
+            width:"100%", background:"rgba(255,255,255,0.12)", border:`1px solid rgba(200,160,80,0.4)`,
+            borderRadius:6, padding:"8px 36px 8px 14px", color:"#f5edd8",
+            fontFamily:"'Crimson Pro',serif", fontSize:14, outline:"none",
+          }}
         />
-        {loading && <div style={{ position:"absolute", right:14, top:"50%", transform:"translateY(-50%)", fontSize:13, color:C.textDim }}>⟳</div>}
+        {loading && <span style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", color:"#d4b070", fontSize:13 }}>⟳</span>}
+        {query && !loading && <span onClick={()=>{setQuery(""); setResults(null); setOpen(false);}} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", color:"#d4b070", cursor:"pointer", fontSize:13 }}>✕</span>}
       </div>
 
-      {results && (
-        <div style={{ display:"flex", gap:6, marginBottom:14, flexWrap:"wrap" }}>
-          {[
-            { key:"all",      label:`Tout (${results.total})` },
-            { key:"items",    label:`Items (${results.items.length})` },
-            { key:"monsters", label:`Monstres (${results.monsters.length})` },
-          ].map(f => (
-            <button key={f.key} className={`filter-btn${activeType===f.key?" active":""}`} onClick={()=>setActiveType(f.key)} style={{fontSize:12}}>
-              {f.label}
-            </button>
-          ))}
+      {/* Panel résultats */}
+      {open && results && (
+        <div style={{
+          position:"absolute", top:"100%", left:20, right:20, zIndex:2000,
+          background:C.bgPanel, border:`2px solid ${C.panelBorder}`,
+          borderRadius:8, boxShadow:"0 8px 32px rgba(42,26,8,0.4)",
+          maxHeight:480, overflow:"auto",
+        }}>
+          {results.all.length === 0 && !results.error && (
+            <div style={{ padding:"16px", textAlign:"center", color:C.textDim, fontStyle:"italic", fontSize:13 }}>Aucun résultat</div>
+          )}
+          {results.error && (
+            <div style={{ padding:"16px", textAlign:"center", color:"#8a2a2a", fontSize:13 }}>Erreur de connexion</div>
+          )}
+
+          {/* Liste */}
+          {!detail && results.all.map((r, i) => {
+            const isMonster = r.type?.name_id === "monsters";
+            return (
+              <div key={i} onClick={() => loadDetail(r)} style={{
+                display:"flex", alignItems:"center", gap:10, padding:"8px 14px",
+                cursor:"pointer", borderBottom:`1px solid ${C.border}`,
+                background: selected?.ankama_id === r.ankama_id ? "rgba(139,94,26,0.1)" : "transparent",
+                transition:"background 0.1s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background="rgba(139,94,26,0.08)"}
+              onMouseLeave={e => e.currentTarget.style.background=selected?.ankama_id===r.ankama_id?"rgba(139,94,26,0.1)":"transparent"}
+              >
+                {r.image_urls?.icon && <img src={r.image_urls.icon} alt="" style={{ width:28, height:28, objectFit:"contain", imageRendering:"pixelated", flexShrink:0 }} onError={e=>e.target.style.display="none"} />}
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:C.textBright, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{getName(r)}</div>
+                  <div style={{ fontSize:10, color:C.textDim }}>{getTypeName(r)}{r.level ? ` — Niv. ${r.level}` : ""}</div>
+                </div>
+                <span style={{ fontSize:11, color:C.textDim }}>›</span>
+              </div>
+            );
+          })}
+
+          {/* Fiche détail */}
+          {detail && !detail.error && (
+            <div style={{ padding:"16px" }}>
+              <button onClick={() => { setDetail(null); setSelected(null); }} style={{ background:"none", border:"none", color:C.gold, cursor:"pointer", fontFamily:"'Cinzel',serif", fontSize:11, marginBottom:12 }}>← Retour</button>
+              <div style={{ display:"flex", gap:12, marginBottom:12 }}>
+                {(detail.image_urls?.sd || detail.image_urls?.icon) && <img src={detail.image_urls?.sd || detail.image_urls?.icon} style={{ width:52, height:52, objectFit:"contain", imageRendering:"pixelated" }} onError={e=>e.target.style.display="none"} alt="" />}
+                <div>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:14, fontWeight:700, color:C.gold }}>
+                    {typeof detail.name === "object" ? detail.name?.fr || "" : detail.name || ""}
+                  </div>
+                  <div style={{ display:"flex", gap:6, marginTop:4, flexWrap:"wrap" }}>
+                    {detail.type && <span style={{ fontSize:10, padding:"1px 7px", borderRadius:10, background:"rgba(139,94,26,0.15)", color:C.gold, fontFamily:"'Cinzel',serif" }}>
+                      {typeof detail.type === "object" ? detail.type?.name_fr || detail.type?.name?.fr || "Item" : detail.type}
+                    </span>}
+                    {detail.level && <span style={{ fontSize:10, color:C.textDim }}>Niv. {detail.level}</span>}
+                  </div>
+                </div>
+              </div>
+              {detail.description && <div style={{ fontSize:12, color:C.textDim, fontStyle:"italic", marginBottom:10, lineHeight:1.5, padding:"6px 10px", background:"rgba(139,94,26,0.05)", borderRadius:5, borderLeft:`3px solid ${C.goldDim}` }}>{typeof detail.description==="object"?detail.description?.fr||"":detail.description}</div>}
+              {detail.effects?.length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Effets</div>
+                  {detail.effects.map((e,i) => (
+                    <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"3px 8px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:12, marginBottom:2 }}>
+                      <span style={{ color:C.text }}>{typeof e.type==="object"?e.type?.name||e.type?.name_fr||"Effet":e.type||"Effet"}</span>
+                      <span style={{ color:e.int_minimum>=0?"#2a6a2a":"#8a2a2a", fontWeight:700 }}>
+                        {e.int_minimum===e.int_maximum ? (e.int_minimum>0?`+${e.int_minimum}`:e.int_minimum) : `${e.int_minimum>0?"+":""}${e.int_minimum} à ${e.int_maximum>0?"+":""}${e.int_maximum}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {detail.resistances && Object.keys(detail.resistances).length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Résistances</div>
+                  <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:3 }}>
+                    {Object.entries(detail.resistances).map(([k,v]) => (
+                      <div key={k} style={{ textAlign:"center", padding:"4px 2px", background:"rgba(139,94,26,0.05)", borderRadius:3 }}>
+                        <div style={{ fontSize:9, color:C.textDim, textTransform:"capitalize" }}>{k}</div>
+                        <div style={{ fontSize:11, fontWeight:700, color:v>0?"#2a6a2a":v<0?"#8a2a2a":C.textDim }}>{v>0?`+${v}`:v}%</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {detail.drops?.length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Drops</div>
+                  {detail.drops.slice(0,6).map((d,i) => (
+                    <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"3px 8px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11, marginBottom:2 }}>
+                      <span style={{ color:C.text }}>{typeof d.item?.name==="object"?d.item.name?.fr||"":d.item?.name||"Item"}</span>
+                      <span style={{ color:C.textDim }}>{d.drop_chances?`${d.drop_chances}%`:"?"}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {detail.recipe?.length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Recette</div>
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
+                    {detail.recipe.map((r,i) => (
+                      <div key={i} style={{ display:"flex", alignItems:"center", gap:3, padding:"2px 7px", background:"rgba(139,94,26,0.05)", borderRadius:3, fontSize:11 }}>
+                        {r.item?.image_urls?.icon && <img src={r.item.image_urls.icon} style={{ width:16, height:16, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
+                        <span style={{ color:C.text }}>{r.quantity}× {typeof r.item?.name==="object"?r.item.name?.fr||"":r.item?.name||"Ressource"}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <a href={`https://dofusdb.fr/fr/${selected?.type?.name_id==="monsters"?"database/monsters":"database/items"}/${selected?.ankama_id}`}
+                target="_blank" rel="noopener noreferrer"
+                style={{ fontSize:11, color:C.gold, fontFamily:"'Cinzel',serif", textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
+                Voir sur DofusDB →
+              </a>
+            </div>
+          )}
+          {loadingDetail && <div style={{ padding:"20px", textAlign:"center", color:C.textDim, fontSize:13 }}>Chargement…</div>}
+          {detail?.error && <div style={{ padding:"16px", textAlign:"center", color:"#8a2a2a", fontSize:13 }}>Impossible de charger les détails.</div>}
         </div>
       )}
-
-      <div style={{ display:"grid", gridTemplateColumns: selected ? "260px 1fr" : "1fr", gap:12, alignItems:"start" }}>
-
-        {/* Liste */}
-        {allResults.length > 0 && (
-          <div style={{ display:"flex", flexDirection:"column", gap:5, maxHeight:580, overflowY:"auto" }}>
-            {allResults.map(r => {
-              const isMonster = r._kind === "monster";
-              const isSelected = selected?.ankama_id === r.ankama_id && selected?._kind === r._kind;
-              const displayName = typeof r.name === "object" ? r.name?.fr || r.name?.en || "" : r.name || "";
-              const displayType = isMonster ? "Monstre" : (typeof r.type === "object" ? r.type?.name_fr || r.type?.name?.fr || "Équipement" : r.type || "Équipement");
-              return (
-                <div key={`${r._kind}-${r.ankama_id}`} onClick={() => loadDetail(r)} style={{
-                  display:"flex", alignItems:"center", gap:10, padding:"8px 12px",
-                  borderRadius:6, cursor:"pointer",
-                  background: isSelected ? "rgba(122,74,154,0.12)" : C.bgCard,
-                  border:`1px solid ${isSelected ? "#7a4a9a" : C.borderLight}`,
-                  transition:"all 0.12s",
-                }}>
-                  {r.image_urls?.icon && <img src={r.image_urls.icon} alt={displayName} style={{ width:32, height:32, objectFit:"contain", flexShrink:0, imageRendering:"pixelated" }} onError={e=>e.target.style.display="none"} />}
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color:C.textBright, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{displayName}</div>
-                    <div style={{ display:"flex", alignItems:"center", gap:6, marginTop:2 }}>
-                      <span style={{ fontSize:10, padding:"1px 6px", borderRadius:10, background:isMonster?"rgba(138,42,42,0.12)":"rgba(42,74,138,0.12)", color:isMonster?"#8a2a2a":"#2a4a8a", fontFamily:"'Cinzel',serif", fontWeight:600 }}>
-                        {displayType}
-                      </span>
-                      {r.level && <span style={{ fontSize:10, color:C.textDim }}>Niv. {r.level}</span>}
-                    </div>
-                  </div>
-                  <span style={{ fontSize:12, color:C.textDim }}>›</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Détail */}
-        {selected && (
-          <div className="panel-gold" style={{ padding:"18px 20px" }}>
-            {loadingDetail ? (
-              <div style={{ textAlign:"center", padding:"30px", color:C.textDim, fontSize:13 }}>Chargement…</div>
-            ) : detail?.error ? (
-              <div style={{ textAlign:"center", padding:"20px", color:"#8a2a2a", fontSize:13 }}>Impossible de charger les détails.</div>
-            ) : detail ? (
-              <>
-                <div style={{ display:"flex", alignItems:"flex-start", gap:14, marginBottom:16 }}>
-                  {(detail.image_urls?.sd || detail.image_urls?.icon) && (
-                    <img src={detail.image_urls.sd || detail.image_urls.icon} alt={typeof detail.name === 'object' ? detail.name?.fr || '' : detail.name || ''} style={{ width:64, height:64, objectFit:"contain", imageRendering:"pixelated", flexShrink:0 }} onError={e=>e.target.style.display="none"} />
-                  )}
-                  <div>
-                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:16, fontWeight:700, color:C.gold, marginBottom:4 }}>{typeof detail.name === 'object' ? detail.name?.fr || '' : detail.name || ''}</div>
-                    <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
-                      {detail.type && <span style={{ fontSize:11, padding:"2px 8px", borderRadius:10, background:"rgba(139,94,26,0.15)", color:C.gold, fontFamily:"'Cinzel',serif" }}>{typeof detail.type === 'object' ? detail.type_fr || detail.type?.fr || 'Item' : detail.type}</span>}
-                      {detail.level && <span style={{ fontSize:11, padding:"2px 8px", borderRadius:10, background:"rgba(139,94,26,0.1)", color:C.textDim }}>Niv. {detail.level}</span>}
-                    </div>
-                  </div>
-                </div>
-
-                {detail.description && (
-                  <div style={{ fontSize:12, color:C.textDim, fontStyle:"italic", marginBottom:14, lineHeight:1.5, padding:"8px 12px", background:"rgba(139,94,26,0.05)", borderRadius:6, borderLeft:`3px solid ${C.goldDim}` }}>
-                    {detail.description}
-                  </div>
-                )}
-
-                {/* Effets */}
-                {detail.effects?.length > 0 && (
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Effets</div>
-                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-                      {detail.effects.map((e, i) => (
-                        <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"4px 8px", background:"rgba(139,94,26,0.06)", borderRadius:4, fontSize:12 }}>
-                          <span style={{ color:C.text }}>{e.type?.name || e.label || "Effet"}</span>
-                          <span style={{ color: e.int_minimum >= 0 ? "#2a6a2a" : "#8a2a2a", fontWeight:700 }}>
-                            {e.int_minimum === e.int_maximum ? (e.int_minimum > 0 ? `+${e.int_minimum}` : e.int_minimum) : `${e.int_minimum > 0 ? "+" : ""}${e.int_minimum} à ${e.int_maximum > 0 ? "+" : ""}${e.int_maximum}`}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Résistances monstre */}
-                {detail.resistances && Object.keys(detail.resistances).length > 0 && (
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Résistances</div>
-                    <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:4 }}>
-                      {Object.entries(detail.resistances).map(([k, v]) => (
-                        <div key={k} style={{ textAlign:"center", padding:"5px 3px", background:"rgba(139,94,26,0.06)", borderRadius:4 }}>
-                          <div style={{ fontSize:9, color:C.textDim, marginBottom:1, textTransform:"capitalize" }}>{k}</div>
-                          <div style={{ fontSize:12, fontWeight:700, color: v > 0 ? "#2a6a2a" : v < 0 ? "#8a2a2a" : C.textDim }}>{v > 0 ? `+${v}` : v}%</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Drops monstre */}
-                {detail.drops?.length > 0 && (
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Drops</div>
-                    <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-                      {detail.drops.slice(0,8).map((d,i) => (
-                        <div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"3px 8px", background:"rgba(139,94,26,0.06)", borderRadius:4, fontSize:12 }}>
-                          <span style={{ color:C.text }}>{d.item?.name || "Item"}</span>
-                          <span style={{ color:C.textDim }}>{d.drop_chances ? `${d.drop_chances}%` : "?"}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Recette craft */}
-                {detail.recipe?.length > 0 && (
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Recette</div>
-                    <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                      {detail.recipe.map((r,i) => (
-                        <div key={i} style={{ display:"flex", alignItems:"center", gap:4, padding:"3px 8px", background:"rgba(139,94,26,0.06)", borderRadius:4, fontSize:11 }}>
-                          {r.item?.image_urls?.icon && <img src={r.item.image_urls.icon} style={{ width:20, height:20, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
-                          <span style={{ color:C.text }}>{r.quantity}x {r.item?.name || "Ressource"}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <a href={`https://dofusdb.fr/fr/${selected._kind === "monster" ? "database/monsters" : "database/items"}/${selected.ankama_id}`}
-                  target="_blank" rel="noopener noreferrer"
-                  style={{ display:"inline-block", marginTop:4, fontSize:11, color:C.gold, fontFamily:"'Cinzel',serif", textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
-                  Voir sur DofusDB →
-                </a>
-              </>
-            ) : null}
-          </div>
-        )}
-
-        {!loading && !results && (
-          <div style={{ textAlign:"center", padding:"40px 20px", color:C.textDim, fontStyle:"italic", fontSize:13 }}>
-            Tape le nom d'un item, monstre ou boss pour commencer…
-          </div>
-        )}
-        {!loading && results && results.total === 0 && (
-          <div style={{ textAlign:"center", padding:"30px 20px", color:C.textDim, fontStyle:"italic", fontSize:13 }}>
-            Aucun résultat pour "<strong>{query}</strong>"
-          </div>
-        )}
-        {results?.error && (
-          <div style={{ textAlign:"center", padding:"20px", color:"#8a2a2a", fontSize:13 }}>
-            Erreur de connexion à l'API. Réessaie dans quelques secondes.
-          </div>
-        )}
-      </div>
-
-      <div style={{ fontSize:10, color:C.textDim, textAlign:"center", marginTop:16, fontStyle:"italic" }}>
-        Données fournies par <a href="https://dofusdu.de" target="_blank" rel="noopener noreferrer" style={{color:C.gold}}>dofusdude</a>
-      </div>
     </div>
   );
 }
@@ -2083,7 +2022,6 @@ export default function App() {
     { key:"cell",       label:"◈  Cell",        active:{ bg:"#f8ede8",   border:"#9a4a2a",     color:"#7a2a1a"  } },
     { key:"familiers",  label:"🐾 Familiers",  active:{ bg:"#eaf4ea",   border:"#4a8a4a",     color:"#2a6a2a"  } },
     { key:"chasse",     label:"🗺 Chasse",      active:{ bg:"#f8f4e8",   border:"#a08020",     color:"#6a4a10"  } },
-    { key:"encyclopedie",label:"📖 Encyclopédie",active:{ bg:"#f4eaf8", border:"#7a4a9a",     color:"#5a2a8a"  } },
   ];
 
   const duoAll    = DUO_DATA.flatMap(c=>c.objectives);
@@ -2158,6 +2096,7 @@ export default function App() {
           })}
         </div>
         <div style={{ height:2, background:`linear-gradient(90deg,transparent,${C.panelBorder},transparent)` }} />
+        <GlobalSearch />
         <AlmanaxWidget />
       </div>
 
@@ -2261,7 +2200,6 @@ export default function App() {
                 </div>
               </div>
             )}
-            {tab==="encyclopedie" && <EncyclopedieTab />}
           </div>
           {tab==="skydro" && (
             <DailyQuestsSection
