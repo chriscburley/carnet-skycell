@@ -1721,12 +1721,12 @@ function EncyclopedieTab() {
     debounceRef.current = setTimeout(() => search(v), 400);
   };
 
-      const allResults = results ? [
-        ...( activeType === "all" || activeType === "items"    ? results.items    : []),
-        ...( activeType === "all" || activeType === "monsters" ? results.monsters : []),
-      ] : [];
+  const allResults = results ? [
+    ...( activeType === "all" || activeType === "items"    ? results.items    : []),
+    ...( activeType === "all" || activeType === "monsters" ? results.monsters : []),
+  ] : [];
 
-      return (
+  return (
     <div>
       <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:16, textAlign:"center" }}>
         📖 Encyclopédie Dofus
