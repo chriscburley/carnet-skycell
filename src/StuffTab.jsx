@@ -43,16 +43,32 @@ const PLAYERS = [
 const EMPTY_STUFF = { sky1:{}, sky2:{}, cell1:{}, cell2:{} };
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
-// Vrais IDs de l'API dofusdude (vérifiés)
 const EFFECT_MAP = {
-  9:"vita", 10:"sagesse", 12:"pa", 14:"pm", 31:"po",
+  9:"vita", 10:"sagesse", 12:"pa", 8:"pm", 31:"po",
   45:"force", 13:"intel", 22:"chance", 36:"agil",
-  61:"dmgFeu", 27:"dmgEau", 48:"dmgTerre", 47:"dmgAir", 49:"dmgNeutre", 30:"dmg",
+  61:"dmgFeu", 27:"dmgEau", 48:"dmgTerre", 47:"dmgAir", 49:"dmgNeutre", 195:"dmgNeutre", 30:"dmg",
   96:"resFeu", 97:"resEau", 98:"resTerre", 99:"resAir", 100:"resNeutre",
   84:"resFeu%", 83:"resEau%", 82:"resTerre%", 81:"resAir%",
   26:"tacle", 75:"esquivePA", 76:"esquivePM",
   29:"critique", 28:"invocation", 25:"init",
 };
+
+function calcStats(stuff) {
+  const totals = {};
+  STAT_DISPLAY.forEach(s => { totals[s.key] = 0; });
+  Object.values(stuff).filter(Boolean).forEach(item => {
+    (item.effects || []).forEach(eff => {
+      const effId = eff.type?.id ?? eff.effect_id ?? eff.effectId;
+      // PA/PM/PO et autres stats fixes : int_maximum est 0, utiliser int_minimum
+      const val = (eff.int_maximum === 0 && eff.int_minimum > 0)
+        ? eff.int_minimum
+        : (eff.int_maximum ?? eff.int_minimum ?? eff.value ?? 0);
+      const statKey = EFFECT_MAP[effId];
+      if (statKey && totals[statKey] !== undefined) totals[statKey] += Number(val) || 0;
+    });
+  });
+  return totals;
+}
 
 const STAT_DISPLAY = [
   { key:"pa",        label:"PA",         emoji:"⭐" },
