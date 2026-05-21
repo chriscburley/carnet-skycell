@@ -2132,7 +2132,7 @@ function AlmanaxWidget() {
         <span style={{ color:"#a0d0a0" }}>Bonus : </span>
         <span style={{ fontStyle:"italic" }}>{bonus}</span>
       </span>
-      {kamas && <span style={{ fontSize:12, color:"#f8e080" }}>💰 {kamas}</span>}
+      {false && kamas && <span style={{ fontSize:12, color:"#f8e080" }}>💰 {kamas}</span>}
     </div>
   );
 }
@@ -2344,12 +2344,19 @@ function OcreTab({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
   }, [CELL_KEY, CELL_SLUG]);
 
   const calcProgress = (zones) => {
-    if (!zones) return { owned:0, total:0 };
-    let owned = 0, total = 0;
+    if (!zones) return { bossOwned:0, bossTotal:0, archiOwned:0, archiTotal:0 };
+    // Déduplique par id de monstre pour éviter les doublons entre zones
+    const seen = new Set();
+    let bossOwned=0, bossTotal=0, archiOwned=0, archiTotal=0;
     zones.forEach(z => z.subzones?.forEach(sz => sz.monsters?.forEach(m => {
-      total += m.required; owned += Math.min(m.owned, m.required);
+      if (seen.has(m.id)) return;
+      seen.add(m.id);
+      const isBoss = m.type?.id === 2;
+      const done = m.status === "complete" ? 1 : 0;
+      if (isBoss) { bossTotal++; bossOwned += done; }
+      else        { archiTotal++; archiOwned += done; }
     })));
-    return { owned, total };
+    return { bossOwned, bossTotal, archiOwned, archiTotal };
   };
 
   const filterZones = (zones, search) => {
@@ -2366,7 +2373,8 @@ function OcreTab({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
 
   const QuestPanel = ({ label, color, border, bg, data, loading, error, search, setSearch, apiKey, slug, meta, onUpdateMeta }) => {
     const prog = calcProgress(data);
-    const pct = prog.total > 0 ? Math.round(prog.owned / prog.total * 100) : 0;
+    const bossPct  = prog.bossTotal  > 0 ? Math.round(prog.bossOwned  / prog.bossTotal  * 100) : 0;
+    const archiPct = prog.archiTotal > 0 ? Math.round(prog.archiOwned / prog.archiTotal * 100) : 0;
     const filtered = filterZones(data, search);
 
     if (!apiKey || !slug) return (
@@ -2402,13 +2410,30 @@ function OcreTab({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
           <div style={{ fontFamily:"'Cinzel',serif", fontSize:12, fontWeight:700, color }}>◈ {label}</div>
-          {data && <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, fontWeight:700, color }}>{prog.owned}/{prog.total} — {pct}%</div>}
+          {data && <div style={{ display:"flex", gap:8 }}>
+            <span style={{ fontSize:11, color:"#8a2a2a", fontFamily:"'Cinzel',serif" }}>💀 {prog.bossOwned}/{prog.bossTotal}</span>
+            <span style={{ fontSize:11, color:"#6a4a00", fontFamily:"'Cinzel',serif" }}>⚔ {prog.archiOwned}/{prog.archiTotal}</span>
+          </div>}
         </div>
 
-        {/* Barre globale */}
         {data && (
-          <div style={{ height:8, background:"rgba(0,0,0,0.08)", borderRadius:4, overflow:"hidden", marginBottom:12 }}>
-            <div style={{ height:"100%", width:`${pct}%`, background:`linear-gradient(90deg,${color},${border})`, borderRadius:4, transition:"width 0.5s" }} />
+          <div style={{ display:"flex", flexDirection:"column", gap:6, marginBottom:12 }}>
+            {/* Boss */}
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <span style={{ fontSize:10, color:"#8a2a2a", fontFamily:"'Cinzel',serif", width:80, flexShrink:0 }}>💀 Boss</span>
+              <div style={{ flex:1, height:6, background:"rgba(138,42,42,0.1)", borderRadius:4, overflow:"hidden" }}>
+                <div style={{ height:"100%", width:`${bossPct}%`, background:"linear-gradient(90deg,#8a2a2a,#c05040)", borderRadius:4, transition:"width 0.5s" }} />
+              </div>
+              <span style={{ fontSize:10, color:"#8a2a2a", fontFamily:"'Cinzel',serif", flexShrink:0, minWidth:70, textAlign:"right" }}>{prog.bossOwned}/{prog.bossTotal} ({bossPct}%)</span>
+            </div>
+            {/* Archimonstres */}
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <span style={{ fontSize:10, color:"#6a4a00", fontFamily:"'Cinzel',serif", width:80, flexShrink:0 }}>⚔ Archi</span>
+              <div style={{ flex:1, height:6, background:"rgba(200,146,26,0.1)", borderRadius:4, overflow:"hidden" }}>
+                <div style={{ height:"100%", width:`${archiPct}%`, background:"linear-gradient(90deg,#c8921a,#e8b840)", borderRadius:4, transition:"width 0.5s" }} />
+              </div>
+              <span style={{ fontSize:10, color:"#6a4a00", fontFamily:"'Cinzel',serif", flexShrink:0, minWidth:70, textAlign:"right" }}>{prog.archiOwned}/{prog.archiTotal} ({archiPct}%)</span>
+            </div>
           </div>
         )}
 
