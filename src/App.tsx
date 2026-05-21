@@ -481,7 +481,75 @@ body{background:#f0eef8;}
   .badge-card{padding:8px 4px;}
   .cat-title{font-size:10px;}
 }
+
+/* ─── MODE SOMBRE ─────────────────────────────────────────────────────────── */
+body.dark-mode {
+  background:#0f0e1a !important;
+}
+.dark-mode .dofus-app { background:#0f0e1a !important; }
+.dark-mode .panel      { background:#1a1830 !important; border-color:#3a3560 !important; box-shadow:0 2px 12px rgba(0,0,0,0.4) !important; }
+.dark-mode .panel-gold { background:linear-gradient(160deg,#1e1c35,#16142a) !important; border-color:#3a3560 !important; }
+.dark-mode .obj-row    { background:#1e1c35 !important; border-color:#2e2c50 !important; color:#e0deff !important; }
+.dark-mode .obj-row:hover { background:#252340 !important; border-color:#7f77dd !important; }
+.dark-mode .obj-row.done  { background:#0d1a10 !important; border-color:#2a5a30 !important; }
+.dark-mode .obj-name   { color:#e8e4ff !important; }
+.dark-mode .obj-desc   { color:#8880c0 !important; }
+.dark-mode .cat-title  { color:#afa9ec !important; }
+.dark-mode .check-box  { background:#12101e !important; border-color:#5a54a0 !important; }
+.dark-mode .prog-track { background:rgba(127,119,221,0.15) !important; }
+.dark-mode .filter-btn { border-color:#3a3560 !important; color:#8880c0 !important; background:transparent !important; }
+.dark-mode .filter-btn:hover { border-color:#afa9ec !important; color:#afa9ec !important; }
+.dark-mode .filter-btn.active { background:rgba(127,119,221,0.2) !important; border-color:#7f77dd !important; color:#c8c4ff !important; }
+.dark-mode .note-input  { background:#12101e !important; border-color:#3a3560 !important; color:#e0deff !important; }
+.dark-mode .meta-input  { background:#12101e !important; border-color:#3a3560 !important; color:#e0deff !important; }
+.dark-mode .badge-card.unlocked { background:linear-gradient(160deg,#1e1c35,#16142a) !important; border-color:#5a54a0 !important; }
+.dark-mode .badge-card.locked   { background:rgba(127,119,221,0.04) !important; }
+.dark-mode .tab-btn.inactive    { background:rgba(127,119,221,0.08) !important; border-color:#3a3560 !important; color:#8880c0 !important; }
 `;
+
+// ─── DARK MODE TOGGLE ────────────────────────────────────────────────────────
+function DarkModeToggle() {
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem("darkMode") === "1"; } catch(e) { return false; }
+  });
+
+  useEffect(() => {
+    document.body.classList.toggle("dark-mode", dark);
+    try { localStorage.setItem("darkMode", dark ? "1" : "0"); } catch(e) {}
+  }, [dark]);
+
+  return (
+    <div onClick={() => setDark(d => !d)} style={{
+      position:"fixed", top:12, left:12, zIndex:9999,
+      display:"flex", alignItems:"center", gap:6,
+      background: dark ? "#1a1830" : "#1a1535",
+      border:`1px solid ${dark ? "#5a54a0" : "rgba(255,255,255,0.2)"}`,
+      borderRadius:20, padding:"4px 10px 4px 6px",
+      cursor:"pointer", userSelect:"none",
+      boxShadow:"0 2px 8px rgba(0,0,0,0.3)",
+      transition:"all 0.2s",
+    }}>
+      {/* Toggle pill */}
+      <div style={{
+        width:28, height:16, borderRadius:8, position:"relative",
+        background: dark ? "#7f77dd" : "rgba(255,255,255,0.2)",
+        transition:"background 0.2s", flexShrink:0,
+      }}>
+        <div style={{
+          position:"absolute", top:2, left: dark ? 14 : 2,
+          width:12, height:12, borderRadius:"50%",
+          background:"white", transition:"left 0.2s",
+          boxShadow:"0 1px 3px rgba(0,0,0,0.3)",
+        }} />
+      </div>
+      <span style={{ fontSize:11, color: dark ? "#c8c4ff" : "rgba(255,255,255,0.8)", fontFamily:"'Cinzel',serif", letterSpacing:0.3 }}>
+        {dark ? "🌙" : "☀️"}
+      </span>
+    </div>
+  );
+}
+
+
 
 // ─── EFFET LUMIÈRE DORÉE (canvas) ────────────────────────────────────────────
 function GoldBurst({ x, y, onDone }) {
@@ -2821,6 +2889,7 @@ export default function App() {
   return (
     <div className="dofus-app">
       <style>{styles}</style>
+      <DarkModeToggle />
       {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
       {badgeOverlay && !catOverlay && <BadgeUnlockOverlay badge={badgeOverlay} onDone={() => setBadgeOverlay(null)} />}
 
