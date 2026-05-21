@@ -61,89 +61,89 @@ const FAMILIER_BADGES = [
 
 const FAMILIERS = [
   // ─ A ─
-  { id:"fm001", name:"Abra Kadabra",       how:"Échange",  fun:"Le Sorcier du Sous-Bois",          where:"[-10,-12] — 5x Ambre du Chêne Mou + 5x Racine d'Abraknyde Ancestral",                        req:"Succès : Vieilles branches" },
-  { id:"fm002", name:"Atouin",             how:"Échange",  fun:"La Carapace Ambitieuse",            where:"[7,-10] Cloaque d'Amakna — 10x Étoffe de Sphincter Cell",                                    req:"Succès : Rats Maknéens" },
+  { id:"fm001", name:"Abra Kadabra",       how:"Échange",  fun:"Le Sorcier du Sous-Bois",          where:"[-10,-12] — 5x Ambre du Chêne Mou + 5x Racine d'Abraknyde Ancestral",                        emoji:"🌳", req:"Succès : Vieilles branches" },
+  { id:"fm002", name:"Atouin",             how:"Échange",  fun:"La Carapace Ambitieuse",            where:"[7,-10] Cloaque d'Amakna — 10x Étoffe de Sphincter Cell",                                    emoji:"🐢", req:"Succès : Rats Maknéens" },
   // ─ B ─
-  { id:"fm003", name:"Balafreux",          how:"Jetons",   fun:"Le Champion des Arènes",            where:"[-13,-29] Kolizéum — 50 000x Kolizéton",                                                     req:"Cote > 3500 (solo/équipe/duel)" },
-  { id:"fm004", name:"Bébé Pandawa",       how:"Échange",  fun:"Le Tonneau en Couches",             where:"[22,-31] — 20x de chaque Artefact Pandawushu (Bois/Eau/Feu/Roc/Vent)",                       req:"Succès : Massacre élémentaire" },
-  { id:"fm005", name:"Bilby",             how:"Échange",  fun:"La Gelée de Poche",                  where:"[9,28] — 2x Gelée Citron + 2x Bleuet + 2x Menthe + 2x Fraise (Royales)",                    req:"Succès : Gelées" },
-  { id:"fm006", name:"Bisouglours",       how:"Échange",  fun:"L'Ours Polaire Câlin",               where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace",                                             req:"Niveau > 79" },
-  { id:"fm007", name:"Black Tiwabbit",    how:"Échange",  fun:"Le Lapin des Ténèbres",              where:"[28,-12] à côté du Terrier du Wa Wabbit — 100x Bandeau du Black Tiwabbit",                   req:"Succès : Wabbits" },
-  { id:"fm008", name:"Blérodoudou",       how:"Échange",  fun:"Le Doudou Givré",                    where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace",                                             req:"Niveau > 79" },
-  { id:"fm009", name:"Bloalak",           how:"Échange",  fun:"Le Passionné de Kaliptus",           where:"[-16,3] — 200x Fleur de Kaliptus",                                                           req:"Succès : Amateur de Kaliptus" },
-  { id:"fm010", name:"Blokus",            how:"Échange",  fun:"Le Cube Philosophique",              where:"[1,6] Xélorium — 500x Orichor",                                                              req:"Aucun" },
-  { id:"fm011", name:"Bontique",          how:"Alliance", fun:"La Mascotte Bontarienne",            where:"[-33,-56] — 20x Aliton",                                                                     req:"Ordre 1+" },
-  { id:"fm012", name:"Boskito",           how:"Échange",  fun:"L'Insecte des Champs",               where:"[8,-22] dans la grange — 50x Pétale Tournesol Sauvage + 50x Pétale Rose Démoniaque",         req:"Succès : Plantes des champs" },
-  { id:"fm013", name:"Bouflux",           how:"Alliance", fun:"Le Mouton Électrique",               where:"[-26,36] — 200x Aliton",                                                                     req:"Ordre 5" },
-  { id:"fm014", name:"Bouftor",           how:"Alliance", fun:"Le Bouclier Laineux",                where:"[-33,-56] — 200x Aliton",                                                                    req:"Ordre 5" },
-  { id:"fm015", name:"Bouloute",          how:"Échange",  fun:"Le Mouton des Neiges",               where:"[-83,-48] — 100x Laine de Boufmouth",                                                        req:"Succès : Boufmouths" },
-  { id:"fm016", name:"Bouloute du Parrain",how:"Échange", fun:"Le Mouton de la Mafia",              where:"[5,-19] au fond de la milice — 100x Cuir de Bouftou Noir",                                   req:"Succès : Bouftous" },
-  { id:"fm017", name:"Brâkarien",         how:"Alliance", fun:"La Mascotte Brakmariènne",           where:"[-26,36] — 20x Aliton",                                                                      req:"Ordre 1+" },
-  { id:"fm018", name:"Brûlih",            how:"Jetons",   fun:"La Flamme Vivante",                  where:"[13,35] Temple des Alliances — 10 000x Pépite",                                              req:"Aucun" },
-  { id:"fm019", name:"Bulbisou",          how:"Échange",  fun:"L'Escargot Glacé",                   where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace",                                             req:"Niveau > 79" },
-  { id:"fm020", name:"Bulbouture",        how:"Échange",  fun:"La Plante Carnivore",                where:"[27,-31] — 10x Bourgeon explosif de Damadrya",                                               req:"Succès : Plantalas" },
-  { id:"fm021", name:"Bwak d'Air",        how:"Échange",  fun:"Le Poulet du Vent",                  where:"[-5,-7] — 10x Ver d'Air + 50x Plume du Kwak de Vent",                                        req:"Succès : En plein vol" },
-  { id:"fm022", name:"Bwak d'Eau",        how:"Échange",  fun:"Le Poulet des Profondeurs",          where:"[-5,-9] — 10x Ver d'Eau + 50x Plume du Kwak de Glace",                                       req:"Succès : En plein vol" },
-  { id:"fm023", name:"Bwak de Feu",       how:"Échange",  fun:"Le Poulet Enflammé",                 where:"[-6,-9] — 10x Ver de Feu + 50x Plume du Kwak de Flamme",                                     req:"Succès : En plein vol" },
-  { id:"fm024", name:"Bwak de Terre",     how:"Échange",  fun:"Le Poulet Terrien",                  where:"[-1,-8] — 10x Ver de Terre + 50x Plume du Kwak de Terre",                                    req:"Succès : En plein vol" },
-  { id:"fm025", name:"Bworky",            how:"Échange",  fun:"Le Barbare Miniature",               where:"[-6,9] Village des Bworks — 500x Bière de Bwork",                                            req:"Succès : Bworks" },
+  { id:"fm003", name:"Balafreux",          how:"Jetons",   fun:"Le Champion des Arènes",            where:"[-13,-29] Kolizéum — 50 000x Kolizéton",                                                     emoji:"⚔️", req:"Cote > 3500 (solo/équipe/duel)" },
+  { id:"fm004", name:"Bébé Pandawa",       how:"Échange",  fun:"Le Tonneau en Couches",             where:"[22,-31] — 20x de chaque Artefact Pandawushu (Bois/Eau/Feu/Roc/Vent)",                       emoji:"🍺", req:"Succès : Massacre élémentaire" },
+  { id:"fm005", name:"Bilby",             how:"Échange",  fun:"La Gelée de Poche",                  where:"[9,28] — 2x Gelée Citron + 2x Bleuet + 2x Menthe + 2x Fraise (Royales)",                    emoji:"🫧", req:"Succès : Gelées" },
+  { id:"fm006", name:"Bisouglours",       how:"Échange",  fun:"L'Ours Polaire Câlin",               where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace",                                             emoji:"🐻", req:"Niveau > 79" },
+  { id:"fm007", name:"Black Tiwabbit",    how:"Échange",  fun:"Le Lapin des Ténèbres",              where:"[28,-12] à côté du Terrier du Wa Wabbit — 100x Bandeau du Black Tiwabbit",                   emoji:"🐰", req:"Succès : Wabbits" },
+  { id:"fm008", name:"Blérodoudou",       how:"Échange",  fun:"Le Doudou Givré",                    where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace",                                             emoji:"🧸", req:"Niveau > 79" },
+  { id:"fm009", name:"Bloalak",           how:"Échange",  fun:"Le Passionné de Kaliptus",           where:"[-16,3] — 200x Fleur de Kaliptus",                                                           emoji:"🌿", req:"Succès : Amateur de Kaliptus" },
+  { id:"fm010", name:"Blokus",            how:"Échange",  fun:"Le Cube Philosophique",              where:"[1,6] Xélorium — 500x Orichor",                                                              emoji:"🟦", req:"Aucun" },
+  { id:"fm011", name:"Bontique",          how:"Alliance", fun:"La Mascotte Bontarienne",            where:"[-33,-56] — 20x Aliton",                                                                     emoji:"☀️", req:"Ordre 1+" },
+  { id:"fm012", name:"Boskito",           how:"Échange",  fun:"L'Insecte des Champs",               where:"[8,-22] dans la grange — 50x Pétale Tournesol Sauvage + 50x Pétale Rose Démoniaque",         emoji:"🪲", req:"Succès : Plantes des champs" },
+  { id:"fm013", name:"Bouflux",           how:"Alliance", fun:"Le Mouton Électrique",               where:"[-26,36] — 200x Aliton",                                                                     emoji:"⚡", req:"Ordre 5" },
+  { id:"fm014", name:"Bouftor",           how:"Alliance", fun:"Le Bouclier Laineux",                where:"[-33,-56] — 200x Aliton",                                                                    emoji:"🐑", req:"Ordre 5" },
+  { id:"fm015", name:"Bouloute",          how:"Échange",  fun:"Le Mouton des Neiges",               where:"[-83,-48] — 100x Laine de Boufmouth",                                                        emoji:"❄️", req:"Succès : Boufmouths" },
+  { id:"fm016", name:"Bouloute du Parrain",how:"Échange", fun:"Le Mouton de la Mafia",              where:"[5,-19] au fond de la milice — 100x Cuir de Bouftou Noir",                                   emoji:"🐑", req:"Succès : Bouftous" },
+  { id:"fm017", name:"Brâkarien",         how:"Alliance", fun:"La Mascotte Brakmariènne",           where:"[-26,36] — 20x Aliton",                                                                      emoji:"🌑", req:"Ordre 1+" },
+  { id:"fm018", name:"Brûlih",            how:"Jetons",   fun:"La Flamme Vivante",                  where:"[13,35] Temple des Alliances — 10 000x Pépite",                                              emoji:"🔥", req:"Aucun" },
+  { id:"fm019", name:"Bulbisou",          how:"Échange",  fun:"L'Escargot Glacé",                   where:"[-77,-45] Épicerie Frigost — 50x Kama de Glace",                                             emoji:"🐌", req:"Niveau > 79" },
+  { id:"fm020", name:"Bulbouture",        how:"Échange",  fun:"La Plante Carnivore",                where:"[27,-31] — 10x Bourgeon explosif de Damadrya",                                               emoji:"🌱", req:"Succès : Plantalas" },
+  { id:"fm021", name:"Bwak d'Air",        how:"Échange",  fun:"Le Poulet du Vent",                  where:"[-5,-7] — 10x Ver d'Air + 50x Plume du Kwak de Vent",                                        emoji:"💨", req:"Succès : En plein vol" },
+  { id:"fm022", name:"Bwak d'Eau",        how:"Échange",  fun:"Le Poulet des Profondeurs",          where:"[-5,-9] — 10x Ver d'Eau + 50x Plume du Kwak de Glace",                                       emoji:"💧", req:"Succès : En plein vol" },
+  { id:"fm023", name:"Bwak de Feu",       how:"Échange",  fun:"Le Poulet Enflammé",                 where:"[-6,-9] — 10x Ver de Feu + 50x Plume du Kwak de Flamme",                                     emoji:"🔥", req:"Succès : En plein vol" },
+  { id:"fm024", name:"Bwak de Terre",     how:"Échange",  fun:"Le Poulet Terrien",                  where:"[-1,-8] — 10x Ver de Terre + 50x Plume du Kwak de Terre",                                    emoji:"🌍", req:"Succès : En plein vol" },
+  { id:"fm025", name:"Bworky",            how:"Échange",  fun:"Le Barbare Miniature",               where:"[-6,9] Village des Bworks — 500x Bière de Bwork",                                            emoji:"🥊", req:"Succès : Bworks" },
   // ─ C ─
-  { id:"fm026", name:"Chacha",            how:"Échange",  fun:"Le Mouton de Poche",                 where:"[2,-34] fin de la Cour du Bouftou Royal — 5x Laine de Bouftou",                              req:"Aucun" },
-  { id:"fm027", name:"Chacha Angora",     how:"Échange",  fun:"Le Chat de Casino",                  where:"[-9,-21] Ecaflipus — 100x Biscuit de chance",                                                req:"Succès : Ecaflipuces" },
-  { id:"fm028", name:"Chacha des Glaces", how:"Échange",  fun:"Le Chat Givré",                      where:"[-66,-75] vers le Comte — 10x Scapula du Comte + 1x Bandelette du Comte Harebourg",          req:"Succès : Givrefoux" },
-  { id:"fm029", name:"Chacha Tigré",      how:"Échange",  fun:"Le Chat Rayé",                       where:"[-1,-6] Ecaflipus — 500x Orichor",                                                           req:"Aucun" },
-  { id:"fm030", name:"Chachyène",         how:"Quête",    fun:"Le Loup-Chat Mystique",              where:"Quête : Chachyène de vie",                                                                    req:"Quête disponible en jeu" },
-  { id:"fm031", name:"Chaperlipopette",   how:"Échange",  fun:"L'Acrobate de Poche",                where:"[-1,-6] Ecaflipus — 500x Orichor",                                                           req:"Aucun" },
-  { id:"fm032", name:"Chauffe-souris",    how:"Échange",  fun:"La Chauve-souris Rôtie",             where:"[9,15] Crypte — 50x Paille Vampiresque",                                                     req:"Aucun" },
-  { id:"fm033", name:"Chauffe-souris Délavée",how:"Échange",fun:"La Chauve-souris Pâlichonne",     where:"[-4,-24] — 150x Almaton OU 50x Rouflaquettes d'Halouine + 5x Chicots d'Halouine",             req:"Aucun" },
-  { id:"fm034", name:"Chercheur d'Ogrines",how:"Échange", fun:"Le Chercheur d'Or",                  where:"[-55,15] chez Otomaï (étage) — 50x Petite pierre d'âme parfaite",                            req:"Succès : Zoths" },
-  { id:"fm035", name:"Chienchien Tigré",  how:"Échange",  fun:"Le Chien Rayé",                      where:"[-27,-5] — 50x Fragment d'Os",                                                               req:"Succès : Mulous" },
-  { id:"fm036", name:"Crocodaille",       how:"Échange",  fun:"Le Croco de Poche",                  where:"[-7,11] — 50x Dent de Crocodaille + 1x Crâne de Chef Crocodaille",                           req:"Succès : Gadouilleux" },
-  { id:"fm037", name:"Cromeugnon",        how:"Échange",  fun:"L'Homme des Cavernes Givré",         where:"[-80,-81] — 100x Larme de Givrefoux",                                                        req:"Succès : Givrefoux" },
-  { id:"fm038", name:"Croum",             how:"Échange",  fun:"Le Bandit Miniature",                where:"[16,21] — 10x Émeraude + 10x Cristal",                                                       req:"Succès : Bandits d'Amakna" },
+  { id:"fm026", name:"Chacha",            how:"Échange",  fun:"Le Mouton de Poche",                 where:"[2,-34] fin de la Cour du Bouftou Royal — 5x Laine de Bouftou",                              emoji:"🐑", req:"Aucun" },
+  { id:"fm027", name:"Chacha Angora",     how:"Échange",  fun:"Le Chat de Casino",                  where:"[-9,-21] Ecaflipus — 100x Biscuit de chance",                                                emoji:"🐱", req:"Succès : Ecaflipuces" },
+  { id:"fm028", name:"Chacha des Glaces", how:"Échange",  fun:"Le Chat Givré",                      where:"[-66,-75] vers le Comte — 10x Scapula du Comte + 1x Bandelette du Comte Harebourg",          emoji:"🐱", req:"Succès : Givrefoux" },
+  { id:"fm029", name:"Chacha Tigré",      how:"Échange",  fun:"Le Chat Rayé",                       where:"[-1,-6] Ecaflipus — 500x Orichor",                                                           emoji:"🐯", req:"Aucun" },
+  { id:"fm030", name:"Chachyène",         how:"Quête",    fun:"Le Loup-Chat Mystique",              where:"Quête : Chachyène de vie",                                                                    emoji:"🐺", req:"Quête disponible en jeu" },
+  { id:"fm031", name:"Chaperlipopette",   how:"Échange",  fun:"L'Acrobate de Poche",                where:"[-1,-6] Ecaflipus — 500x Orichor",                                                           emoji:"🎪", req:"Aucun" },
+  { id:"fm032", name:"Chauffe-souris",    how:"Échange",  fun:"La Chauve-souris Rôtie",             where:"[9,15] Crypte — 50x Paille Vampiresque",                                                     emoji:"🦇", req:"Aucun" },
+  { id:"fm033", name:"Chauffe-souris Délavée",how:"Échange",fun:"La Chauve-souris Pâlichonne",     where:"[-4,-24] — 150x Almaton OU 50x Rouflaquettes d'Halouine + 5x Chicots d'Halouine",             emoji:"🦇", req:"Aucun" },
+  { id:"fm034", name:"Chercheur d'Ogrines",how:"Échange", fun:"Le Chercheur d'Or",                  where:"[-55,15] chez Otomaï (étage) — 50x Petite pierre d'âme parfaite",                            emoji:"💎", req:"Succès : Zoths" },
+  { id:"fm035", name:"Chienchien Tigré",  how:"Échange",  fun:"Le Chien Rayé",                      where:"[-27,-5] — 50x Fragment d'Os",                                                               emoji:"🐕", req:"Succès : Mulous" },
+  { id:"fm036", name:"Crocodaille",       how:"Échange",  fun:"Le Croco de Poche",                  where:"[-7,11] — 50x Dent de Crocodaille + 1x Crâne de Chef Crocodaille",                           emoji:"🐊", req:"Succès : Gadouilleux" },
+  { id:"fm037", name:"Cromeugnon",        how:"Échange",  fun:"L'Homme des Cavernes Givré",         where:"[-80,-81] — 100x Larme de Givrefoux",                                                        emoji:"🧊", req:"Succès : Givrefoux" },
+  { id:"fm038", name:"Croum",             how:"Échange",  fun:"Le Bandit Miniature",                where:"[16,21] — 10x Émeraude + 10x Cristal",                                                       emoji:"🛡️", req:"Succès : Bandits d'Amakna" },
   // ─ D ─
-  { id:"fm039", name:"Dauge",             how:"Quête",    fun:"Le Chien du Dieu Ouginak",           where:"[-24,24] devant le Dieu Ouginak — 50x Baballe",                                              req:"Succès : La Fratrie des Oubliés" },
-  { id:"fm040", name:"Dehluge",           how:"Jetons",   fun:"Le Déluge en Miniature",             where:"[13,35] Temple des Alliances — 10 000x Pépite",                                              req:"Aucun" },
-  { id:"fm041", name:"Dragouf",           how:"Échange",  fun:"Le Dragon du Désert",                where:"[-46,44] — 20x Jeton du Dragouf",                                                            req:"Aucun" },
-  { id:"fm042", name:"Dragoune Noire",    how:"Échange",  fun:"La Dragonne des Ombres",             where:"[-4,26] maison — 10x Dent du Kharnozor + 1x Œil du Kharnozor",                              req:"Succès : Dragoss" },
-  { id:"fm043", name:"Dragoune Rose",     how:"Échange",  fun:"La Princesse du Donjon",             where:"[-2,24] — 10x Corne brisée de Crocabulia",                                                   req:"Succès : Dragoeufs Protecteurs" },
-  { id:"fm044", name:"Drakopin",          how:"Échange",  fun:"Le Dragon du Fond",                  where:"[23,24] — 50x Perle des profondeurs",                                                        req:"Succès : J'tape dans l'fond" },
+  { id:"fm039", name:"Dauge",             how:"Quête",    fun:"Le Chien du Dieu Ouginak",           where:"[-24,24] devant le Dieu Ouginak — 50x Baballe",                                              emoji:"🐕", req:"Succès : La Fratrie des Oubliés" },
+  { id:"fm040", name:"Dehluge",           how:"Jetons",   fun:"Le Déluge en Miniature",             where:"[13,35] Temple des Alliances — 10 000x Pépite",                                              emoji:"🌊", req:"Aucun" },
+  { id:"fm041", name:"Dragouf",           how:"Échange",  fun:"Le Dragon du Désert",                where:"[-46,44] — 20x Jeton du Dragouf",                                                            emoji:"🦎", req:"Aucun" },
+  { id:"fm042", name:"Dragoune Noire",    how:"Échange",  fun:"La Dragonne des Ombres",             where:"[-4,26] maison — 10x Dent du Kharnozor + 1x Œil du Kharnozor",                              emoji:"🐉", req:"Succès : Dragoss" },
+  { id:"fm043", name:"Dragoune Rose",     how:"Échange",  fun:"La Princesse du Donjon",             where:"[-2,24] — 10x Corne brisée de Crocabulia",                                                   emoji:"🐉", req:"Succès : Dragoeufs Protecteurs" },
+  { id:"fm044", name:"Drakopin",          how:"Échange",  fun:"Le Dragon du Fond",                  where:"[23,24] — 50x Perle des profondeurs",                                                        emoji:"🐲", req:"Succès : J'tape dans l'fond" },
   // ─ E ─
-  { id:"fm045", name:"Ecumouth",          how:"Échange",  fun:"L'Écureuil des Pins",                where:"[-64,-50] — 50x Gland de l'Écumouth",                                                        req:"Succès : Faune des Pins Perdus" },
-  { id:"fm046", name:"Ecureuil Chenapan", how:"Échange",  fun:"Le Petit Voleur de Noisettes",       where:"[-1,-7] Île de Pwâk — 200x Coupon praliné",                                                  req:"Succès : Chauuuuud Cacao !" },
-  { id:"fm047", name:"Eliôme",            how:"Échange",  fun:"La Flamme Abyssale",                 where:"[24,33] Abysses — 100x Pierre Angulaire",                                                    req:"Succès : Serviteurs de l'indicible" },
-  { id:"fm048", name:"El Scarador",       how:"Échange",  fun:"Le Scarabée de l'Arène",             where:"[4,28] 3ème map de la mine — 10x Ailes du Scarabosse Doré + 100x Viscères de Scarafeuille",  req:"Succès : Scarafeuilles" },
+  { id:"fm045", name:"Ecumouth",          how:"Échange",  fun:"L'Écureuil des Pins",                where:"[-64,-50] — 50x Gland de l'Écumouth",                                                        emoji:"🐿️", req:"Succès : Faune des Pins Perdus" },
+  { id:"fm046", name:"Ecureuil Chenapan", how:"Échange",  fun:"Le Petit Voleur de Noisettes",       where:"[-1,-7] Île de Pwâk — 200x Coupon praliné",                                                  emoji:"🐿️", req:"Succès : Chauuuuud Cacao !" },
+  { id:"fm047", name:"Eliôme",            how:"Échange",  fun:"La Flamme Abyssale",                 where:"[24,33] Abysses — 100x Pierre Angulaire",                                                    emoji:"💥", req:"Succès : Serviteurs de l'indicible" },
+  { id:"fm048", name:"El Scarador",       how:"Échange",  fun:"Le Scarabée de l'Arène",             where:"[4,28] 3ème map de la mine — 10x Ailes du Scarabosse Doré + 100x Viscères de Scarafeuille",  emoji:"🪲", req:"Succès : Scarafeuilles" },
   // ─ F ─
-  { id:"fm049", name:"Fëanor",            how:"Échange",  fun:"Le Scarabée Mystique",               where:"[12,-76] Pyramide — 100x Scarabée Chrysonéfritin",                                           req:"Succès : Maudits" },
-  { id:"fm050", name:"Fosfo",             how:"Échange",  fun:"Le Lapin Radioactif",                where:"[28,-13] devant les laboratoires — 100x Cawotte Transgénique",                               req:"Succès : Wabbits mutants" },
-  { id:"fm051", name:"Fotome",            how:"Échange",  fun:"Le Fantôme de Poche",                where:"[-13,-41] — 10x Boostoplasme",                                                               req:"Succès : Bêtes de la nuit" },
+  { id:"fm049", name:"Fëanor",            how:"Échange",  fun:"Le Scarabée Mystique",               where:"[12,-76] Pyramide — 100x Scarabée Chrysonéfritin",                                           emoji:"🐞", req:"Succès : Maudits" },
+  { id:"fm050", name:"Fosfo",             how:"Échange",  fun:"Le Lapin Radioactif",                where:"[28,-13] devant les laboratoires — 100x Cawotte Transgénique",                               emoji:"🐇", req:"Succès : Wabbits mutants" },
+  { id:"fm051", name:"Fotome",            how:"Échange",  fun:"Le Fantôme de Poche",                where:"[-13,-41] — 10x Boostoplasme",                                                               emoji:"👻", req:"Succès : Bêtes de la nuit" },
   // ─ G ─
-  { id:"fm052", name:"Gelutin",           how:"Échange",  fun:"La Gelée Colorée",                   where:"[-7,-43] — 5x Feuille de Blop Multicolore Royal + 5x Feuille de Blop Royal",                req:"Succès : Blops" },
-  { id:"fm053", name:"Givrefoux",         how:"Échange",  fun:"Le Renard de Glace",                 where:"[-81,-75] — 5x Cuir de Fuji Givrefoux + 10x Laine de Tengu Givrefoux",                       req:"Succès : Givrefoux" },
-  { id:"fm054", name:"Grossepioche",      how:"Échange",  fun:"Le Mineur de Fond",                  where:"[13,21] Donjon des Forgerons — 5x Croc du Coffre des Forgerons",                             req:"Succès : Forgerons" },
+  { id:"fm052", name:"Gelutin",           how:"Échange",  fun:"La Gelée Colorée",                   where:"[-7,-43] — 5x Feuille de Blop Multicolore Royal + 5x Feuille de Blop Royal",                emoji:"🫧", req:"Succès : Blops" },
+  { id:"fm053", name:"Givrefoux",         how:"Échange",  fun:"Le Renard de Glace",                 where:"[-81,-75] — 5x Cuir de Fuji Givrefoux + 10x Laine de Tengu Givrefoux",                       emoji:"🦊", req:"Succès : Givrefoux" },
+  { id:"fm054", name:"Grossepioche",      how:"Échange",  fun:"Le Mineur de Fond",                  where:"[13,21] Donjon des Forgerons — 5x Croc du Coffre des Forgerons",                             emoji:"⛏️", req:"Succès : Forgerons" },
   // ─ K/L/M/N/O/P ─
-  { id:"fm055", name:"Kanigrou",          how:"Échange",  fun:"Le Kangourou Boxeur",                where:"[-3,0] Cania — 20x Pince de Kanigrou",                                                       req:"Succès : Kanigrous" },
-  { id:"fm056", name:"Léopardo",          how:"Échange",  fun:"Le Fauve des Neiges",                where:"Pont de Grobe Frigost — 50x Os Fantôme Nukoui San + 50x Os Fantôme Pandore",                req:"Succès Dofus Émeraude" },
-  { id:"fm057", name:"Mékrabe",           how:"Échange",  fun:"Le Crabe Métallique",                where:"[-3,-53] Frigost — 20x Pince de Mékrabe",                                                    req:"Succès : Se Jeter à l'Eau (Merkator)" },
-  { id:"fm058", name:"Minoskour",         how:"Échange",  fun:"Le Taureau Miniature",               where:"[-74,-38] Frigost — 20x Corne de Minoskour",                                                 req:"Succès : Minotoror" },
-  { id:"fm059", name:"Nomoon",            how:"Échange",  fun:"L'Araignée de Poche",                where:"[-3,-16] Donjon Abraknydes — 5x Toile d'Abraknyde Ancestral",                               req:"Succès : Abraknydes" },
-  { id:"fm060", name:"Ouassingue",        how:"Échange",  fun:"Le Mouton Enragé",                   where:"[-26,36] — 5x Laine de Bouftou Royal",                                                       req:"Succès : Bouftous" },
-  { id:"fm061", name:"Phortiche",         how:"Échange",  fun:"Le Costaud de Poche",                where:"[1,6] Xélorium/Enutrosor — 500x Orichor",                                                    req:"Aucun" },
-  { id:"fm062", name:"Pioute Jaune",      how:"Échange",  fun:"Le Poussin Solaire",                 where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Jaune + 100x Graine de Sésame",                req:"Aucun" },
-  { id:"fm063", name:"Pioute Rose",       how:"Échange",  fun:"Le Poussin Romantique",              where:"[5,-17] Maison secrète d'Astrub — 50x Plume Piou Rose + 100x Graine de Sésame",             req:"Aucun" },
-  { id:"fm064", name:"Pioute Rouge",      how:"Échange",  fun:"Le Poussin Enragé",                  where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Rouge + 100x Graine de Sésame",                req:"Aucun" },
-  { id:"fm065", name:"Pioute Bleu",       how:"Échange",  fun:"Le Poussin Mélancolique",            where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Bleu + 100x Graine de Sésame",                 req:"Aucun" },
-  { id:"fm066", name:"Pioute Vert",       how:"Échange",  fun:"Le Poussin Écolo",                   where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Vert + 100x Graine de Sésame",                 req:"Aucun" },
-  { id:"fm067", name:"Pioute Violet",     how:"Échange",  fun:"Le Poussin Mystique",                where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Violet + 100x Graine de Sésame",               req:"Aucun" },
-  { id:"fm068", name:"Pioute Blanc",      how:"Échange",  fun:"La Boule de Plumes",                 where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Blanc + 100x Graine de Sésame",                req:"Aucun" },
+  { id:"fm055", name:"Kanigrou",          how:"Échange",  fun:"Le Kangourou Boxeur",                where:"[-3,0] Cania — 20x Pince de Kanigrou",                                                       emoji:"🦘", req:"Succès : Kanigrous" },
+  { id:"fm056", name:"Léopardo",          how:"Échange",  fun:"Le Fauve des Neiges",                where:"Pont de Grobe Frigost — 50x Os Fantôme Nukoui San + 50x Os Fantôme Pandore",                emoji:"🐆", req:"Succès Dofus Émeraude" },
+  { id:"fm057", name:"Mékrabe",           how:"Échange",  fun:"Le Crabe Métallique",                where:"[-3,-53] Frigost — 20x Pince de Mékrabe",                                                    emoji:"🦀", req:"Succès : Se Jeter à l'Eau (Merkator)" },
+  { id:"fm058", name:"Minoskour",         how:"Échange",  fun:"Le Taureau Miniature",               where:"[-74,-38] Frigost — 20x Corne de Minoskour",                                                 emoji:"🐂", req:"Succès : Minotoror" },
+  { id:"fm059", name:"Nomoon",            how:"Échange",  fun:"L'Araignée de Poche",                where:"[-3,-16] Donjon Abraknydes — 5x Toile d'Abraknyde Ancestral",                               emoji:"🕷️", req:"Succès : Abraknydes" },
+  { id:"fm060", name:"Ouassingue",        how:"Échange",  fun:"Le Mouton Enragé",                   where:"[-26,36] — 5x Laine de Bouftou Royal",                                                       emoji:"🐑", req:"Succès : Bouftous" },
+  { id:"fm061", name:"Phortiche",         how:"Échange",  fun:"Le Costaud de Poche",                where:"[1,6] Xélorium/Enutrosor — 500x Orichor",                                                    emoji:"💪", req:"Aucun" },
+  { id:"fm062", name:"Pioute Jaune",      how:"Échange",  fun:"Le Poussin Solaire",                 where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Jaune + 100x Graine de Sésame",                emoji:"🐣", req:"Aucun" },
+  { id:"fm063", name:"Pioute Rose",       how:"Échange",  fun:"Le Poussin Romantique",              where:"[5,-17] Maison secrète d'Astrub — 50x Plume Piou Rose + 100x Graine de Sésame",             emoji:"🐣", req:"Aucun" },
+  { id:"fm064", name:"Pioute Rouge",      how:"Échange",  fun:"Le Poussin Enragé",                  where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Rouge + 100x Graine de Sésame",                emoji:"🐣", req:"Aucun" },
+  { id:"fm065", name:"Pioute Bleu",       how:"Échange",  fun:"Le Poussin Mélancolique",            where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Bleu + 100x Graine de Sésame",                 emoji:"🐣", req:"Aucun" },
+  { id:"fm066", name:"Pioute Vert",       how:"Échange",  fun:"Le Poussin Écolo",                   where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Vert + 100x Graine de Sésame",                 emoji:"🐣", req:"Aucun" },
+  { id:"fm067", name:"Pioute Violet",     how:"Échange",  fun:"Le Poussin Mystique",                where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Violet + 100x Graine de Sésame",               emoji:"🐣", req:"Aucun" },
+  { id:"fm068", name:"Pioute Blanc",      how:"Échange",  fun:"La Boule de Plumes",                 where:"[4,-22] Poulailler d'Astrub — 50x Plume Piou Blanc + 100x Graine de Sésame",                emoji:"🐣", req:"Aucun" },
   // ─ S/T ─
-  { id:"fm069", name:"Scarapiaf",         how:"Échange",  fun:"L'Insecte de Compagnie",             where:"Zone Scarafeuilles — 5x Carapace de Scarafeuille Royal",                                     req:"Succès : Scarafeuilles" },
-  { id:"fm070", name:"Tofurby",           how:"Échange",  fun:"La Peluche Électrisée",              where:"[2,-8] Donjon des Tofus — 5x Plume de Tofu Royal",                                          req:"Succès : Tofus" },
-  { id:"fm071", name:"Tofuldi",           how:"Échange",  fun:"Le Tofu qui Brille",                 where:"[2,-8] Donjon des Tofus — 10x Plume de Tofu Royal",                                         req:"Succès : Tofus" },
-  { id:"fm072", name:"Tofoudre",          how:"Quête",    fun:"Le Tofu Foudroyant",                 where:"[11,8] Zone Feudala — PNJ visible en zone",                                                  req:"Succès Tofus en zone Feudala" },
-  { id:"fm073", name:"Tifoux",            how:"Quête",    fun:"Le Renardeau Elfique",               where:"Zone Sufokia — Quête : Le Petit Renard des Bois",                                            req:"Quête Sufokia" },
-  { id:"fm074", name:"Walk",              how:"Quête",    fun:"Le Marcheur Silencieux",             where:"Zone Lac Gelé — PNJ apparaît après succès",                                                  req:"Succès 'La Marche de l'Empereur' + 'Forage à tous vents'" },
-  { id:"fm075", name:"Bwak Noir",         how:"Quête",    fun:"Le Poulet de la Jungle",             where:"Île Otomaï — échange contre ressources Bwak",                                               req:"Accès Île Otomaï (abonné)" },
+  { id:"fm069", name:"Scarapiaf",         how:"Échange",  fun:"L'Insecte de Compagnie",             where:"Zone Scarafeuilles — 5x Carapace de Scarafeuille Royal",                                     emoji:"🪲", req:"Succès : Scarafeuilles" },
+  { id:"fm070", name:"Tofurby",           how:"Échange",  fun:"La Peluche Électrisée",              where:"[2,-8] Donjon des Tofus — 5x Plume de Tofu Royal",                                          emoji:"🐦", req:"Succès : Tofus" },
+  { id:"fm071", name:"Tofuldi",           how:"Échange",  fun:"Le Tofu qui Brille",                 where:"[2,-8] Donjon des Tofus — 10x Plume de Tofu Royal",                                         emoji:"🐦", req:"Succès : Tofus" },
+  { id:"fm072", name:"Tofoudre",          how:"Quête",    fun:"Le Tofu Foudroyant",                 where:"[11,8] Zone Feudala — PNJ visible en zone",                                                  emoji:"⚡", req:"Succès Tofus en zone Feudala" },
+  { id:"fm073", name:"Tifoux",            how:"Quête",    fun:"Le Renardeau Elfique",               where:"Zone Sufokia — Quête : Le Petit Renard des Bois",                                            emoji:"🦊", req:"Quête Sufokia" },
+  { id:"fm074", name:"Walk",              how:"Quête",    fun:"Le Marcheur Silencieux",             where:"Zone Lac Gelé — PNJ apparaît après succès",                                                  emoji:"🚶", req:"Succès 'La Marche de l'Empereur' + 'Forage à tous vents'" },
+  { id:"fm075", name:"Bwak Noir",         how:"Quête",    fun:"Le Poulet de la Jungle",             where:"Île Otomaï — échange contre ressources Bwak",                                               emoji:"🐓", req:"Accès Île Otomaï (abonné)" },
 ];
 
 
@@ -1460,7 +1460,7 @@ function FamiliersSection({ done, toggle, totalDone }) {
                   {f.name} — {f.where}
                 </div>
               </div>
-              <div style={{ fontSize:13 }}>🐾</div>
+              <div style={{ fontSize:13 }}>{f.emoji || "🐾"}</div>
             </div>
           );
         })}
@@ -1683,7 +1683,7 @@ function FamilierCatchOverlay({ familier, onDone }) {
       <div style={{ position:"absolute", inset:0, background:"rgba(5,20,5,0.8)", backdropFilter:"blur(3px)" }} />
       <canvas ref={canvasRef} style={{ position:"absolute", inset:0, pointerEvents:"none" }} />
       <div style={{ position:"relative", zIndex:1, textAlign:"center", transform:phase==="in"?"scale(0.7)":"scale(1)", transition:"transform 0.4s cubic-bezier(0.34,1.56,0.64,1)" }}>
-        <div style={{ fontSize:64, marginBottom:10, filter:"drop-shadow(0 0 20px rgba(80,200,80,0.7))" }}>🐾</div>
+        <div style={{ fontSize:64, marginBottom:10, filter:"drop-shadow(0 0 20px rgba(80,200,80,0.7))" }}>{familier.emoji || "🐾"}</div>
         <div style={{ fontSize:11, color:"#80c880", fontFamily:"'Cinzel',serif", letterSpacing:3, marginBottom:8 }}>FAMILIER OBTENU</div>
         <div style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(18px,3.5vw,28px)", fontWeight:700, color:"#c0f0a0", letterSpacing:2, textShadow:"0 0 20px rgba(100,220,80,0.8), 0 2px 6px rgba(0,0,0,0.8)", marginBottom:6 }}>{familier.fun}</div>
         <div style={{ fontSize:14, color:"#a0d080", fontStyle:"italic" }}>{familier.name}</div>
@@ -2168,7 +2168,21 @@ export default function App() {
   // ── Badge unlock detection ──
   const [badgeOverlay, setBadgeOverlay] = useState(null);
   const [catOverlay, setCatOverlay] = useState(null);
-  const [shownBadges, setShownBadges] = useState(new Set());
+  const [badgeQueue, setBadgeQueue] = useState([]);
+  // Badges déjà vus — persistés en localStorage pour pas les re-montrer au rechargement
+  const [shownBadges] = useState(() => {
+    try { return new Set(JSON.parse(localStorage.getItem("shownBadges") || "[]")); }
+    catch(e) { return new Set(); }
+  });
+
+  // Quand la queue change, affiche le prochain badge si pas d'overlay en cours
+  useEffect(() => {
+    if (badgeQueue.length > 0 && !badgeOverlay && !catOverlay) {
+      const next = badgeQueue[0];
+      setBadgeQueue(q => q.slice(1));
+      setBadgeOverlay(next);
+    }
+  }, [badgeQueue, badgeOverlay, catOverlay]);
 
   useEffect(() => {
     const allBadges = [
@@ -2180,13 +2194,12 @@ export default function App() {
                   Object.values(cellMeta?.familiers||{}).filter(Boolean).length >= b.threshold,
       })),
     ];
-    allBadges.forEach(b => {
-      if (b.unlocked && !shownBadges.has(b.id)) {
-        setShownBadges(prev => new Set([...prev, b.id]));
-        // Décale légèrement les badges pour éviter le chevauchement
-        setTimeout(() => setBadgeOverlay(b), shownBadges.size * 200);
-      }
-    });
+    const newBadges = allBadges.filter(b => b.unlocked && !shownBadges.has(b.id));
+    if (newBadges.length > 0) {
+      newBadges.forEach(b => shownBadges.add(b.id));
+      try { localStorage.setItem("shownBadges", JSON.stringify([...shownBadges])); } catch(e) {}
+      setBadgeQueue(q => [...q, ...newBadges]);
+    }
   }, [skydroDone, cellDone, skydroMeta, cellMeta, duoDone, skyDailyTotal, cellDailyTotal]);
 
   // Stats cliquables pour naviguer
@@ -2200,7 +2213,7 @@ export default function App() {
     <div className="dofus-app">
       <style>{styles}</style>
       {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
-      {badgeOverlay && <BadgeUnlockOverlay badge={badgeOverlay} onDone={() => setBadgeOverlay(null)} />}
+      {badgeOverlay && !catOverlay && <BadgeUnlockOverlay badge={badgeOverlay} onDone={() => setBadgeOverlay(null)} />}
 
       {/* HEADER */}
       <div style={{ background:`linear-gradient(160deg, #1a1535 0%, #2a2050 50%, #1e1a40 100%)`, padding:"16px 20px 0", textAlign:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.6)", borderBottom:"1px solid rgba(180,140,255,0.15)" }}>
