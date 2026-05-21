@@ -2327,9 +2327,7 @@ function OcreTab({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
     if (!key || !slug) return;
     setLoading(true); setError(null);
     try {
-      const res = await fetch(`https://www.metamob.fr/api/v1/quests/${slug}/zones`, {
-        headers: { "Authorization": `Bearer ${key}` }
-      });
+      const res = await fetch(`/api/metamob?slug=${slug}&apikey=${key}`);
       if (!res.ok) throw new Error(`Erreur ${res.status}`);
       const json = await res.json();
       setData(json.data || []);
