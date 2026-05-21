@@ -2415,8 +2415,10 @@ export default function App() {
   const NAV_TABS = [
     { key:"familiers",   label:"🐾 Familiers",   active:{ bg:"#eaf4ea", border:"#4a8a4a", color:"#2a6a2a" } },
     { key:"compagnons",  label:"⚔ Compagnons",  active:{ bg:"#eaf0fa", border:"#4a6aaa", color:"#1a3a7a" } },
-    { key:"chasse",    label:"🗺 Chasse",    active:{ bg:"#f8f4e8", border:"#a08020",  color:"#6a4a10" } },
-    { key:"stuff",     label:"⚔ Stuff",     active:{ bg:"#f0eaf8", border:"#6a4a8a",  color:"#4a2a6a" } },
+    { key:"chasse",      label:"🗺 Chasse",      active:{ bg:"#f8f4e8", border:"#a08020",  color:"#6a4a10" } },
+    { key:"metiers",     label:"⚒ Métiers",     active:{ bg:"#eaf8ea", border:"#2a8a4a",  color:"#0a5a2a" } },
+    { key:"map",         label:"🌍 Carte",       active:{ bg:"#eaf4f8", border:"#2a7a9a",  color:"#0a4a6a" } },
+    { key:"stuff",       label:"⚔ Stuff",       active:{ bg:"#f0eaf8", border:"#6a4a8a",  color:"#4a2a6a" } },
   ];
 
   const duoAll    = DUO_DATA.flatMap(c=>c.objectives);
@@ -2532,9 +2534,9 @@ export default function App() {
       </div>
 
       {/* ── LAYOUT 3 COLONNES ── */}
-      <div className="dofus-layout" style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:tab==="stuff"?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
+      <div className="dofus-layout" style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:["stuff","metiers","map"].includes(tab)?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
 
-        {tab !== "stuff" && <div className="dofus-sidebar"><RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" /></div>}
+        {!["stuff","metiers","map"].includes(tab) && <div className="dofus-sidebar"><RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" /></div>}
 
         <div className="dofus-center" style={{ flex:1, minWidth:0 }}>
           <div className="panel" style={{ padding:"22px 20px" }}>
@@ -2628,16 +2630,42 @@ export default function App() {
                   Outil DofusDB — sélectionne ton indice sur la carte pour trouver la prochaine étape
                 </div>
                 <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}`, background:"#fff" }}>
-                  <iframe
-                    src="https://dofusdb.fr/fr/tools/treasure-hunt"
-                    style={{ width:"100%", height:"75vh", border:"none", display:"block" }}
-                    title="Résolveur de chasse aux trésors DofusDB"
-                    loading="lazy"
-                  />
+                  <iframe src="https://dofusdb.fr/fr/tools/treasure-hunt" style={{ width:"100%", height:"75vh", border:"none", display:"block" }} title="Chasse aux trésors DofusDB" loading="lazy" />
                 </div>
                 <div style={{ fontSize:11, color:C.textDim, textAlign:"center", marginTop:8, fontStyle:"italic" }}>
-                  Si l'outil ne charge pas, ouvre-le directement sur{" "}
-                  <a href="https://dofusdb.fr/fr/tools/treasure-hunt" target="_blank" rel="noopener noreferrer" style={{ color:C.gold }}>dofusdb.fr</a>
+                  Si l'outil ne charge pas → <a href="https://dofusdb.fr/fr/tools/treasure-hunt" target="_blank" rel="noopener noreferrer" style={{ color:C.gold }}>dofusdb.fr</a>
+                </div>
+              </div>
+            )}
+            {tab==="metiers" && (
+              <div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:8, textAlign:"center" }}>
+                  ⚒ Simulateur XP Métiers
+                </div>
+                <div style={{ fontSize:13, color:C.textDim, fontStyle:"italic", textAlign:"center", marginBottom:16 }}>
+                  Calcule combien d'objets crafter ou récolter pour atteindre le niveau voulu
+                </div>
+                <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}`, background:"#fff" }}>
+                  <iframe src="https://dofusdb.fr/fr/tools/jobs-xp" style={{ width:"100%", height:"80vh", border:"none", display:"block" }} title="XP Métiers DofusDB" loading="lazy" />
+                </div>
+                <div style={{ fontSize:11, color:C.textDim, textAlign:"center", marginTop:8, fontStyle:"italic" }}>
+                  Si l'outil ne charge pas → <a href="https://dofusdb.fr/fr/tools/jobs-xp" target="_blank" rel="noopener noreferrer" style={{ color:C.gold }}>dofusdb.fr</a>
+                </div>
+              </div>
+            )}
+            {tab==="map" && (
+              <div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:8, textAlign:"center" }}>
+                  🌍 Carte des Ressources
+                </div>
+                <div style={{ fontSize:13, color:C.textDim, fontStyle:"italic", textAlign:"center", marginBottom:16 }}>
+                  Carte interactive du Monde des Douze — localise toutes les ressources récoltables
+                </div>
+                <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}`, background:"#fff" }}>
+                  <iframe src="https://dofusdb.fr/fr/tools/map" style={{ width:"100%", height:"82vh", border:"none", display:"block" }} title="Carte des ressources DofusDB" loading="lazy" />
+                </div>
+                <div style={{ fontSize:11, color:C.textDim, textAlign:"center", marginTop:8, fontStyle:"italic" }}>
+                  Si la carte ne charge pas → <a href="https://dofusdb.fr/fr/tools/map" target="_blank" rel="noopener noreferrer" style={{ color:C.gold }}>dofusdb.fr</a>
                 </div>
               </div>
             )}
@@ -2664,7 +2692,7 @@ export default function App() {
           </div>
         </div>
 
-        {tab !== "stuff" && <div className="dofus-sidebar"><RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" /></div>}
+        {!["stuff","metiers","map"].includes(tab) && <div className="dofus-sidebar"><RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" /></div>}
 
       </div>
     </div>
