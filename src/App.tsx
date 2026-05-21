@@ -2307,6 +2307,99 @@ function CompagnonsDualList({ skyComp, cellComp, onToggleSky, onToggleCell, skyd
 // ─── ONGLET OCRE ─────────────────────────────────────────────────────────────
 const METAMOB_IMG = "https://www.metamob.fr/img/monstres/";
 
+// ─── MÉTIERS ─────────────────────────────────────────────────────────────────
+const METIERS_GROUPES = [
+  { groupe:"🌿 Récolte", emoji:"🌿", metiers:[
+    { id:"alchimiste",  name:"Alchimiste",  emoji:"⚗️"  },
+    { id:"bucheron",    name:"Bûcheron",    emoji:"🪓"  },
+    { id:"chasseur",    name:"Chasseur",    emoji:"🏹"  },
+    { id:"mineur",      name:"Mineur",      emoji:"⛏️"  },
+    { id:"paysan",      name:"Paysan",      emoji:"🌾"  },
+    { id:"pecheur",     name:"Pêcheur",     emoji:"🎣"  },
+  ]},
+  { groupe:"⚒ Artisanat", emoji:"⚒", metiers:[
+    { id:"bijoutier",   name:"Bijoutier",   emoji:"💍"  },
+    { id:"bricoleur",   name:"Bricoleur",   emoji:"🔧"  },
+    { id:"boulanger",   name:"Boulanger",   emoji:"🍞"  },
+    { id:"cordonnier",  name:"Cordonnier",  emoji:"👢"  },
+    { id:"faconneur",   name:"Façonneur",   emoji:"🛡️"  },
+    { id:"forgeron",    name:"Forgeron",    emoji:"🔨"  },
+    { id:"sculpteur",   name:"Sculpteur",   emoji:"🪵"  },
+    { id:"tailleur",    name:"Tailleur",    emoji:"🧵"  },
+  ]},
+  { groupe:"✨ Forgemagie", emoji:"✨", metiers:[
+    { id:"cordomage",   name:"Cordomage",   emoji:"👢"  },
+    { id:"costumage",   name:"Costumage",   emoji:"🧣"  },
+    { id:"facomage",    name:"Façomage",    emoji:"🛡️"  },
+    { id:"forgemage",   name:"Forgemage",   emoji:"⚔️"  },
+    { id:"joaillomage", name:"Joaillomage", emoji:"💍"  },
+    { id:"sculptemage", name:"Sculptemage", emoji:"🪄"  },
+  ]},
+  { groupe:"🐉 Élevage", emoji:"🐉", metiers:[
+    { id:"eleveur",     name:"Éleveur",     emoji:"🐉"  },
+  ]},
+];
+
+function MetiersColumn({ label, color, light, border, meta, onUpdate }) {
+  const metiers = meta?.metiers || {};
+
+  const setLevel = (id, val) => {
+    const lvl = Math.min(200, Math.max(0, parseInt(val) || 0));
+    onUpdate({ ...meta, metiers: { ...metiers, [id]: lvl } });
+  };
+
+  const totalMax = METIERS_GROUPES.flatMap(g => g.metiers).length * 200;
+  const totalActuel = Object.values(metiers).reduce((a, b) => a + (b || 0), 0);
+  const pct = Math.round(totalActuel / totalMax * 100);
+
+  return (
+    <div style={{ background:light, border:`2px solid ${border}`, borderRadius:8, padding:"12px 10px", position:"sticky", top:20 }}>
+      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:700, color, marginBottom:8, textAlign:"center", borderBottom:`1px solid ${border}44`, paddingBottom:6 }}>
+        ◈ {label}
+      </div>
+      {/* Barre globale */}
+      <div style={{ marginBottom:10 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:C.textDim, marginBottom:3, fontFamily:"'Cinzel',serif" }}>
+          <span>Progression globale</span><span>{pct}%</span>
+        </div>
+        <div style={{ height:4, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
+          <div style={{ height:"100%", width:`${pct}%`, background:color, borderRadius:2, transition:"width 0.3s" }} />
+        </div>
+      </div>
+      {/* Groupes */}
+      {METIERS_GROUPES.map(g => (
+        <div key={g.groupe} style={{ marginBottom:10 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color, letterSpacing:1, textTransform:"uppercase", marginBottom:5, opacity:0.8 }}>
+            {g.emoji} {g.groupe.replace(/^[^\s]+\s/, "")}
+          </div>
+          {g.metiers.map(m => {
+            const lvl = metiers[m.id] || 0;
+            const pctM = Math.round(lvl / 200 * 100);
+            return (
+              <div key={m.id} style={{ marginBottom:5 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:2 }}>
+                  <span style={{ fontSize:11 }}>{m.emoji}</span>
+                  <span style={{ flex:1, fontSize:10, color:C.text, fontWeight: lvl >= 200 ? 700 : 400 }}>{m.name}</span>
+                  <input
+                    type="number" min={0} max={200}
+                    value={lvl || ""}
+                    placeholder="0"
+                    onChange={e => setLevel(m.id, e.target.value)}
+                    style={{ width:38, padding:"1px 4px", border:`1px solid ${lvl>=200?"#2a6a2a":border}`, borderRadius:3, fontSize:10, textAlign:"center", background:lvl>=200?"#eef4ee":"white", color:lvl>=200?"#2a6a2a":C.text, outline:"none", fontFamily:"'Cinzel',serif", fontWeight:700 }}
+                  />
+                </div>
+                <div style={{ height:3, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
+                  <div style={{ height:"100%", width:`${pctM}%`, background: lvl>=200?"#2a6a2a":lvl>=100?color:`${color}88`, borderRadius:2, transition:"width 0.3s" }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function OcreTab({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
   const [skyData,  setSkyData]  = useState(null);
   const [cellData, setCellData] = useState(null);
@@ -2892,17 +2985,21 @@ export default function App() {
             )}
             {tab==="metiers" && (
               <div>
-                <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:8, textAlign:"center" }}>
-                  ⚒ Simulateur XP Métiers
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12, textAlign:"center" }}>
+                  ⚒ Métiers
                 </div>
-                <div style={{ fontSize:13, color:C.textDim, fontStyle:"italic", textAlign:"center", marginBottom:16 }}>
-                  Calcule combien d'objets crafter ou récolter pour atteindre le niveau voulu
-                </div>
-                <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}`, background:"#fff" }}>
-                  <iframe src="https://dofusdb.fr/fr/tools/jobs-xp" style={{ width:"100%", height:"80vh", border:"none", display:"block" }} title="XP Métiers DofusDB" loading="lazy" />
-                </div>
-                <div style={{ fontSize:11, color:C.textDim, textAlign:"center", marginTop:8, fontStyle:"italic" }}>
-                  Si l'outil ne charge pas → <a href="https://dofusdb.fr/fr/tools/jobs-xp" target="_blank" rel="noopener noreferrer" style={{ color:C.gold }}>dofusdb.fr</a>
+                <div style={{ display:"grid", gridTemplateColumns:"190px 1fr 190px", gap:10, alignItems:"start" }}>
+                  <MetiersColumn label="Sky" color="#2a4a8a" light="#e8f0f8" border="#4a6a9a" meta={skydroMeta} onUpdate={updateSkydroMeta} />
+                  <div>
+                    <div style={{ fontSize:12, color:C.textDim, fontStyle:"italic", textAlign:"center", marginBottom:8 }}>Calcule l'XP nécessaire pour atteindre le niveau voulu</div>
+                    <div style={{ borderRadius:8, overflow:"hidden", border:`1px solid ${C.border}`, background:"#fff" }}>
+                      <iframe src="https://dofusdb.fr/fr/tools/jobs-xp" style={{ width:"100%", height:"78vh", border:"none", display:"block" }} title="XP Métiers DofusDB" loading="lazy" />
+                    </div>
+                    <div style={{ fontSize:10, color:C.textDim, textAlign:"center", marginTop:6, fontStyle:"italic" }}>
+                      Si l'outil ne charge pas → <a href="https://dofusdb.fr/fr/tools/jobs-xp" target="_blank" rel="noopener noreferrer" style={{ color:C.gold }}>dofusdb.fr</a>
+                    </div>
+                  </div>
+                  <MetiersColumn label="Cell" color="#7a2a1a" light="#f8ede8" border="#9a4a2a" meta={cellMeta} onUpdate={updateCellMeta} />
                 </div>
               </div>
             )}
