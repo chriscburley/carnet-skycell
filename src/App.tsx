@@ -147,7 +147,87 @@ const FAMILIERS = [
 ];
 
 
-const HOW_COLORS = {
+const COMPAGNON_BADGES = [
+  { id:"cp1", icon:"🤝", name:"Recrue",            desc:"5 compagnons recrutés",    threshold:5  },
+  { id:"cp2", icon:"⚔️", name:"Lieutenant",        desc:"15 compagnons recrutés",   threshold:15 },
+  { id:"cp3", icon:"🛡️", name:"Capitaine",         desc:"30 compagnons recrutés",   threshold:30 },
+  { id:"cp4", icon:"🎖️", name:"Commandant",        desc:"45 compagnons recrutés",   threshold:45 },
+  { id:"cp5", icon:"👑", name:"Général des Douze", desc:"Les 52 compagnons !",      threshold:52 },
+];
+
+const COMPAGNONS = [
+  // ─ Boutique ─────────────────────────────────────────────────────────────────
+  { id:"cp001", name:"Archiduk",         how:"Boutique",   emoji:"🧪", fun:"Le Savant Fou",            where:"Boutique Dofus — 6 000 ogrines", req:"Abonné", guide:"" },
+  { id:"cp002", name:"Eclaireur Spectral",how:"Marchand",  emoji:"👻", fun:"L'Espion de l'Au-Delà",   where:"[-11,-37] Foire du Trool — Flipiline — 12 000 Trooloton", req:"Abonné", guide:"" },
+  { id:"cp003", name:"Lumino",           how:"Boutique",   emoji:"☀️", fun:"Le Soldat de Lumière",     where:"Boutique Dofus — 2 900 ogrines", req:"Abonné", guide:"" },
+  { id:"cp004", name:"Lumino Star",      how:"Boutique",   emoji:"⭐", fun:"La Star Dorée",            where:"Boutique Dofus — 2 900 ogrines", req:"Abonné", guide:"" },
+  { id:"cp005", name:"Malle O'Kranh",    how:"Boutique",   emoji:"📦", fun:"Le Coffre Ambulant",       where:"Boutique Dofus — 5 800 ogrines", req:"Abonné", guide:"" },
+  { id:"cp006", name:"Masse",            how:"Boutique",   emoji:"🔨", fun:"Le Guerrier Têtu",         where:"Boutique Dofus — 2 900 ogrines", req:"Abonné", guide:"" },
+  { id:"cp007", name:"Ombre",            how:"Boutique",   emoji:"🌑", fun:"Le Silencieux",            where:"Boutique Dofus — 2 900 ogrines", req:"Abonné", guide:"" },
+  { id:"cp008", name:"Scoreur",          how:"Boutique",   emoji:"🔥", fun:"Le Brûleur de Points",     where:"Boutique Dofus — 2 900 ogrines", req:"Abonné", guide:"" },
+  { id:"cp009", name:"Skale",            how:"Boutique",   emoji:"🐍", fun:"Le Reptile des Profondeurs",where:"Boutique Dofus — 2 900 ogrines", req:"Abonné", guide:"" },
+  { id:"cp010", name:"Toxine",           how:"Boutique",   emoji:"☠️", fun:"La Chimiste de l'Ombre",   where:"Boutique Dofus — 5 800 ogrines", req:"Abonné", guide:"" },
+  // ─ Succès ──────────────────────────────────────────────────────────────────
+  { id:"cp011", name:"Chevalier d'Astrub",how:"Succès",   emoji:"🛡️", fun:"Le Garde Fidèle",          where:"Succès « Une petite renommée » — atteindre 500 pts de succès", req:"500 pts succès", guide:"" },
+  { id:"cp012", name:"Hectaupe",         how:"Succès",    emoji:"🦔", fun:"Le Taupier de l'Élite",    where:"Succès « L'esprit de compétition » — 2 000 pts de succès", req:"2 000 pts succès", guide:"" },
+  { id:"cp013", name:"Hichète",          how:"Succès",    emoji:"🪓", fun:"La Guerrière des Terres",  where:"Succès « La folie des grandeurs » — 3 000 pts de succès", req:"3 000 pts succès", guide:"https://www.dofuspourlesnoobs.com/guide-du-compagnon-hichete.html" },
+  { id:"cp014", name:"Krobax",           how:"Succès",    emoji:"🦴", fun:"Le Fossoyeur de Profession",where:"Succès « Krobax » — ouvrir des coffres secrets", req:"Succès Krobax", guide:"" },
+  // ─ Marchand ────────────────────────────────────────────────────────────────
+  { id:"cp015", name:"Feuille",          how:"Marchand",  emoji:"🍃", fun:"La Feuille Volante",       where:"[-13,-29] Kolizéum — Annabelle Huaire — 50 000 Kolizétons", req:"Abonné", guide:"" },
+  { id:"cp016", name:"Flamme",           how:"Marchand",  emoji:"🔥", fun:"La Flamme Vengeresse",     where:"[-13,-29] Kolizéum — Annabelle Huaire — 50 000 Kolizétons", req:"Abonné", guide:"" },
+  { id:"cp017", name:"Goutte",           how:"Marchand",  emoji:"💧", fun:"La Larme Coulante",        where:"[-13,-29] Kolizéum — Annabelle Huaire — 50 000 Kolizétons", req:"Abonné", guide:"" },
+  { id:"cp018", name:"Grouillot",        how:"Marchand",  emoji:"🐛", fun:"Le Grouillot des Songes",  where:"Marché onirique des Songes Infinis — Neru Stalar — 10 000 Brises de rêve", req:"Abonné", guide:"" },
+  { id:"cp019", name:"Hulkrap",          how:"Marchand",  emoji:"💪", fun:"Le Crapaud Colossal",      where:"[5,-19] Gardien de prison — 5 000 Aviton", req:"Abonné", guide:"" },
+  { id:"cp020", name:"Krosmoglob",       how:"Marchand",  emoji:"🌐", fun:"Le Globe-Trotter Krosmiqueien", where:"PNJ Globule — échange contre Almaton", req:"Abonné", guide:"" },
+  { id:"cp021", name:"Traçon",           how:"Marchand",  emoji:"🧱", fun:"Le Maçon Silencieux",      where:"[13,35] Temple des Alliances — Pépites", req:"Abonné", guide:"" },
+  { id:"cp022", name:"Pichon",           how:"Marchand",  emoji:"🐦", fun:"Le Pigeon Voyageur",       where:"Marché du Havre-Sac — Pépites ou Kamas", req:"Abonné", guide:"" },
+  // ─ Quête ──────────────────────────────────────────────────────────────────
+  { id:"cp023", name:"Kanig",            how:"Quête",     emoji:"👑", fun:"Le Roi Miniature",         where:"Quête des Kanigs de Cania — La voyageuse imprudente", req:"Quête Cania", guide:"https://www.dofuspourlesnoobs.com/quecirctes.html" },
+  { id:"cp024", name:"Isabelle",         how:"Quête",     emoji:"👩", fun:"La Farceuse en Rose",      where:"Quête de la Forêt des Abraknydes", req:"Quête Abraknydes", guide:"https://www.dofuspourlesnoobs.com/quecirctes.html" },
+  { id:"cp025", name:"Momie",            how:"Quête",     emoji:"🧟", fun:"La Bandelette Errante",    where:"Quêtes de la Pyramide — Zone Khamelot", req:"Quêtes Pyramide", guide:"https://www.dofuspourlesnoobs.com/quecirctes.html" },
+  { id:"cp026", name:"Sidekick",         how:"Quête",     emoji:"🤜", fun:"Le Poing de Fer",          where:"Quêtes des Bandits — Zone Amakna", req:"Quêtes Bandits", guide:"https://www.dofuspourlesnoobs.com/quecirctes.html" },
+  { id:"cp027", name:"Wulfy",            how:"Quête",     emoji:"🐺", fun:"Le Loup Solitaire",        where:"Quêtes de la Zone Frigost", req:"Quêtes Frigost", guide:"https://www.dofuspourlesnoobs.com/quecirctes.html" },
+  { id:"cp028", name:"Pandawa Noir",     how:"Quête",     emoji:"🐼", fun:"Le Panda des Ombres",      where:"Quêtes de Pandala", req:"Quêtes Pandala", guide:"https://www.dofuspourlesnoobs.com/quecirctes.html" },
+  // ─ Ressources / Craft ──────────────────────────────────────────────────────
+  { id:"cp029", name:"Gobeuf",           how:"Ressources",emoji:"🥚", fun:"Le Collectionneur d'Œufs", where:"Position variable selon le jour — 250x chaque Oeuf de Dragoeuf", req:"Succès Directeur Grunob + Gobelins d'Amakna", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp030", name:"Grizou",           how:"Craft",     emoji:"⛏️", fun:"Le Mineur Inépuisable",    where:"[14,21] Demetra Fikante — 50x Grizite (nécessite Mineur niv.30)", req:"Mineur niveau 30", guide:"" },
+  { id:"cp031", name:"Grüt",             how:"Ressources",emoji:"🍺", fun:"Le Bwork Assoiffé",        where:"[-4,10] Village des Bworks — Zrüt — 2 000x Bière Bwork", req:"Succès Bworkette + Kaïra + Bworks d'Amakna", guide:"https://www.dofuspourlesnoobs.com/kaiumlra.html" },
+  // ─ Drop ───────────────────────────────────────────────────────────────────
+  { id:"cp032", name:"Haku",             how:"Drop",      emoji:"🌊", fun:"Le Guerrier de la Canopée", where:"Village de la Canopée — Monstres Zoth — 0.05% de chance", req:"Zone Village de la Canopée", guide:"" },
+  // ─ Compagnons des incarnations (via ressources/échange) ──────────────────
+  { id:"cp033", name:"Ana Siwie",        how:"Ressources",emoji:"🏹", fun:"L'Archère des Elfes",      where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp034", name:"Chep Sykie",       how:"Ressources",emoji:"🔱", fun:"Le Sorcier Ancestral",     where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp035", name:"Chichée",          how:"Ressources",emoji:"🌸", fun:"La Fleur des Champs",      where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp036", name:"Cosmoune",         how:"Ressources",emoji:"🌌", fun:"L'Astronaute de l'Ocre",   where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp037", name:"Crocoracle",       how:"Ressources",emoji:"🐊", fun:"Le Prophète Crocodilien",  where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp038", name:"Ekiroul",          how:"Ressources",emoji:"🐿️", fun:"L'Écureuil Chaotique",    where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp039", name:"Flêche Flèche",    how:"Ressources",emoji:"🏹", fun:"La Sagitaire Précise",     where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp040", name:"Gibrielle",        how:"Ressources",emoji:"🦅", fun:"L'Ange Déchu",             where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp041", name:"Gogoulf",          how:"Ressources",emoji:"🦁", fun:"Le Lion des Prairies",     where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp042", name:"Heliora",          how:"Ressources",emoji:"☀️", fun:"La Druidesse Solaire",     where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp043", name:"Itsaclou",         how:"Ressources",emoji:"🔨", fun:"Le Forgeron Acharné",      where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp044", name:"Korriandre Jr",    how:"Ressources",emoji:"🌿", fun:"Le Botaniste Enragé",      where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp045", name:"Koya",             how:"Ressources",emoji:"🦊", fun:"Le Renard Rusé",           where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp046", name:"Octavius",         how:"Ressources",emoji:"🐙", fun:"Le Poulpe Lettré",         where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp047", name:"Pandora",          how:"Ressources",emoji:"🐼", fun:"La Pandawa Curieuse",      where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp048", name:"Rök",              how:"Ressources",emoji:"🪨", fun:"L'Ennemi du Dragon",       where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp049", name:"Souïa",            how:"Ressources",emoji:"🐦", fun:"La Messagère Ailée",       where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp050", name:"Troupion",         how:"Ressources",emoji:"🪖", fun:"Le Fantassin Maladroit",   where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp051", name:"Vourvoubia",       how:"Ressources",emoji:"🐺", fun:"La Louve des Steppes",     where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+  { id:"cp052", name:"Zéphyr",           how:"Ressources",emoji:"💨", fun:"Le Vent du Destin",        where:"Ressources à rassembler — voir Clionora en [0,6]", req:"Abonné", guide:"https://www.dofuspourlesnoobs.com/les-compagnons.html" },
+];
+
+const HOW_COMPAGNON_COLORS = {
+  "Boutique":   { color:"#1a5a8a", bg:"#e8f0f8", border:"#4a8ab8" },
+  "Succès":     { color:"#7a5a10", bg:"#f8f0d8", border:"#b88a20" },
+  "Marchand":   { color:"#6a1a8a", bg:"#f0e8f8", border:"#9a4ab8" },
+  "Quête":      { color:"#2a6a2a", bg:"#eaf4ea", border:"#4a9a4a" },
+  "Ressources": { color:"#8a3a1a", bg:"#f8ece8", border:"#b86040" },
+  "Craft":      { color:"#4a4a10", bg:"#f4f0d8", border:"#8a8a20" },
+  "Drop":       { color:"#8a1a1a", bg:"#f8e8e8", border:"#b84040" },
+};
+
+
   "Échange":   { color:"#1a5a8a", bg:"#e8f0f8", border:"#4a8ab8" },
   "Jetons":    { color:"#6a1a8a", bg:"#f0e8f8", border:"#9a4ab8" },
   "Quête":     { color:"#7a5a10", bg:"#f8f0d8", border:"#b88a20" },
@@ -2051,6 +2131,173 @@ function AlmanaxWidget() {
   );
 }
 
+// ─── COMPAGNONS DUAL LIST ─────────────────────────────────────────────────────
+function CompagnonsCatchOverlay({ compagnon, onDone }) {
+  const canvasRef = useRef(null);
+  const [phase, setPhase] = useState("in");
+  useEffect(() => {
+    const t1 = setTimeout(() => setPhase("hold"), 350);
+    const t2 = setTimeout(() => setPhase("out"), 2400);
+    const t3 = setTimeout(onDone, 2900);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const W = canvas.width, H = canvas.height, cx = W/2, cy = H/2;
+    // Étoiles qui convergent vers le centre (style différent des familiers)
+    const stars = Array.from({ length: 60 }, (_, i) => {
+      const angle = (i/60)*Math.PI*2;
+      const r = 250 + Math.random()*150;
+      const colors = ["#a0c8ff","#ffffff","#c8b0ff","#80a0ff","#e0d0ff"];
+      return { angle, r, x: cx+Math.cos(angle)*r, y: cy+Math.sin(angle)*r, size:2+Math.random()*3, color:colors[i%colors.length], alpha:0, delay:Math.random()*15, speed:4+Math.random()*5 };
+    });
+    let frame = 0, raf;
+    const draw = () => {
+      ctx.clearRect(0,0,W,H);
+      stars.forEach(s => {
+        if (frame < s.delay) return;
+        s.alpha = Math.min(1,(frame-s.delay)/12);
+        s.r = Math.max(0,s.r-s.speed);
+        s.x = cx+Math.cos(s.angle)*s.r; s.y = cy+Math.sin(s.angle)*s.r;
+        if (s.r<=0){s.alpha=Math.max(0,s.alpha-0.06);return;}
+        ctx.save(); ctx.globalAlpha=s.alpha*0.9;
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+        ctx.fillStyle=s.color; ctx.shadowColor=s.color; ctx.shadowBlur=8; ctx.fill(); ctx.restore();
+      });
+      frame++; if(frame<120) raf=requestAnimationFrame(draw);
+    };
+    draw(); return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <div style={{ position:"fixed", inset:0, zIndex:10001, pointerEvents:"none", display:"flex", alignItems:"center", justifyContent:"center", opacity:phase==="out"?0:1, transition:phase==="out"?"opacity 0.5s":"opacity 0.25s" }}>
+      <div style={{ position:"absolute", inset:0, background:"rgba(10,8,30,0.85)", backdropFilter:"blur(3px)" }} />
+      <canvas ref={canvasRef} style={{ position:"absolute", inset:0, pointerEvents:"none" }} />
+      <div style={{ position:"relative", zIndex:1, textAlign:"center", transform:phase==="in"?"scale(0.7)":"scale(1)", transition:"transform 0.4s cubic-bezier(0.34,1.56,0.64,1)" }}>
+        <div style={{ fontSize:64, marginBottom:10, filter:"drop-shadow(0 0 20px rgba(160,160,255,0.8))" }}>{compagnon.emoji || "⚔️"}</div>
+        <div style={{ fontSize:11, color:"#a0b8ff", fontFamily:"'Cinzel',serif", letterSpacing:3, marginBottom:8 }}>COMPAGNON RECRUTÉ</div>
+        <div style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(18px,3.5vw,28px)", fontWeight:700, color:"#c8d8ff", letterSpacing:2, textShadow:"0 0 20px rgba(140,160,255,0.8), 0 2px 6px rgba(0,0,0,0.8)", marginBottom:6 }}>{compagnon.fun}</div>
+        <div style={{ fontSize:14, color:"#a0b8ff", fontStyle:"italic" }}>{compagnon.name}</div>
+      </div>
+    </div>
+  );
+}
+
+function CompagnonsDualList({ skyComp, cellComp, onToggleSky, onToggleCell, skydroMeta, cellMeta }) {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [overlay, setOverlay] = useState(null);
+
+  const skyCount  = Object.values(skyComp).filter(Boolean).length;
+  const cellCount = Object.values(cellComp).filter(Boolean).length;
+
+  const filtered = COMPAGNONS.filter(c => {
+    const sd = skyComp[c.id], cd = cellComp[c.id];
+    if (filter === "done") return sd || cd;
+    if (filter === "todo") return !sd || !cd;
+    if (["Boutique","Succès","Marchand","Quête","Ressources","Craft","Drop"].includes(filter)) return c.how === filter;
+    if (search) return c.name.toLowerCase().includes(search.toLowerCase()) || c.fun.toLowerCase().includes(search.toLowerCase());
+    return true;
+  });
+
+  const handleToggle = (c, player) => {
+    if (player === "sky") { const was = skyComp[c.id]; onToggleSky(c.id); if (!was) setOverlay(c); }
+    else { const was = cellComp[c.id]; onToggleCell(c.id); if (!was) setOverlay(c); }
+  };
+
+  return (
+    <div>
+      {overlay && <CompagnonsCatchOverlay compagnon={overlay} onDone={() => setOverlay(null)} />}
+
+      {/* Barres de progression */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:16 }}>
+        {[
+          { label:"Sky",  count:skyCount,  color:"#2a4a8a", border:"#4a6a9a", bg:"#e8f0f8", meta:skydroMeta },
+          { label:"Cell", count:cellCount, color:"#7a2a1a", border:"#9a4a2a", bg:"#f8ede8", meta:cellMeta   },
+        ].map(p => (
+          <div key={p.label} style={{ background:p.bg, border:`1px solid ${p.border}`, borderRadius:8, padding:"10px 14px" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+              <span style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:p.color, fontWeight:700 }}>◈ {p.label}</span>
+              <span style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:p.color }}>{p.count}/{COMPAGNONS.length}</span>
+            </div>
+            <div style={{ height:5, background:`${p.border}22`, borderRadius:3, overflow:"hidden", marginBottom:8 }}>
+              <div style={{ height:"100%", width:`${Math.round(p.count/COMPAGNONS.length*100)}%`, background:p.color, borderRadius:3, transition:"width 0.5s" }} />
+            </div>
+            <div style={{ display:"flex", gap:4, flexWrap:"wrap" }}>
+              {COMPAGNON_BADGES.map(b => {
+                const unlocked = p.count >= b.threshold;
+                return (
+                  <div key={b.id} title={b.desc} style={{ fontSize:10, padding:"2px 7px", borderRadius:10, background:unlocked?`${p.color}18`:"transparent", border:`1px solid ${unlocked?p.border:C.borderLight}`, color:unlocked?p.color:C.textDim, fontFamily:"'Cinzel',serif", filter:unlocked?"none":"grayscale(1)", opacity:unlocked?1:0.4 }}>
+                    {b.icon} {b.name}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filtres */}
+      <div style={{ display:"flex", gap:5, flexWrap:"wrap", marginBottom:10 }}>
+        {[{key:"all",label:"Tous"},{key:"done",label:"✓ Recrutés"},{key:"todo",label:"À recruter"},
+          {key:"Boutique",label:"Boutique"},{key:"Succès",label:"Succès"},{key:"Marchand",label:"Marchand"},
+          {key:"Quête",label:"Quête"},{key:"Ressources",label:"Ressources"},{key:"Craft",label:"Craft"},{key:"Drop",label:"Drop"},
+        ].map(f => (
+          <button key={f.key} className={`filter-btn${filter===f.key?" active":""}`} onClick={()=>setFilter(f.key)} style={{fontSize:10}}>{f.label}</button>
+        ))}
+      </div>
+
+      <input className="meta-input" placeholder="🔍 Rechercher un compagnon…" value={search} onChange={e=>setSearch(e.target.value)} style={{marginBottom:12,fontSize:13}} />
+
+      {/* Header colonnes */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 52px 52px", gap:8, padding:"6px 12px", marginBottom:4, borderBottom:`1px solid ${C.border}` }}>
+        <div style={{ fontSize:11, color:C.textDim, fontFamily:"'Cinzel',serif" }}>Compagnon</div>
+        <div style={{ fontSize:11, color:"#2a4a8a", fontFamily:"'Cinzel',serif", textAlign:"center", fontWeight:700 }}>Sky</div>
+        <div style={{ fontSize:11, color:"#7a2a1a", fontFamily:"'Cinzel',serif", textAlign:"center", fontWeight:700 }}>Cell</div>
+      </div>
+
+      <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+        {filtered.map(c => {
+          const sd = skyComp[c.id], cd = cellComp[c.id];
+          const cfg = HOW_COMPAGNON_COLORS[c.how] || HOW_COMPAGNON_COLORS["Ressources"];
+          const both = sd && cd;
+          return (
+            <div key={c.id} style={{ display:"grid", gridTemplateColumns:"1fr 52px 52px", alignItems:"center", gap:8, padding:"9px 12px", borderRadius:6, background:both?"#eef4ee":C.bgCard, border:`1px solid ${both?"#4a8a4a":C.borderLight}`, transition:"all 0.12s" }}>
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:2 }}>
+                  <span style={{ fontSize:16 }}>{c.emoji}</span>
+                  <span style={{ fontSize:13, fontWeight:600, color:both?C.textDim:C.textBright, textDecoration:both?"line-through":"none" }}>{c.fun}</span>
+                  <span style={{ fontSize:9, padding:"1px 6px", borderRadius:10, background:cfg.bg, color:cfg.color, border:`1px solid ${cfg.border}`, fontFamily:"'Cinzel',serif", fontWeight:600 }}>{c.how}</span>
+                </div>
+                <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>{c.name} — {c.where}</div>
+                {c.req && c.req !== "Abonné" && (
+                  <div style={{ fontSize:10, color:"#6b66a0", marginTop:1 }}>
+                    <span title={`Prérequis : ${c.req}`} style={{ cursor:"help", borderBottom:"1px dashed #6b66a0" }}>⚠ {c.req}</span>
+                  </div>
+                )}
+                {c.guide && (
+                  <a href={c.guide} target="_blank" rel="noopener noreferrer" style={{ fontSize:10, color:C.gold, textDecoration:"none", borderBottom:`1px solid ${C.goldDim}` }}>
+                    📖 Guide DPLN →
+                  </a>
+                )}
+              </div>
+              {[{done:sd,color:"#2a4a8a",border:"#4a6a9a",player:"sky"},{done:cd,color:"#7a2a1a",border:"#9a4a2a",player:"cell"}].map(p => (
+                <div key={p.player} onClick={() => handleToggle(c,p.player)} style={{ display:"flex", justifyContent:"center", cursor:"pointer" }}>
+                  <div style={{ width:26, height:26, borderRadius:5, border:`2px solid ${p.done?p.color:p.border}`, background:p.done?p.color:"white", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, transition:"all 0.15s", boxShadow:p.done?`0 0 8px ${p.color}66`:"none" }}>
+                    {p.done && <span style={{color:"white"}}>✓</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function RecapCard({ label, meta, color, colorLight, border }) {
   const persos = meta?.persos || [];
   const kamas = meta?.kamas || 0;
@@ -2127,6 +2374,8 @@ export default function App() {
       onValue(ref(db,"notes"),      s => { if(s.exists()) setNotes(s.val()); }),
       onValue(ref(db,"skyDaily"),   s => { if(s.exists()) setSkyDailyDone(s.val()); }),
       onValue(ref(db,"cellDaily"),  s => { if(s.exists()) setCellDailyDone(s.val()); }),
+      onValue(ref(db,"skyComp"),    s => { if(s.exists()) setSkyComp(s.val()); }),
+      onValue(ref(db,"cellComp"),   s => { if(s.exists()) setCellComp(s.val()); }),
     ];
     setTimeout(() => setSynced(true), 2000);
     return () => unsubs.forEach(u => u());
@@ -2143,6 +2392,12 @@ export default function App() {
   const toggleSkyDaily  = (key, val) => { const n={...skyDailyDone, [key]:val};  setSkyDailyDone(n);  set(ref(db,"skyDaily"),n); };
   const toggleCellDaily = (key, val) => { const n={...cellDailyDone,[key]:val};  setCellDailyDone(n); set(ref(db,"cellDaily"),n); };
 
+  const [skyComp, setSkyComp]   = useState({});
+  const [cellComp, setCellComp] = useState({});
+
+  const toggleSkyComp  = (id) => { const n={...skyComp,  [id]:!skyComp[id]};  setSkyComp(n);  set(ref(db,"skyComp"),n); };
+  const toggleCellComp = (id) => { const n={...cellComp, [id]:!cellComp[id]}; setCellComp(n); set(ref(db,"cellComp"),n); };
+
   const skyDailyTotal  = Object.values(skyDailyDone).filter(Boolean).length;
   const cellDailyTotal = Object.values(cellDailyDone).filter(Boolean).length;
 
@@ -2152,7 +2407,8 @@ export default function App() {
   };
 
   const NAV_TABS = [
-    { key:"familiers", label:"🐾 Familiers", active:{ bg:"#eaf4ea", border:"#4a8a4a", color:"#2a6a2a" } },
+    { key:"familiers",   label:"🐾 Familiers",   active:{ bg:"#eaf4ea", border:"#4a8a4a", color:"#2a6a2a" } },
+    { key:"compagnons",  label:"⚔ Compagnons",  active:{ bg:"#eaf0fa", border:"#4a6aaa", color:"#1a3a7a" } },
     { key:"chasse",    label:"🗺 Chasse",    active:{ bg:"#f8f4e8", border:"#a08020",  color:"#6a4a10" } },
     { key:"stuff",     label:"⚔ Stuff",     active:{ bg:"#f0eaf8", border:"#6a4a8a",  color:"#4a2a6a" } },
   ];
@@ -2188,6 +2444,11 @@ export default function App() {
     const allBadges = [
       ...BADGES.map(b => ({ ...b, unlocked: b.check(skydroDone, skydroMeta, duoDone) || b.check(cellDone, cellMeta, duoDone) })),
       ...DAILY_BADGES.map(b => ({ ...b, unlocked: skyDailyTotal >= b.threshold || cellDailyTotal >= b.threshold })),
+      ...COMPAGNON_BADGES.map(b => ({
+        ...b,
+        unlocked: Object.values(skyComp).filter(Boolean).length >= b.threshold ||
+                  Object.values(cellComp).filter(Boolean).length >= b.threshold,
+      })),
       ...FAMILIER_BADGES.map(b => ({
         ...b,
         unlocked: Object.values(skydroMeta?.familiers||{}).filter(Boolean).length >= b.threshold ||
@@ -2337,6 +2598,19 @@ export default function App() {
                     const cur = cellMeta?.familiers||{};
                     updateCellMeta({...cellMeta, familiers:{...cur,[id]:!cur[id]}});
                   }}
+                />
+              </div>
+            )}
+            )}
+            {tab==="compagnons" && (
+              <div>
+                <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:16, textAlign:"center" }}>
+                  ⚔ Collection de Compagnons
+                </div>
+                <CompagnonsDualList
+                  skyComp={skyComp} cellComp={cellComp}
+                  onToggleSky={toggleSkyComp} onToggleCell={toggleCellComp}
+                  skydroMeta={skydroMeta} cellMeta={cellMeta}
                 />
               </div>
             )}
