@@ -43,35 +43,43 @@ const PLAYERS = [
 const EMPTY_STUFF = { sky1:{}, sky2:{}, cell1:{}, cell2:{} };
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
-// Correspondance effect type id → stat key (basé sur l'API dofusdude)
+// Vrais IDs de l'API dofusdude (vérifiés)
 const EFFECT_MAP = {
-  160:"pa", 174:"pm", 176:"po",
-  110:"vita", 118:"force", 122:"intel", 120:"chance", 119:"agil", 124:"sagesse",
-  96:"dmgNeutre", 104:"dmgNeutre", 101:"dmgEau", 97:"dmgEau",
-  102:"dmgTerre", 98:"dmgTerre", 103:"dmgAir", 99:"dmgAir",
-  105:"dmgFeu", 100:"dmgFeu", 108:"renvoi",
-  84:"resFeu", 88:"resFeu%", 83:"resEau", 87:"resEau%",
-  82:"resTerre", 86:"resTerre%", 81:"resAir", 85:"resAir%",
+  9:"vita", 10:"sagesse", 12:"pa", 14:"pm", 31:"po",
+  45:"force", 13:"intel", 22:"chance", 36:"agil",
+  61:"dmgFeu", 27:"dmgEau", 48:"dmgTerre", 47:"dmgAir", 49:"dmgNeutre", 30:"dmg",
+  96:"resFeu", 97:"resEau", 98:"resTerre", 99:"resAir", 100:"resNeutre",
+  84:"resFeu%", 83:"resEau%", 82:"resTerre%", 81:"resAir%",
+  26:"tacle", 75:"esquivePA", 76:"esquivePM",
+  29:"critique", 28:"invocation", 25:"init",
 };
 
 const STAT_DISPLAY = [
-  { key:"pa",       label:"PA",        emoji:"⭐" },
-  { key:"pm",       label:"PM",        emoji:"👢" },
-  { key:"po",       label:"PO",        emoji:"👁️" },
-  { key:"vita",     label:"Vita",      emoji:"❤️" },
-  { key:"force",    label:"Force",     emoji:"🌍" },
-  { key:"intel",    label:"Intel",     emoji:"🔥" },
-  { key:"chance",   label:"Chance",    emoji:"💧" },
-  { key:"agil",     label:"Agilité",   emoji:"💨" },
-  { key:"sagesse",  label:"Sagesse",   emoji:"📖" },
-  { key:"dmgFeu",   label:"Dmg Feu",   emoji:"🔥" },
-  { key:"dmgEau",   label:"Dmg Eau",   emoji:"💧" },
-  { key:"dmgTerre", label:"Dmg Terre", emoji:"🌍" },
-  { key:"dmgAir",   label:"Dmg Air",   emoji:"💨" },
-  { key:"resFeu",   label:"Rés Feu",   emoji:"🔥" },
-  { key:"resEau",   label:"Rés Eau",   emoji:"💧" },
-  { key:"resTerre", label:"Rés Terre", emoji:"🌍" },
-  { key:"resAir",   label:"Rés Air",   emoji:"💨" },
+  { key:"pa",        label:"PA",         emoji:"⭐" },
+  { key:"pm",        label:"PM",         emoji:"👢" },
+  { key:"po",        label:"PO",         emoji:"👁️" },
+  { key:"vita",      label:"Vita",       emoji:"❤️" },
+  { key:"force",     label:"Force",      emoji:"🌍" },
+  { key:"intel",     label:"Intel",      emoji:"🔥" },
+  { key:"chance",    label:"Chance",     emoji:"💧" },
+  { key:"agil",      label:"Agilité",    emoji:"💨" },
+  { key:"sagesse",   label:"Sagesse",    emoji:"📖" },
+  { key:"dmg",       label:"Dommages",   emoji:"⚔️" },
+  { key:"dmgFeu",    label:"Dmg Feu",    emoji:"🔥" },
+  { key:"dmgEau",    label:"Dmg Eau",    emoji:"💧" },
+  { key:"dmgTerre",  label:"Dmg Terre",  emoji:"🌍" },
+  { key:"dmgAir",    label:"Dmg Air",    emoji:"💨" },
+  { key:"dmgNeutre", label:"Dmg Neutre", emoji:"⬜" },
+  { key:"resFeu%",   label:"Rés% Feu",   emoji:"🔥" },
+  { key:"resEau%",   label:"Rés% Eau",   emoji:"💧" },
+  { key:"resTerre%", label:"Rés% Terre", emoji:"🌍" },
+  { key:"resAir%",   label:"Rés% Air",   emoji:"💨" },
+  { key:"resFeu",    label:"Rés Feu",    emoji:"🔥" },
+  { key:"resEau",    label:"Rés Eau",    emoji:"💧" },
+  { key:"resTerre",  label:"Rés Terre",  emoji:"🌍" },
+  { key:"resAir",    label:"Rés Air",    emoji:"💨" },
+  { key:"critique",  label:"Critique",   emoji:"🎯" },
+  { key:"init",      label:"Initiative", emoji:"⚡" },
 ];
 
 function calcStats(stuff) {
@@ -162,21 +170,71 @@ function ItemSearch({ onSelect, slotTypes }) {
   );
 }
 
-// ─── SLOT BOX ─────────────────────────────────────────────────────────────────
+function ItemTooltip({ item, color }) {
+  const name = typeof item.name === "object" ? item.name?.fr || "" : item.name || "";
+  const type = typeof item.type === "object" ? item.type?.name || "" : item.type || "";
+  const stats = calcStats({ _item: item });
+  const visible = STAT_DISPLAY.filter(s => stats[s.key] > 0);
+  return (
+    <div style={{
+      position:"absolute", bottom:"calc(100% + 8px)", left:"50%", transform:"translateX(-50%)",
+      zIndex:3000, width:200, background:"#2a1a08", border:`1px solid ${C.goldDim}`,
+      borderRadius:8, padding:"10px 12px", boxShadow:"0 4px 20px rgba(0,0,0,0.5)",
+      pointerEvents:"none",
+    }}>
+      <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
+        {item.image_urls?.sd && <img src={item.image_urls.sd} style={{ width:36, height:36, imageRendering:"pixelated", flexShrink:0 }} alt="" onError={e=>e.target.style.display="none"} />}
+        <div>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:12, fontWeight:700, color:"#f5d060", lineHeight:1.2 }}>{name}</div>
+          <div style={{ fontSize:10, color:"rgba(245,237,216,0.6)", marginTop:2 }}>{type}{item.level ? ` · Niv. ${item.level}` : ""}</div>
+        </div>
+      </div>
+      {visible.length > 0 && (
+        <div style={{ borderTop:"1px solid rgba(200,160,80,0.3)", paddingTop:6 }}>
+          {visible.map(s => (
+            <div key={s.key} style={{ display:"flex", justifyContent:"space-between", fontSize:10, marginBottom:1 }}>
+              <span style={{ color:"rgba(245,237,216,0.7)" }}>{s.emoji} {s.label}</span>
+              <span style={{ color:"#a8d060", fontWeight:700 }}>+{stats[s.key]}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {item.recipe?.length > 0 && (
+        <div style={{ borderTop:"1px solid rgba(200,160,80,0.3)", paddingTop:6, marginTop:6 }}>
+          <div style={{ fontSize:9, color:"rgba(245,237,216,0.5)", letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>Recette</div>
+          {item.recipe.slice(0,4).map((r,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:4, fontSize:10, marginBottom:2 }}>
+              {r._img && <img src={r._img} style={{ width:14, height:14, imageRendering:"pixelated" }} alt="" onError={e=>e.target.style.display="none"} />}
+              <span style={{ color:"rgba(245,237,216,0.8)" }}>{r.quantity}× {r._name || `#${r.item_ankama_id}`}</span>
+            </div>
+          ))}
+          {item.recipe.length > 4 && <div style={{ fontSize:9, color:"rgba(245,237,216,0.4)" }}>+{item.recipe.length-4} autres…</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SlotBox({ slot, item, onSearch, onRemove }) {
   const [hover, setHover] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const img = item?.image_urls?.icon;
   const name = item ? (typeof item.name === "object" ? item.name?.fr || "" : item.name || "") : null;
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-      <div onClick={onSearch} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} title={name || slot.label}
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:2, position:"relative" }}>
+      {showTooltip && item && <ItemTooltip item={item} />}
+      <div
+        onClick={onSearch}
+        onMouseEnter={() => { setHover(true); setShowTooltip(true); }}
+        onMouseLeave={() => { setHover(false); setShowTooltip(false); }}
+        title={!item ? slot.label : undefined}
         style={{ width:44, height:44, borderRadius:6, cursor:"pointer", background:item?"white":"rgba(139,94,26,0.06)", border:`2px solid ${item?C.goldDim:C.borderLight}`, display:"flex", alignItems:"center", justifyContent:"center", position:"relative", transition:"all 0.15s", boxShadow:hover?"0 0 6px rgba(139,94,26,0.3)":"none" }}
       >
         {img ? <img src={img} alt={name} style={{ width:34, height:34, imageRendering:"pixelated" }} onError={e=>e.target.style.display="none"} />
               : <span style={{ fontSize:18, opacity:0.5 }}>{slot.emoji}</span>}
         {item && hover && (
-          <div onClick={(e)=>{e.stopPropagation();onRemove();}} style={{ position:"absolute", top:-5, right:-5, width:14, height:14, borderRadius:"50%", background:"#8a2a2a", color:"white", fontSize:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer" }}>✕</div>
+          <div onClick={(e)=>{e.stopPropagation();onRemove();}} style={{ position:"absolute", top:-5, right:-5, width:14, height:14, borderRadius:"50%", background:"#8a2a2a", color:"white", fontSize:9, display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", zIndex:1 }}>✕</div>
         )}
       </div>
       <div style={{ fontSize:8, color:C.textDim, fontFamily:"'Cinzel',serif", textAlign:"center", maxWidth:46, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
@@ -287,11 +345,14 @@ function aggregateItems(items) {
   items.filter(Boolean).forEach(item => {
     (item.recipe || []).forEach(r => {
       const id = r.item_ankama_id;
+      if (!id) return;
       if (!agg[id]) agg[id] = { id, name: r._name || `#${id}`, img: r._img || null, qty: 0 };
-      agg[id].qty += r.quantity;
+      agg[id].qty += Number(r.quantity) || 0;
+      // Met à jour le nom si résolu
+      if (r._name) { agg[id].name = r._name; agg[id].img = r._img; }
     });
   });
-  return Object.values(agg).sort((a,b) => b.qty - a.qty);
+  return Object.values(agg).filter(r => r.qty > 0).sort((a,b) => b.qty - a.qty);
 }
 
 function ResourceRow({ r, checked, onCheck }) {
