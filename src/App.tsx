@@ -2304,6 +2304,229 @@ function CompagnonsDualList({ skyComp, cellComp, onToggleSky, onToggleCell, skyd
   );
 }
 
+// ─── ONGLET OCRE ─────────────────────────────────────────────────────────────
+const METAMOB_IMG = "https://www.metamob.fr/img/monstres/";
+
+function OcreTab({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
+  const [skyData,  setSkyData]  = useState(null);
+  const [cellData, setCellData] = useState(null);
+  const [skyLoading,  setSkyLoading]  = useState(false);
+  const [cellLoading, setCellLoading] = useState(false);
+  const [skyError,  setSkyError]  = useState(null);
+  const [cellError, setCellError] = useState(null);
+  const [skySearch,  setSkySearch]  = useState("");
+  const [cellSearch, setCellSearch] = useState("");
+  const [activePlayer, setActivePlayer] = useState("sky");
+
+  const SKY_KEY   = skydroMeta?.metamobKey  || "";
+  const SKY_SLUG  = skydroMeta?.metamobSlug || "";
+  const CELL_KEY  = cellMeta?.metamobKey    || "";
+  const CELL_SLUG = cellMeta?.metamobSlug   || "";
+
+  const fetchData = async (key, slug, setData, setLoading, setError) => {
+    if (!key || !slug) return;
+    setLoading(true); setError(null);
+    try {
+      const res = await fetch(`https://www.metamob.fr/api/v1/quests/${slug}/zones`, {
+        headers: { "Authorization": `Bearer ${key}` }
+      });
+      if (!res.ok) throw new Error(`Erreur ${res.status}`);
+      const json = await res.json();
+      setData(json.data || []);
+    } catch(e) { setError(e.message); }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (SKY_KEY && SKY_SLUG) fetchData(SKY_KEY, SKY_SLUG, setSkyData, setSkyLoading, setSkyError);
+  }, [SKY_KEY, SKY_SLUG]);
+
+  useEffect(() => {
+    if (CELL_KEY && CELL_SLUG) fetchData(CELL_KEY, CELL_SLUG, setCellData, setCellLoading, setCellError);
+  }, [CELL_KEY, CELL_SLUG]);
+
+  const calcProgress = (zones) => {
+    if (!zones) return { owned:0, total:0 };
+    let owned = 0, total = 0;
+    zones.forEach(z => z.subzones?.forEach(sz => sz.monsters?.forEach(m => {
+      total += m.required; owned += Math.min(m.owned, m.required);
+    })));
+    return { owned, total };
+  };
+
+  const filterZones = (zones, search) => {
+    if (!search || !zones) return zones;
+    const q = search.toLowerCase();
+    return zones.map(z => ({
+      ...z,
+      subzones: (z.subzones || []).map(sz => ({
+        ...sz,
+        monsters: (sz.monsters || []).filter(m => m.name?.fr?.toLowerCase().includes(q))
+      })).filter(sz => sz.monsters.length > 0)
+    })).filter(z => z.subzones.length > 0 || z.name?.fr?.toLowerCase().includes(q));
+  };
+
+  const QuestPanel = ({ label, color, border, bg, data, loading, error, search, setSearch, apiKey, slug, meta, onUpdateMeta }) => {
+    const prog = calcProgress(data);
+    const pct = prog.total > 0 ? Math.round(prog.owned / prog.total * 100) : 0;
+    const filtered = filterZones(data, search);
+
+    if (!apiKey || !slug) return (
+      <div style={{ background:bg, border:`1px solid ${border}`, borderRadius:8, padding:16 }}>
+        <div style={{ fontFamily:"'Cinzel',serif", fontSize:12, fontWeight:700, color, marginBottom:12 }}>◈ {label}</div>
+        <div style={{ fontSize:13, color:C.textDim, fontStyle:"italic", marginBottom:12 }}>
+          Configure ta clé API et ton slug Metamob ci-dessous pour voir ta progression.
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+          <div>
+            <div style={{ fontSize:11, color:C.textDim, marginBottom:3 }}>Clé API Metamob</div>
+            <input className="meta-input" type="password" placeholder="Ta clé API Metamob"
+              defaultValue={apiKey}
+              onBlur={e => onUpdateMeta({ ...meta, metamobKey: e.target.value })}
+            />
+          </div>
+          <div>
+            <div style={{ fontSize:11, color:C.textDim, marginBottom:3 }}>Slug de la quête</div>
+            <input className="meta-input" placeholder="ex: 4009ba84"
+              defaultValue={slug}
+              onBlur={e => onUpdateMeta({ ...meta, metamobSlug: e.target.value })}
+            />
+            <div style={{ fontSize:10, color:C.textDim, marginTop:3, fontStyle:"italic" }}>
+              Le slug se trouve dans l'URL de ta quête sur metamob.fr
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    return (
+      <div style={{ background:bg, border:`1px solid ${border}`, borderRadius:8, padding:16 }}>
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:12, fontWeight:700, color }}>◈ {label}</div>
+          {data && <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, fontWeight:700, color }}>{prog.owned}/{prog.total} — {pct}%</div>}
+        </div>
+
+        {/* Barre globale */}
+        {data && (
+          <div style={{ height:8, background:"rgba(0,0,0,0.08)", borderRadius:4, overflow:"hidden", marginBottom:12 }}>
+            <div style={{ height:"100%", width:`${pct}%`, background:`linear-gradient(90deg,${color},${border})`, borderRadius:4, transition:"width 0.5s" }} />
+          </div>
+        )}
+
+        {loading && <div style={{ textAlign:"center", padding:20, color:C.textDim, fontSize:13 }}>Chargement…</div>}
+        {error && <div style={{ color:"#8a2a2a", fontSize:12, marginBottom:8 }}>⚠ {error}</div>}
+
+        {data && (
+          <>
+            <input className="meta-input" placeholder="🔍 Filtrer par monstre…" value={search}
+              onChange={e => setSearch(e.target.value)} style={{ marginBottom:10, fontSize:12 }} />
+
+            <div style={{ display:"flex", flexDirection:"column", gap:8, maxHeight:500, overflowY:"auto" }}>
+              {(filtered || []).map(zone => {
+                const zOwned = zone.subzones?.reduce((a,sz) => a + sz.monsters?.reduce((b,m) => b + Math.min(m.owned, m.required), 0), 0) || 0;
+                const zTotal = zone.subzones?.reduce((a,sz) => a + sz.monsters?.reduce((b,m) => b + m.required, 0), 0) || 0;
+                const zPct = zTotal > 0 ? Math.round(zOwned/zTotal*100) : 0;
+                const zDone = zOwned >= zTotal;
+                return (
+                  <div key={zone.id} style={{ background:"white", borderRadius:6, padding:"10px 12px", border:`1px solid ${zDone?"#4a8a4a":C.borderLight}` }}>
+                    {/* Zone header */}
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+                      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:700, color:zDone?"#2a6a2a":color }}>
+                        {zDone ? "✓ " : ""}{zone.name?.fr}
+                      </div>
+                      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                        <div style={{ width:80, height:4, background:"rgba(0,0,0,0.08)", borderRadius:2, overflow:"hidden" }}>
+                          <div style={{ height:"100%", width:`${zPct}%`, background:zDone?"#2a6a2a":color, borderRadius:2 }} />
+                        </div>
+                        <span style={{ fontSize:10, color:C.textDim, fontFamily:"'Cinzel',serif" }}>{zOwned}/{zTotal}</span>
+                      </div>
+                    </div>
+                    {/* Sous-zones et monstres */}
+                    {zone.subzones?.map(sz => (
+                      <div key={sz.id} style={{ marginBottom:6 }}>
+                        <div style={{ fontSize:10, color:C.textDim, fontStyle:"italic", marginBottom:3, paddingLeft:6, borderLeft:`2px solid ${C.borderLight}` }}>
+                          {sz.name?.fr}
+                        </div>
+                        <div style={{ display:"flex", flexWrap:"wrap", gap:4, paddingLeft:6 }}>
+                          {sz.monsters?.map(m => {
+                            const done = m.owned >= m.required;
+                            const partial = m.owned > 0 && !done;
+                            const isBoss = m.type?.id === 2;
+                            return (
+                              <div key={m.id} title={`${m.name?.fr} — ${m.owned}/${m.required}`} style={{
+                                display:"flex", alignItems:"center", gap:4, padding:"3px 8px",
+                                borderRadius:4, fontSize:11, border:"1px solid",
+                                background: done ? "#eef4ee" : partial ? "#fef8e8" : "white",
+                                borderColor: done ? "#4a8a4a" : partial ? "#c8921a" : isBoss ? "#8a2a2a" : C.borderLight,
+                                color: done ? "#2a6a2a" : partial ? "#7a5000" : isBoss ? "#8a2a2a" : C.text,
+                              }}>
+                                <img src={`${METAMOB_IMG}${m.image}`} alt="" style={{ width:16, height:16, imageRendering:"pixelated" }} onError={e=>e.target.style.display="none"} />
+                                <span style={{ maxWidth:120, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                                  {done ? "✓ " : ""}{m.name?.fr}
+                                </span>
+                                <span style={{ flexShrink:0, opacity:0.7 }}>{m.owned}/{m.required}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:"#7a5000", letterSpacing:2, textTransform:"uppercase", marginBottom:4, textAlign:"center" }}>
+        🥚 Dofus Ocre — Suivi Metamob
+      </div>
+      <div style={{ fontSize:12, color:C.textDim, textAlign:"center", marginBottom:16, fontStyle:"italic" }}>
+        Les données sont en lecture seule — mets à jour ta progression sur{" "}
+        <a href="https://www.metamob.fr" target="_blank" rel="noopener noreferrer" style={{ color:"#c8921a", fontWeight:700 }}>metamob.fr</a>
+      </div>
+
+      {/* Boutons refresh */}
+      <div style={{ display:"flex", justifyContent:"center", gap:8, marginBottom:16 }}>
+        <button onClick={() => fetchData(SKY_KEY, SKY_SLUG, setSkyData, setSkyLoading, setSkyError)}
+          style={{ padding:"6px 14px", background:"#1a1535", border:"none", borderRadius:6, color:"#e8e4ff", fontFamily:"'Cinzel',serif", fontSize:11, cursor:"pointer" }}>
+          ↺ Actualiser Sky
+        </button>
+        <button onClick={() => fetchData(CELL_KEY, CELL_SLUG, setCellData, setCellLoading, setCellError)}
+          style={{ padding:"6px 14px", background:"#1a1535", border:"none", borderRadius:6, color:"#e8e4ff", fontFamily:"'Cinzel',serif", fontSize:11, cursor:"pointer" }}>
+          ↺ Actualiser Cell
+        </button>
+        <a href="https://www.metamob.fr" target="_blank" rel="noopener noreferrer"
+          style={{ padding:"6px 14px", background:"#c8921a", border:"none", borderRadius:6, color:"white", fontFamily:"'Cinzel',serif", fontSize:11, textDecoration:"none", display:"inline-block" }}>
+          ✏ Modifier sur Metamob
+        </a>
+      </div>
+
+      {/* 2 colonnes */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+        <QuestPanel label="Sky" color="#2a4a8a" border="#4a6a9a" bg="#e8f0f8"
+          data={skyData} loading={skyLoading} error={skyError}
+          search={skySearch} setSearch={setSkySearch}
+          apiKey={SKY_KEY} slug={SKY_SLUG} meta={skydroMeta}
+          onUpdateMeta={onUpdateSkydro}
+        />
+        <QuestPanel label="Cell" color="#7a2a1a" border="#9a4a2a" bg="#f8ede8"
+          data={cellData} loading={cellLoading} error={cellError}
+          search={cellSearch} setSearch={setCellSearch}
+          apiKey={CELL_KEY} slug={CELL_SLUG} meta={cellMeta}
+          onUpdateMeta={onUpdateCell}
+        />
+      </div>
+    </div>
+  );
+}
+
 function RecapCard({ label, meta, color, colorLight, border }) {
   const persos = meta?.persos || [];
   const kamas = meta?.kamas || 0;
@@ -2415,6 +2638,7 @@ export default function App() {
   const NAV_TABS = [
     { key:"familiers",   label:"🐾 Familiers",   active:{ bg:"#eaf4ea", border:"#4a8a4a", color:"#2a6a2a" } },
     { key:"compagnons",  label:"⚔ Compagnons",  active:{ bg:"#eaf0fa", border:"#4a6aaa", color:"#1a3a7a" } },
+    { key:"ocre",        label:"🥚 Ocre",        active:{ bg:"#fef8e8", border:"#c8921a", color:"#7a5000" } },
     { key:"chasse",      label:"🗺 Chasse",      active:{ bg:"#f8f4e8", border:"#a08020",  color:"#6a4a10" } },
     { key:"metiers",     label:"⚒ Métiers",     active:{ bg:"#eaf8ea", border:"#2a8a4a",  color:"#0a5a2a" } },
     { key:"map",         label:"🌍 Carte",       active:{ bg:"#eaf4f8", border:"#2a7a9a",  color:"#0a4a6a" } },
@@ -2536,7 +2760,7 @@ export default function App() {
       {/* ── LAYOUT 3 COLONNES ── */}
       <div className="dofus-layout" style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:["stuff","metiers","map"].includes(tab)?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
 
-        {!["stuff","metiers","map"].includes(tab) && <div className="dofus-sidebar"><RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" /></div>}
+        {!["stuff","metiers","map","ocre"].includes(tab) && <div className="dofus-sidebar"><RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" /></div>}
 
         <div className="dofus-center" style={{ flex:1, minWidth:0 }}>
           <div className="panel" style={{ padding:"22px 20px" }}>
@@ -2621,6 +2845,12 @@ export default function App() {
                 />
               </div>
             )}
+            {tab==="ocre" && (
+              <OcreTab
+                skydroMeta={skydroMeta} cellMeta={cellMeta}
+                onUpdateSkydro={updateSkydroMeta} onUpdateCell={updateCellMeta}
+              />
+            )}
             {tab==="chasse" && (
               <div>
                 <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12, textAlign:"center" }}>
@@ -2692,7 +2922,7 @@ export default function App() {
           </div>
         </div>
 
-        {!["stuff","metiers","map"].includes(tab) && <div className="dofus-sidebar"><RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" /></div>}
+        {!["stuff","metiers","map","ocre"].includes(tab) && <div className="dofus-sidebar"><RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" /></div>}
 
       </div>
     </div>
