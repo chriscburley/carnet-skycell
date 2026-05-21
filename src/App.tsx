@@ -2224,12 +2224,12 @@ export default function App() {
       </div>
 
       {/* ── LAYOUT 3 COLONNES ── */}
-      <div style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:1200, margin:"0 auto", padding:"20px 12px 48px" }}>
+      <div style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:tab==="stuff"?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
 
-        {/* COLONNE SKY — gauche */}
-        <RecapCard label="Sky" meta={skydroMeta} color="#2a4a8a" colorLight="#e8f0f8" border="#4a6a9a" />
+        {/* COLONNE SKY — gauche, cachée sur Stuff */}
+        {tab !== "stuff" && <RecapCard label="Sky" meta={skydroMeta} color="#2a4a8a" colorLight="#e8f0f8" border="#4a6a9a" />}
 
-        {/* COLONNE CENTRE — objectifs */}
+        {/* COLONNE CENTRE */}
         <div style={{ flex:1, minWidth:0 }}>
           <div className="panel" style={{ padding:"22px 20px" }}>
             {tab==="duo" && <TabContent data={DUO_DATA} done={duoDone} toggle={toggleDuo} player={null}
@@ -2346,8 +2346,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* COLONNE CELL — droite */}
-        <RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" />
+        {/* COLONNE CELL — droite, cachée sur Stuff */}
+        {tab !== "stuff" && <RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" />}
 
       </div>
     </div>
