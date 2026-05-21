@@ -2602,7 +2602,6 @@ export default function App() {
                 />
               </div>
             )}
-            )}
             {tab==="compagnons" && (
               <div>
                 <div style={{ fontFamily:"'Cinzel',serif", fontSize:13, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:16, textAlign:"center" }}>
