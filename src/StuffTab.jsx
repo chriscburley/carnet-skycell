@@ -53,23 +53,6 @@ const EFFECT_MAP = {
   29:"critique", 28:"invocation", 25:"init",
 };
 
-function calcStats(stuff) {
-  const totals = {};
-  STAT_DISPLAY.forEach(s => { totals[s.key] = 0; });
-  Object.values(stuff).filter(Boolean).forEach(item => {
-    (item.effects || []).forEach(eff => {
-      const effId = eff.type?.id ?? eff.effect_id ?? eff.effectId;
-      // PA/PM/PO et autres stats fixes : int_maximum est 0, utiliser int_minimum
-      const val = (eff.int_maximum === 0 && eff.int_minimum > 0)
-        ? eff.int_minimum
-        : (eff.int_maximum ?? eff.int_minimum ?? eff.value ?? 0);
-      const statKey = EFFECT_MAP[effId];
-      if (statKey && totals[statKey] !== undefined) totals[statKey] += Number(val) || 0;
-    });
-  });
-  return totals;
-}
-
 const STAT_DISPLAY = [
   { key:"pa",        label:"PA",         emoji:"⭐" },
   { key:"pm",        label:"PM",         emoji:"👢" },
@@ -103,9 +86,10 @@ function calcStats(stuff) {
   STAT_DISPLAY.forEach(s => { totals[s.key] = 0; });
   Object.values(stuff).filter(Boolean).forEach(item => {
     (item.effects || []).forEach(eff => {
-      // L'API dofusdude retourne type.id pour identifier l'effet
       const effId = eff.type?.id ?? eff.effect_id ?? eff.effectId;
-      const val = eff.int_maximum ?? eff.max ?? eff.value ?? 0;
+      const val = (eff.int_maximum === 0 && eff.int_minimum > 0)
+        ? eff.int_minimum
+        : (eff.int_maximum ?? eff.int_minimum ?? eff.value ?? 0);
       const statKey = EFFECT_MAP[effId];
       if (statKey && totals[statKey] !== undefined) totals[statKey] += Number(val) || 0;
     });
