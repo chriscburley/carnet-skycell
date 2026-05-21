@@ -17,27 +17,37 @@ const db = getDatabase(firebaseApp);
 
 // ─── BADGES ─────────────────────────────────────────────────────────────────
 const BADGES = [
-  { id: "bg1",  icon: "🌱", name: "Premier Pas",       desc: "Cocher son 1er objectif",              check: (d,_,__) => Object.values(d).filter(Boolean).length >= 1 },
-  { id: "bg2",  icon: "⚔️", name: "Aventurier",        desc: "10 objectifs complétés",               check: (d,_,__) => Object.values(d).filter(Boolean).length >= 10 },
-  { id: "bg3",  icon: "🏰", name: "Vétéran",           desc: "25 objectifs complétés",               check: (d,_,__) => Object.values(d).filter(Boolean).length >= 25 },
-  { id: "bg4",  icon: "👑", name: "Légende",           desc: "50 objectifs complétés",               check: (d,_,__) => Object.values(d).filter(Boolean).length >= 50 },
-  { id: "bg5",  icon: "💰", name: "Marchand",          desc: "Kamas > 10 millions",                  check: (_,meta,__) => (meta?.kamas||0) >= 10000000 },
-  { id: "bg6",  icon: "💎", name: "Fortuné",           desc: "Kamas > 50 millions",                  check: (_,meta,__) => (meta?.kamas||0) >= 50000000 },
-  { id: "bg7",  icon: "🐉", name: "Dieu des Douze",   desc: "Kamas > 100 millions",                 check: (_,meta,__) => (meta?.kamas||0) >= 100000000 },
-  { id: "bg8",  icon: "⭐", name: "Chasseur",          desc: "Succès > 1 000 pts",                   check: (_,meta,__) => (meta?.succes||0) >= 1000 },
-  { id: "bg9",  icon: "🌟", name: "Expert",            desc: "Succès > 5 000 pts",                   check: (_,meta,__) => (meta?.succes||0) >= 5000 },
-  { id: "bg10", icon: "✨", name: "Maître des Succès", desc: "Succès > 10 000 pts",                  check: (_,meta,__) => (meta?.succes||0) >= 10000 },
-  { id: "bg11", icon: "🤝", name: "Inséparables",      desc: "20 objectifs duo complétés",           check: (_,__,duo) => Object.values(duo).filter(Boolean).length >= 20 },
-  { id: "bg12", icon: "🎯", name: "Perfectionniste",   desc: "Tous les objectifs d'une catégorie",   check: (d,_,__) => Object.values(d).filter(Boolean).length >= 8 },
+  { id:"bg1",  icon:"🌱", name:"Premier Pas",        desc:"Cocher son 1er objectif",            check:(d)=>Object.values(d).filter(Boolean).length>=1 },
+  { id:"bg2",  icon:"⚔️", name:"Aventurier",         desc:"10 objectifs complétés",             check:(d)=>Object.values(d).filter(Boolean).length>=10 },
+  { id:"bg3",  icon:"🏰", name:"Vétéran",            desc:"25 objectifs complétés",             check:(d)=>Object.values(d).filter(Boolean).length>=25 },
+  { id:"bg4",  icon:"👑", name:"Légende",            desc:"50 objectifs complétés",             check:(d)=>Object.values(d).filter(Boolean).length>=50 },
+  { id:"bg5",  icon:"💰", name:"Bourse Bien Garnie", desc:"Kamas > 100 000",                    check:(_,m)=>(m?.kamas||0)>=100000 },
+  { id:"bg6",  icon:"💵", name:"Marchand",           desc:"Kamas > 1 million",                  check:(_,m)=>(m?.kamas||0)>=1000000 },
+  { id:"bg7",  icon:"💎", name:"Fortuné",            desc:"Kamas > 5 millions",                 check:(_,m)=>(m?.kamas||0)>=5000000 },
+  { id:"bg8",  icon:"🏦", name:"Rentier",            desc:"Kamas > 50 millions",                check:(_,m)=>(m?.kamas||0)>=50000000 },
+  { id:"bg9",  icon:"🐉", name:"Dieu des Douze",    desc:"Kamas > 100 millions",               check:(_,m)=>(m?.kamas||0)>=100000000 },
+  { id:"bg10", icon:"⭐", name:"Chasseur",           desc:"Succès > 500 pts",                   check:(_,m)=>(m?.succes||0)>=500 },
+  { id:"bg11", icon:"🌟", name:"Érudit",             desc:"Succès > 1 000 pts",                 check:(_,m)=>(m?.succes||0)>=1000 },
+  { id:"bg12", icon:"💫", name:"Expert",             desc:"Succès > 2 000 pts",                 check:(_,m)=>(m?.succes||0)>=2000 },
+  { id:"bg13", icon:"✨", name:"Maître",             desc:"Succès > 3 000 pts",                 check:(_,m)=>(m?.succes||0)>=3000 },
+  { id:"bg14", icon:"🎖️", name:"Maître des Succès", desc:"Succès > 5 000 pts",                 check:(_,m)=>(m?.succes||0)>=5000 },
+  { id:"bg15", icon:"🏆", name:"Transcendant",       desc:"Succès > 10 000 pts",                check:(_,m)=>(m?.succes||0)>=10000 },
+  { id:"bg16", icon:"🤝", name:"Inséparables",       desc:"20 objectifs duo complétés",         check:(_,__,duo)=>Object.values(duo||{}).filter(Boolean).length>=20 },
+  { id:"bg17", icon:"🎯", name:"Perfectionniste",    desc:"Tous les objectifs d'une catégorie", check:(d)=>Object.values(d).filter(Boolean).length>=8 },
+  { id:"bg18", icon:"🗡️", name:"Bretteur",           desc:"Niveau 100 atteint",                 check:(_,m)=>(m?.persos||[]).some(p=>(p?.level||0)>=100) },
+  { id:"bg19", icon:"🔱", name:"Héros",              desc:"Niveau 150 atteint",                 check:(_,m)=>(m?.persos||[]).some(p=>(p?.level||0)>=150) },
+  { id:"bg20", icon:"🌠", name:"Transcendé",         desc:"Niveau 200 atteint",                 check:(_,m)=>(m?.persos||[]).some(p=>(p?.level||0)>=200) },
 ];
 
 const KAMAS_PALIERS = [
-  { label: "10M",  val: 10000000  },
-  { label: "25M",  val: 25000000  },
-  { label: "50M",  val: 50000000  },
-  { label: "75M",  val: 75000000  },
-  { label: "100M", val: 100000000 },
-  { label: "200M", val: 200000000 },
+  { label:"100k", val:100000 },
+  { label:"1M",   val:1000000 },
+  { label:"5M",   val:5000000 },
+  { label:"10M",  val:10000000 },
+  { label:"25M",  val:25000000 },
+  { label:"50M",  val:50000000 },
+  { label:"100M", val:100000000 },
+  { label:"200M", val:200000000 },
 ];
 
 // ─── BADGES FAMILIERS ────────────────────────────────────────────────────────
@@ -323,7 +333,7 @@ const C = {
   border:"#d4b87a", borderLight:"#e8d4a0",
   text:"#2a1a08", textDim:"#6b4e28", textBright:"#1a0e04",
   green:"#2a6a2a", greenBorder:"#4a8a4a",
-  headerBg:"#5a3a10", headerBg2:"#7a5018",
+  headerBg:"#3a2408", headerBg2:"#5a3a14",
   panelBorder:"#b8924a",
 };
 const DIFF_COLORS = ["#2a7a2a","#6a8a1a","#b87a10","#c85a10","#a01010"];
@@ -526,11 +536,12 @@ function ProgBar({ label, done, total, color, height=8 }) {
 }
 
 // ─── SECTION PERSONNAGES ─────────────────────────────────────────────────────
-function PersonnagesSection({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell }) {
-  const players = [
-    { label:"Sky",  color:"#2a4a8a", border:"#4a6a9a", colorLight:"#e8f0f8", meta:skydroMeta, onUpdate:onUpdateSkydro },
-    { label:"Cell", color:"#7a2a1a", border:"#9a4a2a", colorLight:"#f8ede8", meta:cellMeta,   onUpdate:onUpdateCell   },
+function PersonnagesSection({ skydroMeta, cellMeta, onUpdateSkydro, onUpdateCell, singlePlayer }) {
+  const allPlayers = [
+    { label:"Sky",  color:"#2a4a8a", border:"#4a6a9a", colorLight:"#e8f0f8", meta:skydroMeta, onUpdate:onUpdateSkydro, key:"skydro" },
+    { label:"Cell", color:"#7a2a1a", border:"#9a4a2a", colorLight:"#f8ede8", meta:cellMeta,   onUpdate:onUpdateCell,   key:"cell"   },
   ];
+  const players = singlePlayer ? allPlayers.filter(p => p.key === singlePlayer) : allPlayers;
   return (
     <div style={{ marginBottom:20 }}>
       <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>⚔ Personnages</div>
@@ -773,7 +784,7 @@ function CatCompleteOverlay({ title, icon, onDone }) {
         transform: phase === "in" ? "scale(0.7)" : "scale(1)",
         transition: "transform 0.4s cubic-bezier(0.34,1.56,0.64,1)",
       }}>
-        <div style={{ fontSize: 52, marginBottom: 8, filter: "drop-shadow(0 0 20px rgba(245,208,96,0.8))" }}>{icon}</div>
+        <div style={{ fontSize: 52, marginBottom: 16, marginTop: -20, filter: "drop-shadow(0 0 20px rgba(245,208,96,0.8))", lineHeight:1 }}>{icon}</div>
         <div style={{
           fontFamily: "'Cinzel', serif", fontSize: "clamp(18px,4vw,32px)", fontWeight: 700,
           color: "#f5d060", letterSpacing: 3, textTransform: "uppercase",
@@ -945,16 +956,11 @@ function TabContent({ data, done, toggle, player, meta, onMetaUpdate, notes, onN
                 cellMeta={player.key==="cell" ? meta : null}
                 onUpdateSkydro={player.key==="skydro" ? onMetaUpdate : ()=>{}}
                 onUpdateCell={player.key==="cell" ? onMetaUpdate : ()=>{}}
+                singlePlayer={player.key}
               />
               <KamasSection player={player.label} kamas={meta?.kamas} onUpdate={v => onMetaUpdate({...meta, kamas:v})} />
               <SuccesSection player={player.label} succes={meta?.succes} onUpdate={v => onMetaUpdate({...meta, succes:v})} />
             </>
-          )}
-          {!player && (
-            <PersonnagesSection
-              skydroMeta={skydroMeta} cellMeta={cellMeta}
-              onUpdateSkydro={onUpdateSkydro} onUpdateCell={onUpdateCell}
-            />
           )}
         </div>
       )}
@@ -980,117 +986,111 @@ const DAILY_BADGES = [
 
 // ─── BASE DE DONJONS PAR NIVEAU ───────────────────────────────────────────────
 const DUNGEONS_BY_LEVEL = [
-  { min:1,   max:25,  name:"Crypte de Kardorim",          boss:"Kardorim" },
-  { min:1,   max:25,  name:"Grange du Tournesol Affamé",  boss:"Tournesol Affamé" },
-  { min:15,  max:35,  name:"Donjon des Champs",           boss:"Gelée Royale" },
-  { min:20,  max:40,  name:"Château Ensablé",             boss:"Sphincter Cell" },
-  { min:25,  max:45,  name:"Donjon des Bworks",           boss:"Bwork Mage" },
-  { min:30,  max:50,  name:"Donjon des Tofus",            boss:"Tofu Royal" },
-  { min:35,  max:55,  name:"Donjon des Scarafeuilles",    boss:"Scarafeuille Royal" },
-  { min:40,  max:60,  name:"Donjon des Squelettes",       boss:"Chafer Ronin" },
-  { min:40,  max:60,  name:"Cache de Kankreblath",        boss:"Kankreblath" },
-  { min:45,  max:65,  name:"Maison Fantôme",              boss:"Boostache" },
-  { min:45,  max:65,  name:"Donjon des Forgerons",        boss:"Coffre des Forgerons" },
-  { min:45,  max:65,  name:"Grotte Hesque",               boss:"Corailleur Magistral" },
-  { min:50,  max:70,  name:"Donjon des Larves",           boss:"Shin Larve" },
-  { min:50,  max:70,  name:"Caverne des Bulbes",          boss:"Bulbig Brozeur" },
-  { min:50,  max:70,  name:"Nid du Kwakwa",               boss:"Kwakwa" },
-  { min:55,  max:75,  name:"Donjon des Bouftous",         boss:"Bouftou Royal" },
-  { min:55,  max:80,  name:"Château du Wa Wabbit",        boss:"Wa Wabbit" },
-  { min:60,  max:80,  name:"Donjon Abraknydes",           boss:"Abraknyde Ancestral" },
-  { min:65,  max:85,  name:"Forteresse de Kimbo",         boss:"Kimbo" },
-  { min:70,  max:90,  name:"Donjon des Tréants",          boss:"Chêne Mou" },
-  { min:75,  max:95,  name:"Antre du Dragon Cochon",      boss:"Dragon Cochon" },
-  { min:80,  max:100, name:"Donjon du Roi Nidas",         boss:"Roi Nidas" },
-  { min:85,  max:105, name:"Prison du Comte Harebourg",   boss:"Comte Harebourg" },
-  { min:90,  max:110, name:"Donjon du Kanniboul",         boss:"Kanniboul Eth" },
-  { min:95,  max:115, name:"Antre de Malefisk",           boss:"Malefisk" },
-  { min:100, max:120, name:"Temple de Sacrieur",          boss:"Sacrieur Sanguinaire" },
-  { min:100, max:125, name:"Donjon de Bethel",            boss:"Bethel" },
-  { min:110, max:130, name:"Donjon du Sangriard",         boss:"Sangriard" },
-  { min:115, max:135, name:"Tréfonds de Frigost",         boss:"Klime" },
-  { min:120, max:140, name:"Labyrinthe du Minotoror",     boss:"Minotoror" },
-  { min:125, max:145, name:"Tour de Korriandre",          boss:"Korriandre" },
-  { min:130, max:150, name:"Donjon du Skeunk",            boss:"Skeunk" },
-  { min:135, max:155, name:"Antre du Koulosse",           boss:"Koulosse" },
-  { min:140, max:160, name:"Palais de Nileza",            boss:"Nileza" },
-  { min:145, max:165, name:"Tour de Sylargh",             boss:"Sylargh" },
-  { min:150, max:170, name:"Donjon du Bworker",           boss:"Bworker" },
-  { min:155, max:175, name:"Cœur de Buhorado",            boss:"Buhorado" },
-  { min:160, max:180, name:"Repaire de Tengu Schwein",    boss:"Tengu Schwein" },
-  { min:165, max:185, name:"Donjon du Dark Vlad",         boss:"Dark Vlad" },
-  { min:170, max:195, name:"Donjon de Merkator",          boss:"Merkator" },
-  { min:180, max:200, name:"Donjon des Kanigrous",        boss:"Kanigrou" },
-  { min:185, max:200, name:"Donjon du Solar",             boss:"Solar" },
-  { min:190, max:200, name:"Tour de Frigost",             boss:"Missiz Frizz" },
+  { min:1,   max:30,  name:"Crypte de Kardorim",           boss:"Kardorim" },
+  { min:1,   max:30,  name:"Grange du Tournesol Affamé",   boss:"Tournesol Affamé" },
+  { min:15,  max:40,  name:"Château Ensablé",              boss:"Mob l\'Éponge" },
+  { min:20,  max:45,  name:"Cour du Bouftou Royal",        boss:"Bouftou Royal" },
+  { min:25,  max:50,  name:"Donjon des Bworks",            boss:"Bworkette" },
+  { min:30,  max:55,  name:"Donjon des Tofus",             boss:"Batofu" },
+  { min:35,  max:60,  name:"Cache de Kankreblath",         boss:"Kankreblath" },
+  { min:40,  max:65,  name:"Donjon des Forgerons",         boss:"Coffre des Forgerons" },
+  { min:50,  max:75,  name:"Château du Wa Wabbit",         boss:"Wa Wabbit" },
+  { min:55,  max:80,  name:"Donjon Abraknydes",            boss:"Abraknyde Ancestral" },
+  { min:60,  max:85,  name:"Cale de l\'Arche d\'Otomaï",   boss:"Gourlo le Terrible" },
+  { min:65,  max:90,  name:"Antre de la Reine Nyée",       boss:"Reine Nyée" },
+  { min:70,  max:95,  name:"Bateau du Chouque",            boss:"Chouque" },
+  { min:75,  max:100, name:"Donjon des Gelées",            boss:"Blop Multicolore Royal" },
+  { min:80,  max:110, name:"Antre du Dragon Cochon",       boss:"Dragon Cochon" },
+  { min:85,  max:115, name:"Caverne du Koulosse",          boss:"Koulosse" },
+  { min:90,  max:120, name:"Bibliothèque du Maître Corbac",boss:"Maître Corbac" },
+  { min:95,  max:125, name:"Tanière du Meulou",            boss:"Meulou" },
+  { min:100, max:130, name:"Clairière du Chêne Mou",       boss:"Chêne Mou" },
+  { min:110, max:140, name:"Épave du Grolandais Violent",  boss:"Ben le Ripate" },
+  { min:120, max:150, name:"Antre du Blop Multicolore",    boss:"Blop Multicolore" },
+  { min:140, max:165, name:"Canopée du Kimbo",             boss:"Kimbo" },
+  { min:150, max:180, name:"Antre du Korriandre",          boss:"Korriandre" },
+  { min:160, max:190, name:"Grotte du Bworker",            boss:"Bworker" },
+  { min:165, max:195, name:"Antre du Kralamoure Géant",    boss:"Kralamoure Géant" },
+  { min:175, max:200, name:"Cavernes du Kolosso",          boss:"Kolosso" },
+  { min:180, max:200, name:"Antichambre des Gloursons",    boss:"Glourséleste" },
+  { min:190, max:200, name:"Aquadôme de Merkator",         boss:"Merkator" },
+  { min:190, max:200, name:"Donjon du Comte Harebourg",    boss:"Comte Harebourg" },
+  { min:195, max:200, name:"Tréfonds de Frigost",          boss:"Klime" },
 ];
 
-// ─── QUÊTES CRÉATIVES PAR DIFFICULTÉ ─────────────────────────────────────────
 const DAILY_QUESTS = {
   easy: [
-    { id:"e1",  template: (d) => `Faire le donjon ${d.name} sans utiliser de soin pendant les 3 premières salles`, emoji:"🧪" },
-    { id:"e2",  template: (d) => `Tuer ${d.boss} en moins de 8 tours`, emoji:"⚡" },
-    { id:"e3",  template: (d) => `Finir ${d.name} sans jamais reculer d'une case`, emoji:"🔒" },
-    { id:"e4",  template: (d) => `Entrer dans ${d.name} avec exactement 1 objet de soin dans l'inventaire`, emoji:"🎒" },
-    { id:"e5",  template: (d) => `Faire ${d.name} et finir avec plus de 80% de ses PV`, emoji:"💚" },
-    { id:"e6",  template: (d) => `Tuer ${d.boss} en dernier dans le combat final`, emoji:"🎯" },
-    { id:"e7",  template: (d) => `Faire ${d.name} sans utiliser de sort de zone`, emoji:"🎪" },
-    { id:"e8",  template: (d) => `Finir ${d.name} en commençant chaque combat avec un défi actif`, emoji:"🏆" },
-    { id:"e9",  template: (d) => `Faire ${d.name} sans jamais utiliser plus de 3 PA par tour`, emoji:"🐢" },
-    { id:"e10", template: (d) => `Entrer dans ${d.name} avec un familier équipé`, emoji:"🐾" },
+    { id:"e1",  template:(d)=>`Faire ${d.name} sans utiliser de soin pendant les 2 premières salles`, emoji:"🧪" },
+    { id:"e2",  template:(d)=>`Tuer ${d.boss} en moins de 6 tours`, emoji:"⚡" },
+    { id:"e3",  template:(d)=>`Finir ${d.name} sans jamais reculer d\'une case`, emoji:"🔒" },
+    { id:"e4",  template:(d)=>`Faire ${d.name} en commençant chaque combat avec un défi actif`, emoji:"🏆" },
+    { id:"e5",  template:(d)=>`Finir ${d.name} avec plus de 80% de ses PV`, emoji:"💚" },
+    { id:"e6",  template:(d)=>`Tuer ${d.boss} en dernier dans le combat final`, emoji:"🎯" },
+    { id:"e7",  template:(_d)=>`Réaliser 3 chasses au trésor aujourd\'hui`, emoji:"🗺️" },
+    { id:"e8",  template:(_d)=>`Ramasser 50 ressources en zone ouverte`, emoji:"🌿" },
+    { id:"e9",  template:(_d)=>`Faire l\'Almanax du jour`, emoji:"☀️" },
+    { id:"e10", template:(_d)=>`Vendre 10 objets à l\'Hôtel de Vente`, emoji:"💰" },
+    { id:"e11", template:(_d)=>`Réaliser un succès de combat aujourd\'hui`, emoji:"⭐" },
+    { id:"e12", template:(d)=>`Faire ${d.name} sans jamais utiliser plus de 3 PA par tour`, emoji:"🐢" },
   ],
   normal: [
-    { id:"n1",  template: (d) => `Faire ${d.name} en solo`, emoji:"🧍" },
-    { id:"n2",  template: (d) => `Finir ${d.name} sans jamais être en dessous de 50% de PV`, emoji:"❤️" },
-    { id:"n3",  template: (d) => `Battre ${d.boss} sans utiliser de sort offensif au dernier tour`, emoji:"✋" },
-    { id:"n4",  template: (d) => `Faire ${d.name} avec un stuff entièrement crafté`, emoji:"🔨" },
-    { id:"n5",  template: (d) => `Finir ${d.name} en ne tuant que le boss — épargner tous les autres monstres`, emoji:"🕊️" },
-    { id:"n6",  template: (d) => `Faire ${d.name} sans utiliser de sort de déplacement`, emoji:"🧱" },
-    { id:"n7",  template: (d) => `Terminer ${d.name} en ayant accumulé 0 dommage reçu en T1 de chaque combat`, emoji:"🛡️" },
-    { id:"n8",  template: (d) => `Faire ${d.name} avec un équipement d'une classe différente de la tienne`, emoji:"🎭" },
-    { id:"n9",  template: (d) => `Battre ${d.boss} en moins de 3 tours`, emoji:"💥" },
-    { id:"n10", template: (d) => `Faire ${d.name} sans jamais passer son tour`, emoji:"⏩" },
+    { id:"n1",  template:(d)=>`Faire ${d.name} en solo`, emoji:"🧍" },
+    { id:"n2",  template:(d)=>`Finir ${d.name} sans jamais être en dessous de 50% de PV`, emoji:"❤️" },
+    { id:"n3",  template:(d)=>`Battre ${d.boss} sans utiliser de sort offensif au dernier tour`, emoji:"✋" },
+    { id:"n4",  template:(d)=>`Faire ${d.name} sans utiliser de sort de déplacement`, emoji:"🧱" },
+    { id:"n5",  template:(d)=>`Finir ${d.name} en ne tuant que le boss — épargner tous les autres monstres`, emoji:"🕊️" },
+    { id:"n6",  template:(d)=>`Battre ${d.boss} en moins de 4 tours`, emoji:"💥" },
+    { id:"n7",  template:(_d)=>`Réaliser 2 chasses au trésor de la même zone`, emoji:"🗺️" },
+    { id:"n8",  template:(_d)=>`Farmer 100 ressources d\'un même type`, emoji:"⛏️" },
+    { id:"n9",  template:(_d)=>`Gagner 50 000 kamas en vendant à l\'HDV`, emoji:"💵" },
+    { id:"n10", template:(_d)=>`Compléter 3 combats d\'affilée avec un défi "Sans dommages"`, emoji:"🛡️" },
+    { id:"n11", template:(_d)=>`Réaliser un succès de donjon jamais complété`, emoji:"🆕" },
+    { id:"n12", template:(d)=>`Faire ${d.name} sans jamais passer son tour`, emoji:"⏩" },
   ],
   hard: [
-    { id:"h1",  template: (d) => `Faire ${d.name} en hardcore : si tu meurs, tu recommences`, emoji:"💀" },
-    { id:"h2",  template: (d) => `Battre ${d.boss} en solo sans équipement dans les slots accessoires`, emoji:"🪦" },
-    { id:"h3",  template: (d) => `Faire ${d.name} entier sans jamais utiliser plus de 2 sorts différents`, emoji:"🔂" },
-    { id:"h4",  template: (d) => `Terminer ${d.name} en ayant coché le succès "Mains propres" (0 mort dans l'équipe)`, emoji:"🧤" },
-    { id:"h5",  template: (d) => `Faire ${d.name} en étant 20 niveaux en dessous du niveau recommandé`, emoji:"📉" },
-    { id:"h6",  template: (d) => `Battre ${d.boss} sans jamais infliger plus de 200 dégâts par sort`, emoji:"🪶" },
-    { id:"h7",  template: (d) => `Finir ${d.name} sans utiliser de sorts d'éléments différents`, emoji:"🧊" },
-    { id:"h8",  template: (d) => `Faire ${d.name} en partant avec exactement la moitié de son équipement habituel`, emoji:"✂️" },
-    { id:"h9",  template: (d) => `Battre ${d.boss} en utilisant uniquement des sorts de corps-à-corps`, emoji:"🥊" },
-    { id:"h10", template: (d) => `Faire ${d.name} sans jamais utiliser une case adjacente au boss`, emoji:"🚫" },
+    { id:"h1",  template:(d)=>`Faire ${d.name} en hardcore : si tu meurs, tu recommences`, emoji:"💀" },
+    { id:"h2",  template:(d)=>`Battre ${d.boss} sans équipement dans les slots accessoires`, emoji:"🪦" },
+    { id:"h3",  template:(d)=>`Faire ${d.name} entier sans utiliser plus de 2 sorts différents`, emoji:"🔂" },
+    { id:"h4",  template:(d)=>`Terminer ${d.name} avec le succès "Mains propres" (0 mort)`, emoji:"🧤" },
+    { id:"h5",  template:(d)=>`Battre ${d.boss} sans jamais infliger plus de 200 dégâts par sort`, emoji:"🪶" },
+    { id:"h6",  template:(d)=>`Faire ${d.name} en utilisant uniquement des sorts d\'un seul élément`, emoji:"🧊" },
+    { id:"h7",  template:(_d)=>`Réaliser 5 chasses au trésor d\'affilée sans échouer`, emoji:"🏅" },
+    { id:"h8",  template:(_d)=>`Gagner 200 000 kamas en une session de jeu`, emoji:"💎" },
+    { id:"h9",  template:(_d)=>`Compléter 3 combats d\'affilée sans utiliser de sort de soin`, emoji:"🩸" },
+    { id:"h10", template:(d)=>`Faire ${d.name} sans jamais utiliser une case adjacente au boss`, emoji:"🚫" },
   ],
 };
 
 function getDungeonsForLevel(level) {
   if (!level || level < 1) return DUNGEONS_BY_LEVEL.slice(0, 5);
-  return DUNGEONS_BY_LEVEL.filter(d => level >= d.min - 15 && level <= d.max + 15);
+  const min = Math.max(1, level - 50);
+  return DUNGEONS_BY_LEVEL.filter(d => d.max <= level && d.max >= min);
 }
 
-function getDailyQuests(level, dateKey) {
-  // Seed basé sur la date + niveau pour être reproductible
-  const seed = dateKey.split("-").reduce((a, b) => a * 31 + parseInt(b), level || 1);
-  const rng = (n, offset = 0) => Math.abs((seed * 1664525 + 1013904223 * (n + offset + 1)) & 0x7fffffff) % 1000 / 1000;
+function getDailyQuests(levelSnapshot, dateKey) {
+  // Seed basé UNIQUEMENT sur la date — fixe toute la journée
+  const dateSeed = dateKey.split("-").reduce((a,b,i) => a + parseInt(b) * (i+1) * 97, 0);
+  const rng = (n) => Math.abs((dateSeed * 1664525 + 1013904223 * (n+1)) & 0x7fffffff) % 1000 / 1000;
 
-  const dungeons = getDungeonsForLevel(level);
-  if (!dungeons.length) return [];
+  const dungeons = getDungeonsForLevel(levelSnapshot);
+  const pool = dungeons.length > 0 ? dungeons : DUNGEONS_BY_LEVEL.slice(0, 5);
 
-  const pick = (arr, n) => Math.floor(rng(n) * arr.length);
-  const pickQ = (arr, n) => Math.floor(rng(n + 100) * arr.length);
+  const pickD = (n) => pool[Math.floor(rng(n) * pool.length)];
+  const pickQ = (arr, n) => arr[Math.floor(rng(n+50) * arr.length)];
+
+  const easyQ  = pickQ(DAILY_QUESTS.easy, 0);
+  const normalQ = pickQ(DAILY_QUESTS.normal, 1);
+  const hardQ   = pickQ(DAILY_QUESTS.hard, 2);
+
+  const needsDungeon = (q) => !q.template.toString().includes("_d");
 
   return [
-    { difficulty:"easy",   color:"#2a7a2a", bg:"#eaf4ea", border:"#4a9a4a", label:"Facile",
-      dungeon: dungeons[pick(dungeons, 0)],
-      quest: DAILY_QUESTS.easy[pickQ(DAILY_QUESTS.easy, 0)] },
+    { difficulty:"easy",   color:"#2a7a2a", bg:"#eaf4ea", border:"#4a8a4a", label:"Facile",
+      dungeon: needsDungeon(easyQ)  ? pickD(0) : null, quest: easyQ  },
     { difficulty:"normal", color:"#7a5a10", bg:"#f8f0d8", border:"#b88a20", label:"Normal",
-      dungeon: dungeons[pick(dungeons, 1)],
-      quest: DAILY_QUESTS.normal[pickQ(DAILY_QUESTS.normal, 1)] },
+      dungeon: needsDungeon(normalQ) ? pickD(1) : null, quest: normalQ },
     { difficulty:"hard",   color:"#8a1a1a", bg:"#f8e8e8", border:"#b84040", label:"Difficile",
-      dungeon: dungeons[pick(dungeons, 2)],
-      quest: DAILY_QUESTS.hard[pickQ(DAILY_QUESTS.hard, 2)] },
+      dungeon: needsDungeon(hardQ)  ? pickD(2) : null, quest: hardQ  },
   ];
 }
 
@@ -1211,14 +1211,31 @@ function DailyCompleteOverlay({ quest, onDone }) {
 function DailyQuestsSection({ playerLabel, playerColor, playerBorder, playerBg, level, dailyDone, onToggle, totalDone }) {
   const today = new Date();
   const dateKey = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
-  const quests = getDailyQuests(level, dateKey);
+
+  // Snapshot du niveau : on stocke le niveau utilisé pour la journée
+  const [levelSnapshot, setLevelSnapshot] = useState(() => {
+    const stored = localStorage.getItem ? localStorage.getItem(`dailyLevel_${playerLabel}_${dateKey}`) : null;
+    return stored ? parseInt(stored) : (level || null);
+  });
+
+  useEffect(() => {
+    if (level && !levelSnapshot) {
+      setLevelSnapshot(level);
+      try { localStorage.setItem(`dailyLevel_${playerLabel}_${dateKey}`, String(level)); } catch(e) {}
+    }
+  }, [level]);
+
+  const quests = getDailyQuests(levelSnapshot, dateKey);
   const [overlay, setOverlay] = useState(null);
 
   const handleCheck = (q, idx) => {
     const key = `${dateKey}_${idx}`;
     const wasDone = dailyDone[key];
     onToggle(key, !wasDone);
-    if (!wasDone) setOverlay({ ...q, text: q.quest.template(q.dungeon), emoji: q.quest.emoji });
+    if (!wasDone) {
+      const text = q.dungeon ? q.quest.template(q.dungeon) : q.quest.template(null);
+      setOverlay({ ...q, text, emoji: q.quest.emoji });
+    }
   };
 
   const unlockedBadges = DAILY_BADGES.filter(b => totalDone >= b.threshold);
@@ -1246,7 +1263,7 @@ function DailyQuestsSection({ playerLabel, playerColor, playerBorder, playerBg, 
             {quests.map((q, idx) => {
               const key = `${dateKey}_${idx}`;
               const isDone = dailyDone[key];
-              const text = q.quest.template(q.dungeon);
+              const text = q.dungeon ? q.quest.template(q.dungeon) : q.quest.template(null);
               return (
                 <div key={idx} onClick={() => handleCheck(q, idx)} style={{
                   display:"grid", gridTemplateColumns:"28px 1fr auto",
@@ -1275,9 +1292,9 @@ function DailyQuestsSection({ playerLabel, playerColor, playerBorder, playerBg, 
                         border:`1px solid ${q.border}`, fontFamily:"'Cinzel',serif",
                         fontWeight:600, letterSpacing:0.5,
                       }}>{q.label}</span>
-                      <span style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>
+                      {q.dungeon && <span style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>
                         {q.dungeon.name}
-                      </span>
+                      </span>}
                     </div>
                     <div style={{
                       fontSize:13, color: isDone ? C.textDim : C.text,
@@ -1596,7 +1613,13 @@ function FamiliersDualList({ skyFams, cellFams, onToggleSky, onToggleCell }) {
                   <span style={{ fontSize:9, padding:"1px 6px", borderRadius:10, background:cfg.bg, color:cfg.color, border:`1px solid ${cfg.border}`, fontFamily:"'Cinzel',serif", fontWeight:600 }}>{f.how}</span>
                 </div>
                 <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>{f.name} — {f.where}</div>
-                {f.req && f.req !== "Aucun" && <div style={{ fontSize:10, color:"#8a6a30", marginTop:1 }}>⚠ {f.req}</div>}
+                {f.req && f.req !== "Aucun" && (
+                  <div style={{ fontSize:10, color:"#8a6a30", marginTop:1, display:"flex", alignItems:"center", gap:4 }}>
+                    <span title={`Prérequis pour obtenir ${f.name} :\n${f.req}`} style={{ cursor:"help", borderBottom:"1px dashed #8a6a30" }}>
+                      ⚠ {f.req}
+                    </span>
+                  </div>
+                )}
               </div>
               {[{done:sd,color:"#2a4a8a",border:"#4a6a9a",player:"sky"},{done:cd,color:"#7a2a1a",border:"#9a4a2a",player:"cell"}].map(p => (
                 <div key={p.player} onClick={() => handleToggle(f,p.player)} style={{ display:"flex", justifyContent:"center", cursor:"pointer" }}>
@@ -2022,35 +2045,19 @@ function RecapCard({ label, meta, color, colorLight, border }) {
   const kamas = meta?.kamas || 0;
   const succes = meta?.succes || 0;
   const fmt = v => v >= 1000000 ? `${(v/1000000).toFixed(1)}M` : v >= 1000 ? `${(v/1000).toFixed(0)}k` : String(v);
-  const defaultPersos = [{name:"Perso 1", level:1},{name:"Perso 2", level:1}];
-  const displayed = persos.length > 0 ? persos.slice(0,2) : defaultPersos;
+  const displayed = persos.length > 0 ? persos.slice(0,2) : [{name:"Perso 1"},{name:"Perso 2"}];
   return (
     <div style={{
-      width: 150, flexShrink: 0,
-      position: "sticky", top: 20,
-      background: colorLight,
-      border: `2px solid ${border}`,
-      borderRadius: 8,
-      padding: "10px 12px",
-      boxShadow: "0 2px 8px rgba(90,58,16,0.15)",
-      fontSize: 12,
+      width:140, flexShrink:0, position:"sticky", top:20,
+      background:colorLight, border:`2px solid ${border}`, borderRadius:8,
+      padding:"10px 12px", boxShadow:"0 2px 8px rgba(90,58,16,0.15)", fontSize:12,
     }}>
       <div style={{ fontFamily:"'Cinzel',serif", fontSize:12, fontWeight:700, color, marginBottom:8, letterSpacing:1, borderBottom:`1px solid ${border}55`, paddingBottom:5, textAlign:"center" }}>
         ◈ {label}
       </div>
       {displayed.map((perso, i) => (
-        <div key={i} style={{ marginBottom:5 }}>
-          <div style={{ fontSize:11, color:C.text, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-            {perso.name || `Perso ${i+1}`}
-          </div>
-          <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:2 }}>
-            <div style={{ flex:1, height:4, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
-              <div style={{ height:"100%", width:`${perso.level ? Math.min(100, Math.round(perso.level/200*100)) : 0}%`, background:(perso.level||0)>=200?color:`${color}99`, borderRadius:2 }} />
-            </div>
-            <span style={{ fontSize:10, color, fontFamily:"'Cinzel',serif", fontWeight:700, flexShrink:0 }}>
-              {perso.level >= 200 ? "✦200" : perso.level ? `${perso.level}` : "—"}
-            </span>
-          </div>
+        <div key={i} style={{ fontSize:11, color:C.text, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginBottom:4 }}>
+          ⚔ {perso.name || `Perso ${i+1}`}
         </div>
       ))}
       <div style={{ height:1, background:`${border}33`, margin:"7px 0" }} />
@@ -2123,13 +2130,10 @@ export default function App() {
     showToast(`✦ Note de ${author} envoyée`);
   };
 
-  const TABS = [
-    { key:"duo",        label:"⚔  Duo",        active:{ bg:C.bgPanel,   border:C.panelBorder, color:C.gold     } },
-    { key:"skydro",     label:"◈  Sky",         active:{ bg:"#e8f0f8",   border:"#4a6a9a",     color:"#2a4a8a"  } },
-    { key:"cell",       label:"◈  Cell",        active:{ bg:"#f8ede8",   border:"#9a4a2a",     color:"#7a2a1a"  } },
-    { key:"familiers",  label:"🐾 Familiers",  active:{ bg:"#eaf4ea",   border:"#4a8a4a",     color:"#2a6a2a"  } },
-    { key:"chasse",     label:"🗺 Chasse",      active:{ bg:"#f8f4e8",   border:"#a08020",     color:"#6a4a10"  } },
-    { key:"stuff",      label:"⚔ Stuff",       active:{ bg:"#f0eaf8", border:"#6a4a8a",     color:"#4a2a6a"  } },
+  const NAV_TABS = [
+    { key:"familiers", label:"🐾 Familiers", active:{ bg:"#eaf4ea", border:"#4a8a4a", color:"#2a6a2a" } },
+    { key:"chasse",    label:"🗺 Chasse",    active:{ bg:"#f8f4e8", border:"#a08020",  color:"#6a4a10" } },
+    { key:"stuff",     label:"⚔ Stuff",     active:{ bg:"#f0eaf8", border:"#6a4a8a",  color:"#4a2a6a" } },
   ];
 
   const duoAll    = DUO_DATA.flatMap(c=>c.objectives);
@@ -2142,6 +2146,7 @@ export default function App() {
 
   // ── Badge unlock detection ──
   const [badgeOverlay, setBadgeOverlay] = useState(null);
+  const [catOverlay, setCatOverlay] = useState(null);
   const [shownBadges, setShownBadges] = useState(new Set());
 
   useEffect(() => {
@@ -2157,10 +2162,18 @@ export default function App() {
     allBadges.forEach(b => {
       if (b.unlocked && !shownBadges.has(b.id)) {
         setShownBadges(prev => new Set([...prev, b.id]));
-        setBadgeOverlay(b);
+        // Décale légèrement les badges pour éviter le chevauchement
+        setTimeout(() => setBadgeOverlay(b), shownBadges.size * 200);
       }
     });
   }, [skydroDone, cellDone, skydroMeta, cellMeta, duoDone, skyDailyTotal, cellDailyTotal]);
+
+  // Stats cliquables pour naviguer
+  const NAV_STATS = [
+    { key:"duo",    label:"Duo",  done:duoAll.filter(o=>duoDone[o.id]).length,       total:duoAll.length,    color:"#f5e8a0", bg:"rgba(255,240,100,0.15)", border:"rgba(255,220,80,0.4)" },
+    { key:"skydro", label:"Sky",  done:skydroAll.filter(o=>skydroDone[o.id]).length, total:skydroAll.length, color:"#a8c8f8", bg:"rgba(74,120,200,0.2)",  border:"rgba(100,160,255,0.4)" },
+    { key:"cell",   label:"Cell", done:cellAll.filter(o=>cellDone[o.id]).length,     total:cellAll.length,   color:"#f8b8a0", bg:"rgba(200,80,50,0.2)",   border:"rgba(255,120,80,0.4)" },
+  ];
 
   return (
     <div className="dofus-app">
@@ -2168,32 +2181,35 @@ export default function App() {
       {toast && <Toast msg={toast} onDone={() => setToast(null)} />}
       {badgeOverlay && <BadgeUnlockOverlay badge={badgeOverlay} onDone={() => setBadgeOverlay(null)} />}
 
-      {/* HEADER style forum Dofus */}
-      <div style={{ background:`linear-gradient(180deg, ${C.headerBg} 0%, ${C.headerBg2} 100%)`, padding:"24px 20px 0", textAlign:"center", boxShadow:"0 3px 10px rgba(42,26,8,0.3)" }}>
-        <div style={{ fontSize:10, color:"#d4b070", letterSpacing:5, fontFamily:"'Cinzel',serif", marginBottom:4, textTransform:"uppercase" }}>Monde des Douze</div>
-        <h1 style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(20px,4vw,32px)", fontWeight:700, color:"#f5edd8", letterSpacing:2, textShadow:"0 2px 4px rgba(0,0,0,0.4)" }}>
+      {/* HEADER */}
+      <div style={{ background:`linear-gradient(180deg, ${C.headerBg} 0%, ${C.headerBg2} 100%)`, padding:"16px 20px 0", textAlign:"center", boxShadow:"0 3px 10px rgba(0,0,0,0.5)" }}>
+        <div style={{ fontSize:9, color:"#e8c870", letterSpacing:5, fontFamily:"'Cinzel',serif", marginBottom:2, textTransform:"uppercase" }}>Monde des Douze</div>
+        <h1 style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(18px,3vw,26px)", fontWeight:700, color:"#fff8e8", letterSpacing:2, textShadow:"0 2px 6px rgba(0,0,0,0.7)", margin:"0 0 2px" }}>
           Carnet d'Aventure
         </h1>
-        <div style={{ color:"#c8a060", fontSize:13, fontStyle:"italic", margin:"4px 0" }}>Sky & Cell — Objectifs long terme</div>
-        <div style={{ fontSize:11, color:synced?"#8aca8a":"#e8c870", marginBottom:16, letterSpacing:1 }}>{synced?"✦ Synchronisé":"⟳ Connexion…"}</div>
+        <div style={{ color:"#f0d090", fontSize:12, fontStyle:"italic", marginBottom:4 }}>Sky & Cell</div>
+        <div style={{ fontSize:10, color:synced?"#90e090":"#e8d060", marginBottom:10, letterSpacing:1 }}>{synced?"✦ Synchronisé":"⟳ Connexion…"}</div>
 
-        <div style={{ display:"flex", justifyContent:"center", gap:12, marginBottom:20, flexWrap:"wrap" }}>
-          {[
-            { label:"Duo",    done:duoAll.filter(o=>duoDone[o.id]).length,    total:duoAll.length,    color:"#f5edd8",  bg:"rgba(255,255,255,0.1)" },
-            { label:"Sky",   done:skydroAll.filter(o=>skydroDone[o.id]).length, total:skydroAll.length, color:"#a8c8f8", bg:"rgba(74,120,200,0.2)" },
-            { label:"Cell",   done:cellAll.filter(o=>cellDone[o.id]).length,   total:cellAll.length,   color:"#f8b8a0", bg:"rgba(200,80,50,0.2)" },
-          ].map(s => (
-            <div key={s.label} style={{ padding:"8px 18px", textAlign:"center", minWidth:80, background:s.bg, border:"1px solid rgba(255,255,255,0.2)", borderRadius:6 }}>
-              <div style={{ fontFamily:"'Cinzel',serif", fontSize:17, fontWeight:700, color:s.color }}>
+        {/* Stats cliquables Duo / Sky / Cell */}
+        <div style={{ display:"flex", justifyContent:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
+          {NAV_STATS.map(s => (
+            <div key={s.key} onClick={() => setTab(s.key)} style={{
+              padding:"6px 16px", textAlign:"center", minWidth:70,
+              background: tab===s.key ? s.bg : "rgba(255,255,255,0.06)",
+              border:`1px solid ${tab===s.key ? s.border : "rgba(255,255,255,0.15)"}`,
+              borderRadius:6, cursor:"pointer", transition:"all 0.15s",
+            }}>
+              <div style={{ fontFamily:"'Cinzel',serif", fontSize:16, fontWeight:700, color:s.color, textShadow:"0 1px 3px rgba(0,0,0,0.5)" }}>
                 {Math.round(s.done/s.total*100)}%
               </div>
-              <div style={{ fontSize:10, color:"rgba(245,237,216,0.7)", fontFamily:"'Cinzel',serif", letterSpacing:1 }}>{s.label}</div>
+              <div style={{ fontSize:9, color:"rgba(255,240,200,0.85)", fontFamily:"'Cinzel',serif", letterSpacing:1 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
+        {/* Onglets Familiers / Chasse / Stuff */}
         <div style={{ display:"flex", justifyContent:"center", gap:4 }}>
-          {TABS.map(t => {
+          {NAV_TABS.map(t => {
             const isActive = tab===t.key;
             return (
               <button key={t.key} className={`tab-btn${isActive?"":" inactive"}`} onClick={()=>setTab(t.key)}
@@ -2204,7 +2220,6 @@ export default function App() {
           })}
         </div>
         <div style={{ height:2, background:`linear-gradient(90deg,transparent,${C.panelBorder},transparent)` }} />
-        <GlobalSearch />
         <AlmanaxWidget />
       </div>
 
