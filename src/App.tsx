@@ -2056,8 +2056,18 @@ function RecapCard({ label, meta, color, colorLight, border }) {
         ◈ {label}
       </div>
       {displayed.map((perso, i) => (
-        <div key={i} style={{ fontSize:11, color:C.text, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginBottom:4 }}>
-          ⚔ {perso.name || `Perso ${i+1}`}
+        <div key={i} style={{ marginBottom:5 }}>
+          <div style={{ fontSize:11, color:C.text, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+            ⚔ {perso.name || `Perso ${i+1}`}
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:2 }}>
+            <div style={{ flex:1, height:3, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
+              <div style={{ height:"100%", width:`${perso.level ? Math.min(100, Math.round(perso.level/200*100)) : 0}%`, background:color, borderRadius:2 }} />
+            </div>
+            <span style={{ fontSize:9, color, fontFamily:"'Cinzel',serif", fontWeight:700, flexShrink:0 }}>
+              {perso.level >= 200 ? "✦200" : perso.level ? `${perso.level}` : "—"}
+            </span>
+          </div>
         </div>
       ))}
       <div style={{ height:1, background:`${border}33`, margin:"7px 0" }} />
