@@ -328,62 +328,73 @@ function makeSoloData(prefix) {
 
 // ─── COULEURS ────────────────────────────────────────────────────────────────
 const C = {
-  bgDeep:"#e8dcc8", bgPanel:"#f5edd8", bgCard:"#fdf6e8", bgCardHov:"#fff8f0", bgDone:"#eaf2ea",
-  gold:"#8b5e1a", goldLight:"#a0721f", goldDim:"#c8a060",
-  border:"#d4b87a", borderLight:"#e8d4a0",
-  text:"#2a1a08", textDim:"#6b4e28", textBright:"#1a0e04",
+  bgDeep:"#f0eef8", bgPanel:"#faf9fe", bgCard:"#ffffff", bgCardHov:"#f5f3fc", bgDone:"#edf7ed",
+  gold:"#534ab7", goldLight:"#7f77dd", goldDim:"#afa9ec",
+  border:"#c8c3f0", borderLight:"#e4e2f8",
+  text:"#1e1b3a", textDim:"#6b66a0", textBright:"#0f0d2a",
   green:"#2a6a2a", greenBorder:"#4a8a4a",
   headerBg:"#1a1535", headerBg2:"#2a2050",
-  panelBorder:"#b8924a",
+  panelBorder:"#c8c3f0",
 };
 const DIFF_COLORS = ["#2a7a2a","#6a8a1a","#b87a10","#c85a10","#a01010"];
 const DIFF_LABELS = ["Facile","Aisé","Moyen","Difficile","Légendaire"];
 
-// ─── STYLES ──────────────────────────────────────────────────────────────────
 const styles = `
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:${C.bgDeep};}
-.dofus-app{font-family:'Crimson Pro',Georgia,serif;background:${C.bgDeep};min-height:100vh;color:${C.text};background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23b8924a' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
-.panel{background:${C.bgPanel};border:2px solid ${C.panelBorder};border-radius:6px;position:relative;box-shadow:0 2px 8px rgba(90,58,16,0.15);}
-.panel::before{content:'';position:absolute;inset:0;border-radius:4px;background:linear-gradient(135deg,rgba(200,160,80,0.08) 0%,transparent 50%);pointer-events:none;}
-.panel-gold{background:linear-gradient(180deg,#f0e0b0 0%,#e8d49a 100%);border:2px solid ${C.panelBorder};border-radius:6px;position:relative;overflow:hidden;box-shadow:0 2px 6px rgba(90,58,16,0.2);}
-.panel-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${C.goldDim},transparent);}
-.obj-row{display:grid;grid-template-columns:28px 1fr auto;align-items:start;gap:10px;padding:10px 14px;border-radius:5px;background:${C.bgCard};border:1px solid ${C.borderLight};cursor:pointer;transition:background 0.15s,border-color 0.15s;box-shadow:0 1px 3px rgba(90,58,16,0.08);}
-.obj-row:hover{background:${C.bgCardHov};border-color:${C.goldDim};}
-.obj-row.done{background:#eef4ee;border-color:${C.greenBorder};opacity:0.7;}
-.tab-btn{padding:10px 20px;border-radius:5px 5px 0 0;font-family:'Cinzel',serif;font-size:12px;font-weight:600;border:2px solid transparent;border-bottom:none;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;}
-.tab-btn.inactive{background:rgba(90,58,16,0.12);border-color:${C.border};color:${C.headerBg};}
-.tab-btn.inactive:hover{color:${C.gold};border-color:${C.goldDim};}
-.filter-btn{padding:5px 12px;border-radius:3px;font-size:12px;font-family:'Crimson Pro',serif;font-weight:600;border:1px solid ${C.border};background:transparent;color:${C.textDim};cursor:pointer;transition:all 0.12s;}
-.filter-btn:hover{border-color:${C.gold};color:${C.gold};}
-.filter-btn.active{background:rgba(139,94,26,0.15);border-color:${C.gold};color:${C.gold};}
-.cat-title{font-family:'Cinzel',serif;font-size:12px;font-weight:600;color:${C.gold};letter-spacing:1px;text-transform:uppercase;}
-.obj-name{font-size:14px;font-weight:600;color:${C.textBright};line-height:1.3;}
-.obj-name.done{text-decoration:line-through;color:${C.textDim};}
-.obj-desc{font-size:12px;color:${C.textDim};font-style:italic;margin-top:2px;line-height:1.3;}
-.check-box{width:20px;height:20px;border:2px solid ${C.goldDim};border-radius:3px;display:flex;align-items:center;justify-content:center;background:white;flex-shrink:0;margin-top:2px;transition:all 0.15s;}
-.check-box.done{background:${C.green};border-color:${C.green};}
-.prog-track{flex:1;height:8px;background:rgba(139,94,26,0.12);border-radius:2px;border:1px solid ${C.border};overflow:hidden;}
-.prog-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}
-.divider{height:1px;background:linear-gradient(90deg,transparent,${C.panelBorder},transparent);margin:6px 0;}
-.note-input{width:100%;background:white;border:1px solid ${C.border};border-radius:4px;padding:8px 12px;color:${C.text};font-family:'Crimson Pro',serif;font-size:14px;resize:none;outline:none;}
-.note-input:focus{border-color:${C.gold};}
-.send-btn{padding:8px 18px;background:${C.headerBg};border:none;border-radius:4px;color:#f5edd8;font-family:'Cinzel',serif;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;}
-.send-btn:hover{background:${C.headerBg2};}
-.meta-input{background:white;border:1px solid ${C.border};border-radius:4px;padding:6px 10px;color:${C.text};font-family:'Crimson Pro',serif;font-size:14px;outline:none;width:100%;}
-.meta-input:focus{border-color:${C.gold};}
-.badge-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:6px;text-align:center;transition:all 0.2s;}
-.badge-card.unlocked{background:linear-gradient(180deg,#f0e0b0,#e8d49a);border:2px solid ${C.panelBorder};box-shadow:0 2px 6px rgba(90,58,16,0.15);}
-.badge-card.locked{background:rgba(139,94,26,0.05);border:1px solid ${C.borderLight};opacity:0.4;filter:grayscale(1);}
+body{background:#f0eef8;}
+.dofus-app{font-family:'Crimson Pro',Georgia,serif;background:#f0eef8;min-height:100vh;color:#1e1b3a;}
+.panel{background:#faf9fe;border:1.5px solid #c8c3f0;border-radius:10px;position:relative;box-shadow:0 2px 12px rgba(83,74,183,0.08);}
+.panel::before{content:'';position:absolute;inset:0;border-radius:8px;background:linear-gradient(135deg,rgba(127,119,221,0.04) 0%,transparent 60%);pointer-events:none;}
+.panel-gold{background:linear-gradient(160deg,#f4f2fd 0%,#ede9fb 100%);border:1.5px solid #c8c3f0;border-radius:10px;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(83,74,183,0.1);}
+.panel-gold::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#afa9ec,transparent);}
+.obj-row{display:grid;grid-template-columns:28px 1fr auto;align-items:start;gap:10px;padding:10px 14px;border-radius:8px;background:#ffffff;border:1px solid #e4e2f8;cursor:pointer;transition:all 0.15s;box-shadow:0 1px 4px rgba(83,74,183,0.06);}
+.obj-row:hover{background:#f5f3fc;border-color:#afa9ec;transform:translateY(-1px);box-shadow:0 3px 8px rgba(83,74,183,0.12);}
+.obj-row.done{background:#f0f7f0;border-color:#4a8a4a;opacity:0.65;}
+.tab-btn{padding:10px 20px;border-radius:8px 8px 0 0;font-family:'Cinzel',serif;font-size:11px;font-weight:600;border:1.5px solid transparent;border-bottom:none;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;}
+.tab-btn.inactive{background:rgba(83,74,183,0.06);border-color:#c8c3f0;color:#6b66a0;}
+.tab-btn.inactive:hover{color:#534ab7;border-color:#afa9ec;}
+.filter-btn{padding:4px 12px;border-radius:20px;font-size:11px;font-family:'Crimson Pro',serif;font-weight:600;border:1px solid #c8c3f0;background:transparent;color:#6b66a0;cursor:pointer;transition:all 0.12s;}
+.filter-btn:hover{border-color:#534ab7;color:#534ab7;}
+.filter-btn.active{background:rgba(83,74,183,0.12);border-color:#534ab7;color:#534ab7;}
+.cat-title{font-family:'Cinzel',serif;font-size:11px;font-weight:600;color:#534ab7;letter-spacing:1.5px;text-transform:uppercase;}
+.obj-name{font-size:14px;font-weight:600;color:#0f0d2a;line-height:1.3;}
+.obj-name.done{text-decoration:line-through;color:#6b66a0;}
+.obj-desc{font-size:12px;color:#6b66a0;font-style:italic;margin-top:2px;line-height:1.3;}
+.check-box{width:20px;height:20px;border:2px solid #afa9ec;border-radius:5px;display:flex;align-items:center;justify-content:center;background:white;flex-shrink:0;margin-top:2px;transition:all 0.15s;}
+.check-box.done{background:#2a6a2a;border-color:#2a6a2a;}
+.prog-track{flex:1;height:6px;background:rgba(83,74,183,0.1);border-radius:3px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
+.divider{height:1px;background:linear-gradient(90deg,transparent,#c8c3f0,transparent);margin:6px 0;}
+.note-input{width:100%;background:white;border:1px solid #c8c3f0;border-radius:6px;padding:8px 12px;color:#1e1b3a;font-family:'Crimson Pro',serif;font-size:14px;resize:none;outline:none;}
+.note-input:focus{border-color:#534ab7;box-shadow:0 0 0 3px rgba(83,74,183,0.1);}
+.send-btn{padding:8px 18px;background:linear-gradient(135deg,#1a1535,#2a2050);border:none;border-radius:6px;color:#e8e4ff;font-family:'Cinzel',serif;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;}
+.send-btn:hover{opacity:0.85;}
+.meta-input{background:white;border:1px solid #c8c3f0;border-radius:6px;padding:6px 10px;color:#1e1b3a;font-family:'Crimson Pro',serif;font-size:14px;outline:none;width:100%;transition:border-color 0.15s;}
+.meta-input:focus{border-color:#534ab7;box-shadow:0 0 0 3px rgba(83,74,183,0.1);}
+.badge-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 8px;border-radius:8px;text-align:center;transition:all 0.2s;}
+.badge-card.unlocked{background:linear-gradient(160deg,#f4f2fd,#ede9fb);border:1.5px solid #afa9ec;box-shadow:0 2px 8px rgba(83,74,183,0.15);}
+.badge-card.locked{background:rgba(83,74,183,0.03);border:1px solid #e4e2f8;opacity:0.4;filter:grayscale(1);}
 @keyframes popIn{0%{transform:scale(0.5);opacity:0;}60%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;}}
 @keyframes goldBurst{0%{transform:scale(0.3);opacity:1;}100%{transform:scale(4);opacity:0;}}
 @keyframes goldRay{0%{transform:scaleY(0);opacity:0.9;}60%{opacity:0.7;}100%{transform:scaleY(1);opacity:0;}}
 @keyframes goldGlow{0%{opacity:0.9;transform:scale(1);}100%{opacity:0;transform:scale(2.5);}}
 @keyframes catComplete{0%{opacity:0;transform:translateY(-10px);}100%{opacity:1;transform:translateY(0);}}
-@keyframes catGoldFlood{0%{opacity:0;}20%{opacity:0.4;}100%{opacity:0;}}
 .pop-anim{animation:popIn 0.35s ease forwards;}
-.cat-complete-banner{animation:catComplete 0.5s ease forwards;background:linear-gradient(135deg,rgba(139,94,26,0.15),rgba(200,160,80,0.1));border:1px solid ${C.gold};border-radius:6px;padding:12px 20px;text-align:center;margin-bottom:12px;}
+.cat-complete-banner{animation:catComplete 0.5s ease forwards;background:rgba(83,74,183,0.08);border:1px solid #534ab7;border-radius:8px;padding:12px 20px;text-align:center;margin-bottom:12px;}
+@media(max-width:700px){
+  .dofus-layout{flex-direction:column !important;}
+  .dofus-sidebar{display:none !important;}
+  .dofus-center{min-width:0 !important;}
+  .obj-row{grid-template-columns:22px 1fr auto;gap:6px;padding:8px 10px;}
+  .obj-name{font-size:13px;}
+  .filter-btn{font-size:10px;padding:3px 8px;}
+  .panel{border-radius:8px;}
+}
+@media(max-width:480px){
+  .badge-card{padding:8px 4px;}
+  .cat-title{font-size:10px;}
+}
 `;
 
 // ─── EFFET LUMIÈRE DORÉE (canvas) ────────────────────────────────────────────
@@ -2180,9 +2191,9 @@ export default function App() {
 
   // Stats cliquables pour naviguer
   const NAV_STATS = [
-    { key:"duo",    label:"Duo",  done:duoAll.filter(o=>duoDone[o.id]).length,       total:duoAll.length,    color:"#f5e8a0", bg:"rgba(255,240,100,0.15)", border:"rgba(255,220,80,0.4)" },
-    { key:"skydro", label:"Sky",  done:skydroAll.filter(o=>skydroDone[o.id]).length, total:skydroAll.length, color:"#a8c8f8", bg:"rgba(74,120,200,0.2)",  border:"rgba(100,160,255,0.4)" },
-    { key:"cell",   label:"Cell", done:cellAll.filter(o=>cellDone[o.id]).length,     total:cellAll.length,   color:"#f8b8a0", bg:"rgba(200,80,50,0.2)",   border:"rgba(255,120,80,0.4)" },
+    { key:"duo",    label:"Duo",  done:duoAll.filter(o=>duoDone[o.id]).length,       total:duoAll.length,    color:"#c8b0ff", bg:"rgba(180,140,255,0.2)",  border:"rgba(180,140,255,0.4)" },
+    { key:"skydro", label:"Sky",  done:skydroAll.filter(o=>skydroDone[o.id]).length, total:skydroAll.length, color:"#90c0ff", bg:"rgba(100,160,255,0.2)",  border:"rgba(100,160,255,0.4)" },
+    { key:"cell",   label:"Cell", done:cellAll.filter(o=>cellDone[o.id]).length,     total:cellAll.length,   color:"#ffb0a0", bg:"rgba(255,120,80,0.2)",   border:"rgba(255,120,80,0.4)" },
   ];
 
   return (
@@ -2241,13 +2252,11 @@ export default function App() {
       </div>
 
       {/* ── LAYOUT 3 COLONNES ── */}
-      <div style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:tab==="stuff"?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
+      <div className="dofus-layout" style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:tab==="stuff"?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
 
-        {/* COLONNE SKY — gauche, cachée sur Stuff */}
-        {tab !== "stuff" && <RecapCard label="Sky" meta={skydroMeta} color="#2a4a8a" colorLight="#e8f0f8" border="#4a6a9a" />}
+        {tab !== "stuff" && <div className="dofus-sidebar"><RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" /></div>}
 
-        {/* COLONNE CENTRE */}
-        <div style={{ flex:1, minWidth:0 }}>
+        <div className="dofus-center" style={{ flex:1, minWidth:0 }}>
           <div className="panel" style={{ padding:"22px 20px" }}>
             {tab==="duo" && <TabContent data={DUO_DATA} done={duoDone} toggle={toggleDuo} player={null}
               meta={duoMeta} onMetaUpdate={updateDuoMeta} notes={notes} onNote={sendNote} duoDone={duoDone}
@@ -2363,8 +2372,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* COLONNE CELL — droite, cachée sur Stuff */}
-        {tab !== "stuff" && <RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" />}
+        {tab !== "stuff" && <div className="dofus-sidebar"><RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" /></div>}
 
       </div>
     </div>
