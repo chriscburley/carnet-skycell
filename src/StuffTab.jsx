@@ -371,11 +371,44 @@ function ResourceRow({ r, checked, onCheck }) {
 
 function ShoppingList({ stuff }) {
   const [checked, setChecked] = useState({});
+  const [resolved, setResolved] = useState({});
+
+  // Re-résoudre les recettes dont les noms manquent
+  useEffect(() => {
+    const allItems = [stuff.sky1, stuff.sky2, stuff.cell1, stuff.cell2].filter(Boolean);
+    const needsResolve = allItems.filter(item => item.recipe?.length && item.recipe.some(r => !r._name));
+    if (!needsResolve.length) { setResolved({}); return; }
+
+    Promise.all(needsResolve.map(async item => {
+      const resolvedRecipe = await Promise.all(
+        item.recipe.map(r =>
+          r._name ? Promise.resolve(r) :
+          fetch(`${BASE}/items/resources/${r.item_ankama_id}`)
+            .then(res => res.ok ? res.json() : null)
+            .then(d => ({ ...r, _name: d?.name || `#${r.item_ankama_id}`, _img: d?.image_urls?.icon || null }))
+            .catch(() => ({ ...r, _name: `#${r.item_ankama_id}`, _img: null }))
+        )
+      );
+      return { ankama_id: item.ankama_id, recipe: resolvedRecipe };
+    })).then(results => {
+      const map = {};
+      results.forEach(r => { map[r.ankama_id] = r.recipe; });
+      setResolved(map);
+    });
+  }, [stuff]);
+
+  // Merge stuff avec les recettes résolues
+  const mergeStuff = (item) => {
+    if (!item) return null;
+    const resolvedRecipe = resolved[item.ankama_id];
+    return resolvedRecipe ? { ...item, recipe: resolvedRecipe } : item;
+  };
+
   const toggle = (id) => setChecked(p => ({ ...p, [id]: !p[id] }));
 
-  const sky  = aggregateItems([stuff.sky1,  stuff.sky2]);
-  const cell = aggregateItems([stuff.cell1, stuff.cell2]);
-  const all  = aggregateItems([stuff.sky1, stuff.sky2, stuff.cell1, stuff.cell2]);
+  const sky  = aggregateItems([mergeStuff(stuff.sky1),  mergeStuff(stuff.sky2)]);
+  const cell = aggregateItems([mergeStuff(stuff.cell1), mergeStuff(stuff.cell2)]);
+  const all  = aggregateItems([mergeStuff(stuff.sky1), mergeStuff(stuff.sky2), mergeStuff(stuff.cell1), mergeStuff(stuff.cell2)]);
 
   return (
     <div>
