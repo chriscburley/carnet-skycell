@@ -228,6 +228,7 @@ const HOW_COMPAGNON_COLORS = {
 };
 
 
+const HOW_COLORS = {
   "Échange":   { color:"#1a5a8a", bg:"#e8f0f8", border:"#4a8ab8" },
   "Jetons":    { color:"#6a1a8a", bg:"#f0e8f8", border:"#9a4ab8" },
   "Quête":     { color:"#7a5a10", bg:"#f8f0d8", border:"#b88a20" },
