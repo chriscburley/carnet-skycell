@@ -333,7 +333,7 @@ const C = {
   border:"#d4b87a", borderLight:"#e8d4a0",
   text:"#2a1a08", textDim:"#6b4e28", textBright:"#1a0e04",
   green:"#2a6a2a", greenBorder:"#4a8a4a",
-  headerBg:"#3a2408", headerBg2:"#5a3a14",
+  headerBg:"#1a1535", headerBg2:"#2a2050",
   panelBorder:"#b8924a",
 };
 const DIFF_COLORS = ["#2a7a2a","#6a8a1a","#b87a10","#c85a10","#a01010"];
@@ -2023,19 +2023,19 @@ function AlmanaxWidget() {
     <div style={{
       display:"flex", alignItems:"center", justifyContent:"center",
       gap:20, flexWrap:"wrap",
-      background:"rgba(0,0,0,0.2)", borderTop:"1px solid rgba(200,146,42,0.2)",
+      background:"rgba(255,255,255,0.05)", borderTop:"1px solid rgba(180,140,255,0.15)",
       padding:"8px 20px",
     }}>
-      <span style={{ color:"#d4b070", fontFamily:"'Cinzel',serif", fontSize:10, letterSpacing:2, textTransform:"uppercase" }}>☀ Almanax</span>
-      <span style={{ fontSize:12, color:"#f5edd8" }}>
-        <span style={{ color:"#a8c8a8" }}>Offrande : </span>
+      <span style={{ color:"#c8b0ff", fontFamily:"'Cinzel',serif", fontSize:10, letterSpacing:2, textTransform:"uppercase" }}>☀ Almanax</span>
+      <span style={{ fontSize:12, color:"#f0eaff" }}>
+        <span style={{ color:"#a0d0a0" }}>Offrande : </span>
         <strong>{qty}× {offrande}</strong>
       </span>
-      <span style={{ fontSize:12, color:"#f5edd8" }}>
-        <span style={{ color:"#a8c8a8" }}>Bonus : </span>
+      <span style={{ fontSize:12, color:"#f0eaff" }}>
+        <span style={{ color:"#a0d0a0" }}>Bonus : </span>
         <span style={{ fontStyle:"italic" }}>{bonus}</span>
       </span>
-      {kamas && <span style={{ fontSize:12, color:"#e8c870" }}>💰 {kamas}</span>}
+      {kamas && <span style={{ fontSize:12, color:"#f8e080" }}>💰 {kamas}</span>}
     </div>
   );
 }
@@ -2182,44 +2182,51 @@ export default function App() {
       {badgeOverlay && <BadgeUnlockOverlay badge={badgeOverlay} onDone={() => setBadgeOverlay(null)} />}
 
       {/* HEADER */}
-      <div style={{ background:`linear-gradient(180deg, ${C.headerBg} 0%, ${C.headerBg2} 100%)`, padding:"16px 20px 0", textAlign:"center", boxShadow:"0 3px 10px rgba(0,0,0,0.5)" }}>
-        <div style={{ fontSize:9, color:"#e8c870", letterSpacing:5, fontFamily:"'Cinzel',serif", marginBottom:2, textTransform:"uppercase" }}>Monde des Douze</div>
-        <h1 style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(18px,3vw,26px)", fontWeight:700, color:"#fff8e8", letterSpacing:2, textShadow:"0 2px 6px rgba(0,0,0,0.7)", margin:"0 0 2px" }}>
+      <div style={{ background:`linear-gradient(160deg, #1a1535 0%, #2a2050 50%, #1e1a40 100%)`, padding:"16px 20px 0", textAlign:"center", boxShadow:"0 4px 20px rgba(0,0,0,0.6)", borderBottom:"1px solid rgba(180,140,255,0.15)" }}>
+        <div style={{ fontSize:9, color:"#c8b0ff", letterSpacing:6, fontFamily:"'Cinzel',serif", marginBottom:3, textTransform:"uppercase" }}>Monde des Douze</div>
+        <h1 style={{ fontFamily:"'Cinzel',serif", fontSize:"clamp(18px,3vw,28px)", fontWeight:700, color:"#ffffff", letterSpacing:3, textShadow:"0 0 20px rgba(180,140,255,0.6), 0 2px 6px rgba(0,0,0,0.8)", margin:"0 0 3px" }}>
           Carnet d'Aventure
         </h1>
-        <div style={{ color:"#f0d090", fontSize:12, fontStyle:"italic", marginBottom:4 }}>Sky & Cell</div>
-        <div style={{ fontSize:10, color:synced?"#90e090":"#e8d060", marginBottom:10, letterSpacing:1 }}>{synced?"✦ Synchronisé":"⟳ Connexion…"}</div>
+        <div style={{ color:"#c8b0ff", fontSize:12, fontStyle:"italic", marginBottom:4 }}>Sky & Cell</div>
+        <div style={{ fontSize:10, color:synced?"#80e8a0":"#f8d060", marginBottom:10, letterSpacing:1 }}>{synced?"✦ Synchronisé":"⟳ Connexion…"}</div>
 
-        {/* Stats cliquables Duo / Sky / Cell */}
+        {/* Stats cliquables */}
         <div style={{ display:"flex", justifyContent:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
           {NAV_STATS.map(s => (
             <div key={s.key} onClick={() => setTab(s.key)} style={{
-              padding:"6px 16px", textAlign:"center", minWidth:70,
-              background: tab===s.key ? s.bg : "rgba(255,255,255,0.06)",
-              border:`1px solid ${tab===s.key ? s.border : "rgba(255,255,255,0.15)"}`,
-              borderRadius:6, cursor:"pointer", transition:"all 0.15s",
+              padding:"7px 18px", textAlign:"center", minWidth:72,
+              background: tab===s.key ? "rgba(180,140,255,0.2)" : "rgba(255,255,255,0.05)",
+              border:`1px solid ${tab===s.key ? "rgba(180,140,255,0.5)" : "rgba(255,255,255,0.12)"}`,
+              borderRadius:8, cursor:"pointer", transition:"all 0.15s",
+              boxShadow: tab===s.key ? "0 0 12px rgba(180,140,255,0.2)" : "none",
             }}>
-              <div style={{ fontFamily:"'Cinzel',serif", fontSize:16, fontWeight:700, color:s.color, textShadow:"0 1px 3px rgba(0,0,0,0.5)" }}>
+              <div style={{ fontFamily:"'Cinzel',serif", fontSize:17, fontWeight:700, color: tab===s.key ? "#e0d0ff" : s.color, textShadow: tab===s.key ? "0 0 10px rgba(200,170,255,0.8)" : "none" }}>
                 {Math.round(s.done/s.total*100)}%
               </div>
-              <div style={{ fontSize:9, color:"rgba(255,240,200,0.85)", fontFamily:"'Cinzel',serif", letterSpacing:1 }}>{s.label}</div>
+              <div style={{ fontSize:9, color:"rgba(220,210,255,0.7)", fontFamily:"'Cinzel',serif", letterSpacing:1 }}>{s.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Onglets Familiers / Chasse / Stuff */}
+        {/* Onglets */}
         <div style={{ display:"flex", justifyContent:"center", gap:4 }}>
           {NAV_TABS.map(t => {
             const isActive = tab===t.key;
             return (
-              <button key={t.key} className={`tab-btn${isActive?"":" inactive"}`} onClick={()=>setTab(t.key)}
-                style={isActive ? { background:t.active.bg, borderColor:t.active.border, color:t.active.color, borderBottom:`2px solid ${t.active.bg}` } : {}}>
+              <button key={t.key} onClick={() => setTab(t.key)} style={{
+                padding:"8px 16px", borderRadius:"6px 6px 0 0",
+                fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:600, letterSpacing:0.5,
+                border:"none", cursor:"pointer", transition:"all 0.15s",
+                background: isActive ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.07)",
+                color: isActive ? t.active.color : "rgba(220,210,255,0.7)",
+                boxShadow: isActive ? "0 -2px 8px rgba(0,0,0,0.2)" : "none",
+              }}>
                 {t.label}
               </button>
             );
           })}
         </div>
-        <div style={{ height:2, background:`linear-gradient(90deg,transparent,${C.panelBorder},transparent)` }} />
+        <div style={{ height:2, background:`linear-gradient(90deg,transparent,rgba(180,140,255,0.4),transparent)` }} />
         <AlmanaxWidget />
       </div>
 
