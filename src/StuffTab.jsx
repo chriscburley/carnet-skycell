@@ -371,44 +371,67 @@ function ResourceRow({ r, checked, onCheck }) {
 
 function ShoppingList({ stuff }) {
   const [checked, setChecked] = useState({});
-  const [resolved, setResolved] = useState({});
+  const [resolvedNames, setResolvedNames] = useState({}); // id -> {name, img}
+  const [loading, setLoading] = useState(false);
 
-  // Re-résoudre les recettes dont les noms manquent
+  // Extraire tous les items de tous les persos
+  const getAllItems = (persoKeys) =>
+    persoKeys.flatMap(key =>
+      Object.values(stuff[key] || {}).filter(Boolean)
+    );
+
+  const skyItems  = getAllItems(["sky1",  "sky2"]);
+  const cellItems = getAllItems(["cell1", "cell2"]);
+  const allItems  = [...skyItems, ...cellItems];
+
+  // Collecter tous les IDs de ressources qui manquent un nom
   useEffect(() => {
-    const allItems = [stuff.sky1, stuff.sky2, stuff.cell1, stuff.cell2].filter(Boolean);
-    const needsResolve = allItems.filter(item => item.recipe?.length && item.recipe.some(r => !r._name));
-    if (!needsResolve.length) { setResolved({}); return; }
-
-    Promise.all(needsResolve.map(async item => {
-      const resolvedRecipe = await Promise.all(
-        item.recipe.map(r =>
-          r._name ? Promise.resolve(r) :
-          fetch(`${BASE}/items/resources/${r.item_ankama_id}`)
-            .then(res => res.ok ? res.json() : null)
-            .then(d => ({ ...r, _name: d?.name || `#${r.item_ankama_id}`, _img: d?.image_urls?.icon || null }))
-            .catch(() => ({ ...r, _name: `#${r.item_ankama_id}`, _img: null }))
-        )
-      );
-      return { ankama_id: item.ankama_id, recipe: resolvedRecipe };
-    })).then(results => {
-      const map = {};
-      results.forEach(r => { map[r.ankama_id] = r.recipe; });
-      setResolved(map);
+    const missingIds = new Set();
+    allItems.forEach(item => {
+      (item.recipe || []).forEach(r => {
+        if (r.item_ankama_id && !r._name && !resolvedNames[r.item_ankama_id]) {
+          missingIds.add(r.item_ankama_id);
+        }
+      });
     });
-  }, [stuff]);
+    if (!missingIds.size) return;
+    setLoading(true);
+    Promise.all([...missingIds].map(id =>
+      fetch(`${BASE}/items/resources/${id}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(d => ({ id, name: d?.name || `#${id}`, img: d?.image_urls?.icon || null }))
+        .catch(() => ({ id, name: `#${id}`, img: null }))
+    )).then(results => {
+      const map = {};
+      results.forEach(r => { map[r.id] = { name: r.name, img: r.img }; });
+      setResolvedNames(prev => ({ ...prev, ...map }));
+      setLoading(false);
+    });
+  }, [allItems.length]);
 
-  // Merge stuff avec les recettes résolues
-  const mergeStuff = (item) => {
-    if (!item) return null;
-    const resolvedRecipe = resolved[item.ankama_id];
-    return resolvedRecipe ? { ...item, recipe: resolvedRecipe } : item;
+  // Agréger les recettes avec noms résolus
+  const aggregate = (items) => {
+    const agg = {};
+    items.forEach(item => {
+      (item.recipe || []).forEach(r => {
+        const id = r.item_ankama_id;
+        if (!id) return;
+        const resolved = resolvedNames[id];
+        const name = r._name || resolved?.name || `#${id}`;
+        const img  = r._img  || resolved?.img  || null;
+        if (!agg[id]) agg[id] = { id, name, img, qty: 0 };
+        agg[id].qty += Number(r.quantity) || 0;
+        if (name !== `#${id}`) { agg[id].name = name; agg[id].img = img; }
+      });
+    });
+    return Object.values(agg).filter(r => r.qty > 0).sort((a,b) => b.qty - a.qty);
   };
 
   const toggle = (id) => setChecked(p => ({ ...p, [id]: !p[id] }));
 
-  const sky  = aggregateItems([mergeStuff(stuff.sky1),  mergeStuff(stuff.sky2)]);
-  const cell = aggregateItems([mergeStuff(stuff.cell1), mergeStuff(stuff.cell2)]);
-  const all  = aggregateItems([mergeStuff(stuff.sky1), mergeStuff(stuff.sky2), mergeStuff(stuff.cell1), mergeStuff(stuff.cell2)]);
+  const sky  = aggregate(skyItems);
+  const cell = aggregate(cellItems);
+  const all  = aggregate(allItems);
 
   return (
     <div>
