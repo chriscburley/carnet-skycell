@@ -31,8 +31,8 @@ const SLOT_LAYOUT = [
 ];
 
 const C = {
-  bgCard:"#fdf6e8", bgPanel:"#f5edd8", border:"#d4b87a", borderLight:"#e8d4a0",
-  gold:"#8b5e1a", goldDim:"#c8a060", text:"#2a1a08", textDim:"#6b4e28", textBright:"#1a0e04",
+  bgPanel:"#f5edd8", border:"#d4b87a", borderLight:"#e8d4a0",
+  gold:"#8b5e1a", goldDim:"#c8a060", text:"#2a1a08", textDim:"#6b4e28",
 };
 
 const PLAYERS = [
@@ -40,37 +40,50 @@ const PLAYERS = [
   { key:"cell", label:"Cell", color:"#7a2a1a", light:"#f8ede8", border:"#9a4a2a" },
 ];
 
-// ─── STAT CALC ────────────────────────────────────────────────────────────────
-const STAT_KEYS = [
-  { key:"pa",        label:"PA",     emoji:"⭐", effectIds:[160] },
-  { key:"pm",        label:"PM",     emoji:"👢", effectIds:[174] },
-  { key:"po",        label:"PO",     emoji:"👁️", effectIds:[176] },
-  { key:"vita",      label:"Vita",   emoji:"❤️", effectIds:[110] },
-  { key:"force",     label:"Force",  emoji:"🌍", effectIds:[118] },
-  { key:"intel",     label:"Intel",  emoji:"🔥", effectIds:[122] },
-  { key:"chance",    label:"Chance", emoji:"💧", effectIds:[120] },
-  { key:"agil",      label:"Agilité",emoji:"💨", effectIds:[119] },
-  { key:"sagesse",   label:"Sagesse",emoji:"📖", effectIds:[124] },
-  { key:"dmgFeu",    label:"Dmg🔥",  emoji:"🔥", effectIds:[96,104] },
-  { key:"dmgEau",    label:"Dmg💧",  emoji:"💧", effectIds:[97,101] },
-  { key:"dmgTerre",  label:"Dmg🌍",  emoji:"🌍", effectIds:[98,102] },
-  { key:"dmgAir",    label:"Dmg💨",  emoji:"💨", effectIds:[99,103] },
-  { key:"resFeu",    label:"Rés🔥",  emoji:"🔥", effectIds:[84,88] },
-  { key:"resEau",    label:"Rés💧",  emoji:"💧", effectIds:[83,87] },
-  { key:"resTerre",  label:"Rés🌍",  emoji:"🌍", effectIds:[82,86] },
-  { key:"resAir",    label:"Rés💨",  emoji:"💨", effectIds:[81,85] },
+const EMPTY_STUFF = { sky1:{}, sky2:{}, cell1:{}, cell2:{} };
+
+// ─── STATS ────────────────────────────────────────────────────────────────────
+// Correspondance effect type id → stat key (basé sur l'API dofusdude)
+const EFFECT_MAP = {
+  160:"pa", 174:"pm", 176:"po",
+  110:"vita", 118:"force", 122:"intel", 120:"chance", 119:"agil", 124:"sagesse",
+  96:"dmgNeutre", 104:"dmgNeutre", 101:"dmgEau", 97:"dmgEau",
+  102:"dmgTerre", 98:"dmgTerre", 103:"dmgAir", 99:"dmgAir",
+  105:"dmgFeu", 100:"dmgFeu", 108:"renvoi",
+  84:"resFeu", 88:"resFeu%", 83:"resEau", 87:"resEau%",
+  82:"resTerre", 86:"resTerre%", 81:"resAir", 85:"resAir%",
+};
+
+const STAT_DISPLAY = [
+  { key:"pa",       label:"PA",        emoji:"⭐" },
+  { key:"pm",       label:"PM",        emoji:"👢" },
+  { key:"po",       label:"PO",        emoji:"👁️" },
+  { key:"vita",     label:"Vita",      emoji:"❤️" },
+  { key:"force",    label:"Force",     emoji:"🌍" },
+  { key:"intel",    label:"Intel",     emoji:"🔥" },
+  { key:"chance",   label:"Chance",    emoji:"💧" },
+  { key:"agil",     label:"Agilité",   emoji:"💨" },
+  { key:"sagesse",  label:"Sagesse",   emoji:"📖" },
+  { key:"dmgFeu",   label:"Dmg Feu",   emoji:"🔥" },
+  { key:"dmgEau",   label:"Dmg Eau",   emoji:"💧" },
+  { key:"dmgTerre", label:"Dmg Terre", emoji:"🌍" },
+  { key:"dmgAir",   label:"Dmg Air",   emoji:"💨" },
+  { key:"resFeu",   label:"Rés Feu",   emoji:"🔥" },
+  { key:"resEau",   label:"Rés Eau",   emoji:"💧" },
+  { key:"resTerre", label:"Rés Terre", emoji:"🌍" },
+  { key:"resAir",   label:"Rés Air",   emoji:"💨" },
 ];
 
 function calcStats(stuff) {
   const totals = {};
-  STAT_KEYS.forEach(s => { totals[s.key] = 0; });
+  STAT_DISPLAY.forEach(s => { totals[s.key] = 0; });
   Object.values(stuff).filter(Boolean).forEach(item => {
     (item.effects || []).forEach(eff => {
-      const effId = eff.effect_id || eff.effectId || (eff.type?.id);
-      const val = eff.int_maximum ?? eff.diceSide ?? eff.value ?? 0;
-      STAT_KEYS.forEach(s => {
-        if (s.effectIds.includes(effId)) totals[s.key] += val;
-      });
+      // L'API dofusdude retourne type.id pour identifier l'effet
+      const effId = eff.type?.id ?? eff.effect_id ?? eff.effectId;
+      const val = eff.int_maximum ?? eff.max ?? eff.value ?? 0;
+      const statKey = EFFECT_MAP[effId];
+      if (statKey && totals[statKey] !== undefined) totals[statKey] += Number(val) || 0;
     });
   });
   return totals;
@@ -176,22 +189,26 @@ function SlotBox({ slot, item, onSearch, onRemove }) {
 // ─── STATS PANEL ─────────────────────────────────────────────────────────────
 function StatsPanel({ stuff, color }) {
   const stats = calcStats(stuff);
-  const hasAny = Object.values(stats).some(v => v > 0);
-  if (!hasAny) return <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic", textAlign:"center", padding:"8px 0" }}>Équipe un item pour voir les stats</div>;
+  const visible = STAT_DISPLAY.filter(s => stats[s.key] > 0);
+  if (!visible.length) return (
+    <div style={{ fontSize:10, color:C.textDim, fontStyle:"italic", textAlign:"center", padding:"6px 0" }}>
+      Équipe un item pour voir les stats
+    </div>
+  );
   return (
     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px 8px" }}>
-      {STAT_KEYS.map(s => stats[s.key] ? (
+      {visible.map(s => (
         <div key={s.key} style={{ display:"flex", justifyContent:"space-between", fontSize:10, padding:"1px 0" }}>
           <span style={{ color:C.textDim }}>{s.emoji} {s.label}</span>
-          <span style={{ fontWeight:700, color: stats[s.key] > 0 ? color : "#8a2a2a" }}>{stats[s.key] > 0 ? `+${stats[s.key]}` : stats[s.key]}</span>
+          <span style={{ fontWeight:700, color }}>{stats[s.key] > 0 ? `+${stats[s.key]}` : stats[s.key]}</span>
         </div>
-      ) : null)}
+      ))}
     </div>
   );
 }
 
 // ─── PERSO STUFF ─────────────────────────────────────────────────────────────
-function PersoStuff({ label, color, light, border, stuff, onUpdate }) {
+function PersoStuff({ persoKey, label, color, light, border, stuff, onUpdate }) {
   const [activeSlot, setActiveSlot] = useState(null);
   const activeSlotObj = activeSlot ? SLOTS.find(s => s.id === activeSlot) : null;
 
@@ -200,8 +217,23 @@ function PersoStuff({ label, color, light, border, stuff, onUpdate }) {
     try {
       const res = await fetch(`${BASE}/items/equipment/${item.ankama_id}`);
       const full = res.ok ? await res.json() : item;
-      onUpdate({ ...stuff, [activeSlot]: full });
-    } catch(e) { onUpdate({ ...stuff, [activeSlot]: item }); }
+      // Résoudre les noms des ressources de la recette immédiatement
+      if (full.recipe?.length) {
+        const resolved = await Promise.all(
+          full.recipe.map(r =>
+            fetch(`${BASE}/items/resources/${r.item_ankama_id}`)
+              .then(res2 => res2.ok ? res2.json() : null)
+              .then(d => ({ ...r, _name: d?.name || `#${r.item_ankama_id}`, _img: d?.image_urls?.icon || null }))
+              .catch(() => ({ ...r, _name: `#${r.item_ankama_id}`, _img: null }))
+          )
+        );
+        full.recipe = resolved;
+      }
+      const newStuff = { ...stuff, [activeSlot]: full };
+      onUpdate(newStuff);
+    } catch(e) {
+      onUpdate({ ...stuff, [activeSlot]: item });
+    }
     setActiveSlot(null);
   };
 
@@ -211,32 +243,32 @@ function PersoStuff({ label, color, light, border, stuff, onUpdate }) {
         ◈ {label}
       </div>
       <div style={{ display:"flex", gap:10 }}>
-        {/* Slots visuels */}
-        <div style={{ display:"flex", flexDirection:"column", gap:6, alignItems:"center" }}>
+        {/* Slots */}
+        <div style={{ display:"flex", flexDirection:"column", gap:5, alignItems:"center" }}>
           {SLOT_LAYOUT.map((row, ri) => (
             <div key={ri} style={{ display:"flex", gap:4, justifyContent:"center" }}>
               {row.map(slotId => {
                 const slot = SLOTS.find(s => s.id === slotId);
                 return (
-                  <SlotBox key={slotId} slot={slot} item={stuff[slotId]||null}
+                  <SlotBox key={slotId} slot={slot} item={stuff[slotId] || null}
                     onSearch={() => setActiveSlot(slotId === activeSlot ? null : slotId)}
-                    onRemove={() => { const s={...stuff}; delete s[slotId]; onUpdate(s); }}
+                    onRemove={() => { const s = { ...stuff }; delete s[slotId]; onUpdate(s); }}
                   />
                 );
               })}
             </div>
           ))}
-          <div style={{ fontSize:9, color:C.textDim, textAlign:"center", marginTop:2 }}>
+          <div style={{ fontSize:9, color:C.textDim, marginTop:2 }}>
             {Object.values(stuff).filter(Boolean).length}/{SLOTS.length} slots
           </div>
         </div>
         {/* Stats */}
-        <div style={{ flex:1, background:"white", borderRadius:6, border:`1px solid ${border}44`, padding:"8px" }}>
-          <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Stats (max)</div>
+        <div style={{ flex:1, background:"white", borderRadius:6, border:`1px solid ${border}44`, padding:"8px", minWidth:0 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:5 }}>Stats (max)</div>
           <StatsPanel stuff={stuff} color={color} />
         </div>
       </div>
-      {/* Recherche conditionnelle */}
+      {/* Recherche */}
       {activeSlot && (
         <div style={{ marginTop:8, padding:"6px 8px", background:"rgba(139,94,26,0.06)", borderRadius:5, border:`1px solid ${C.goldDim}` }}>
           <div style={{ fontSize:10, color:C.textDim, marginBottom:4 }}>
@@ -249,126 +281,68 @@ function PersoStuff({ label, color, light, border, stuff, onUpdate }) {
   );
 }
 
-// ─── LISTE DE COURSES ─────────────────────────────────────────────────────────
-async function fetchRecipeResources(recipe) {
-  if (!recipe?.length) return [];
-  const results = await Promise.all(
-    recipe.map(r =>
-      fetch(`${BASE}/items/resources/${r.item_ankama_id}`)
-        .then(res => res.ok ? res.json() : null)
-        .then(d => d ? { id:r.item_ankama_id, name:d.name||`#${r.item_ankama_id}`, qty:r.quantity, img:d.image_urls?.icon||null } : null)
-        .catch(() => null)
-    )
-  );
-  return results.filter(Boolean);
-}
-
-function aggregateResources(items) {
+// ─── SHOPPING ────────────────────────────────────────────────────────────────
+function aggregateItems(items) {
   const agg = {};
-  items.forEach(item => {
-    if (!item?.recipe?.length) return;
-    item.recipe.forEach(r => {
+  items.filter(Boolean).forEach(item => {
+    (item.recipe || []).forEach(r => {
       const id = r.item_ankama_id;
-      if (!agg[id]) agg[id] = { id, name:`#${id}`, qty:0, img:null, _nameResolved:false };
+      if (!agg[id]) agg[id] = { id, name: r._name || `#${id}`, img: r._img || null, qty: 0 };
       agg[id].qty += r.quantity;
-      if (item._resolvedRecipe) {
-        const found = item._resolvedRecipe.find(rr => rr.id === id);
-        if (found) { agg[id].name = found.name; agg[id].img = found.img; }
-      }
     });
   });
   return Object.values(agg).sort((a,b) => b.qty - a.qty);
 }
 
-function ShoppingColumn({ title, color, items, checked, onCheck }) {
-  const resList = aggregateResources(items);
-  const done = resList.filter(r => checked[r.id]).length;
-
+function ResourceRow({ r, checked, onCheck }) {
   return (
-    <div style={{ flex:1, minWidth:0 }}>
-      <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color, letterSpacing:1, textTransform:"uppercase", marginBottom:8, display:"flex", justifyContent:"space-between" }}>
-        <span>{title}</span>
-        <span style={{ color:C.textDim }}>{done}/{resList.length}</span>
+    <div onClick={() => onCheck(r.id)} style={{ display:"flex", alignItems:"center", gap:6, padding:"3px 6px", marginBottom:2, borderRadius:4, cursor:"pointer", background:checked?"#eef4ee":"white", border:`1px solid ${checked?"#4a8a4a":C.borderLight}`, opacity:checked?0.65:1, transition:"all 0.1s" }}>
+      <div style={{ width:13, height:13, borderRadius:2, border:`1px solid ${checked?"#2a6a2a":C.goldDim}`, background:checked?"#2a6a2a":"white", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, flexShrink:0 }}>
+        {checked && <span style={{ color:"white" }}>✓</span>}
       </div>
-      {resList.length === 0
-        ? <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>Aucune recette</div>
-        : resList.map(r => (
-          <div key={r.id} onClick={() => onCheck(r.id)} style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 8px", marginBottom:3, borderRadius:4, cursor:"pointer", background:checked[r.id]?"#eef4ee":"white", border:`1px solid ${checked[r.id]?"#4a8a4a":C.borderLight}`, opacity:checked[r.id]?0.65:1, transition:"all 0.1s" }}>
-            <div style={{ width:14, height:14, borderRadius:2, border:`1px solid ${checked[r.id]?"#2a6a2a":C.goldDim}`, background:checked[r.id]?"#2a6a2a":"white", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, flexShrink:0 }}>
-              {checked[r.id] && <span style={{ color:"white" }}>✓</span>}
-            </div>
-            {r.img && <img src={r.img} style={{ width:16, height:16, imageRendering:"pixelated", flexShrink:0 }} alt="" onError={e=>e.target.style.display="none"} />}
-            <span style={{ flex:1, fontSize:11, color:C.text, textDecoration:checked[r.id]?"line-through":"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
-            <span style={{ fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:700, color:C.gold, flexShrink:0 }}>×{r.qty}</span>
-            <a href={`https://dofusdb.fr/fr/database/item/${r.id}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{ fontSize:9, color:C.goldDim, flexShrink:0 }}>↗</a>
-          </div>
-        ))
-      }
+      {r.img && <img src={r.img} style={{ width:16, height:16, imageRendering:"pixelated", flexShrink:0 }} alt="" onError={e=>e.target.style.display="none"} />}
+      <span style={{ flex:1, fontSize:11, color:C.text, textDecoration:checked?"line-through":"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
+      <span style={{ fontFamily:"'Cinzel',serif", fontSize:10, fontWeight:700, color:C.gold, flexShrink:0 }}>×{r.qty}</span>
+      <a href={`https://dofusdb.fr/fr/database/item/${r.id}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{ fontSize:9, color:C.goldDim, flexShrink:0 }}>↗</a>
     </div>
   );
 }
 
 function ShoppingList({ stuff }) {
   const [checked, setChecked] = useState({});
-  const [resolvedStuff, setResolvedStuff] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  // Résoudre les noms des ressources
-  useEffect(() => {
-    const allItems = Object.values(stuff).flat().filter(Boolean);
-    if (!allItems.length) { setResolvedStuff({}); return; }
-    setLoading(true);
-    Promise.all(allItems.map(async item => {
-      if (!item?.recipe?.length || item._resolvedRecipe) return item;
-      const resolved = await fetchRecipeResources(item.recipe);
-      return { ...item, _resolvedRecipe: resolved };
-    })).then(resolved => {
-      const newStuff = {};
-      Object.entries(stuff).forEach(([key, val]) => {
-        newStuff[key] = resolved.find(r => r?.ankama_id === val?.ankama_id || r?.id === val?.id) || val;
-      });
-      setResolvedStuff(newStuff);
-      setLoading(false);
-    });
-  }, [stuff]);
-
   const toggle = (id) => setChecked(p => ({ ...p, [id]: !p[id] }));
 
-  const skyItems  = [resolvedStuff.sky1, resolvedStuff.sky2].filter(Boolean);
-  const cellItems = [resolvedStuff.cell1, resolvedStuff.cell2].filter(Boolean);
-  const allItems  = [...skyItems, ...cellItems];
-
-  if (loading) return <div style={{ textAlign:"center", padding:"12px", color:C.textDim, fontSize:12 }}>Chargement des recettes…</div>;
+  const sky  = aggregateItems([stuff.sky1,  stuff.sky2]);
+  const cell = aggregateItems([stuff.cell1, stuff.cell2]);
+  const all  = aggregateItems([stuff.sky1, stuff.sky2, stuff.cell1, stuff.cell2]);
 
   return (
     <div>
-      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>
-        🛒 Liste de Courses
-      </div>
-      {/* Sky + Cell côte à côte */}
-      <div style={{ display:"flex", gap:16, marginBottom:16 }}>
-        <ShoppingColumn title="Sky" color="#2a4a8a" items={skyItems} checked={checked} onCheck={toggle} />
-        <div style={{ width:1, background:C.borderLight }} />
-        <ShoppingColumn title="Cell" color="#7a2a1a" items={cellItems} checked={checked} onCheck={toggle} />
-      </div>
-      {/* Liste globale */}
-      <div style={{ borderTop:`2px solid ${C.border}`, paddingTop:12 }}>
-        <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:8 }}>Globale (tous les 4 persos)</div>
-        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-          {aggregateResources(allItems).map(r => (
-            <div key={r.id} onClick={() => toggle(r.id)} style={{ display:"flex", alignItems:"center", gap:6, padding:"4px 8px", borderRadius:4, cursor:"pointer", background:checked[r.id]?"#eef4ee":"white", border:`1px solid ${checked[r.id]?"#4a8a4a":C.borderLight}`, opacity:checked[r.id]?0.65:1, transition:"all 0.1s" }}>
-              <div style={{ width:14, height:14, borderRadius:2, border:`1px solid ${checked[r.id]?"#2a6a2a":C.goldDim}`, background:checked[r.id]?"#2a6a2a":"white", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, flexShrink:0 }}>
-                {checked[r.id] && <span style={{ color:"white" }}>✓</span>}
-              </div>
-              {r.img && <img src={r.img} style={{ width:16, height:16, imageRendering:"pixelated", flexShrink:0 }} alt="" onError={e=>e.target.style.display="none"} />}
-              <span style={{ flex:1, fontSize:11, color:C.text, textDecoration:checked[r.id]?"line-through":"none", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{r.name}</span>
-              <span style={{ fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:700, color:C.gold, flexShrink:0 }}>×{r.qty}</span>
-              <a href={`https://dofusdb.fr/fr/database/item/${r.id}`} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{ fontSize:9, color:C.goldDim, flexShrink:0 }}>↗</a>
-            </div>
-          ))}
+      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, color:C.gold, letterSpacing:2, textTransform:"uppercase", marginBottom:12 }}>🛒 Liste de Courses</div>
+
+      {/* Sky | Cell */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14 }}>
+        <div>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:"#2a4a8a", marginBottom:6, fontWeight:700 }}>◈ Sky</div>
+          {sky.length ? sky.map(r => <ResourceRow key={r.id} r={r} checked={!!checked[`sky_${r.id}`]} onCheck={() => toggle(`sky_${r.id}`)} />)
+            : <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>Aucun item</div>}
+        </div>
+        <div>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:"#7a2a1a", marginBottom:6, fontWeight:700 }}>◈ Cell</div>
+          {cell.length ? cell.map(r => <ResourceRow key={r.id} r={r} checked={!!checked[`cell_${r.id}`]} onCheck={() => toggle(`cell_${r.id}`)} />)
+            : <div style={{ fontSize:11, color:C.textDim, fontStyle:"italic" }}>Aucun item</div>}
         </div>
       </div>
-      <button onClick={() => setChecked({})} style={{ marginTop:10, padding:"3px 10px", background:"transparent", border:`1px solid ${C.border}`, borderRadius:3, fontSize:10, color:C.textDim, cursor:"pointer" }}>
+
+      {/* Globale */}
+      {all.length > 0 && (
+        <div style={{ borderTop:`2px solid ${C.border}`, paddingTop:10 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:10, color:C.gold, letterSpacing:1, textTransform:"uppercase", marginBottom:6 }}>Globale (4 persos)</div>
+          {all.map(r => <ResourceRow key={r.id} r={r} checked={!!checked[`all_${r.id}`]} onCheck={() => toggle(`all_${r.id}`)} />)}
+        </div>
+      )}
+
+      <button onClick={() => setChecked({})} style={{ marginTop:8, padding:"3px 10px", background:"transparent", border:`1px solid ${C.border}`, borderRadius:3, fontSize:10, color:C.textDim, cursor:"pointer" }}>
         Réinitialiser
       </button>
     </div>
@@ -377,33 +351,33 @@ function ShoppingList({ stuff }) {
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function StuffTab({ db, skydroMeta, cellMeta }) {
-  const [stuff, setStuff] = useState({ sky1:{}, sky2:{}, cell1:{}, cell2:{} });
+  const [stuff, setStuff] = useState({ ...EMPTY_STUFF });
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const unsub = onValue(ref(db, "stuff"), snap => {
-      if (snap.exists()) setStuff(snap.val());
+      if (snap.exists()) {
+        const val = snap.val();
+        // S'assurer que toutes les clés existent
+        setStuff({ sky1:{}, sky2:{}, cell1:{}, cell2:{}, ...val });
+      }
       setLoaded(true);
     });
     setTimeout(() => setLoaded(true), 2000);
     return () => unsub();
   }, []);
 
-  const update = (key, newStuff) => {
-    const next = { ...stuff, [key]: newStuff };
-    setStuff(next);
-    set(ref(db, "stuff"), next);
+  // Chaque perso a sa propre fonction update isolée
+  const updatePerso = (key) => (newStuff) => {
+    setStuff(prev => {
+      const next = { sky1:{}, sky2:{}, cell1:{}, cell2:{}, ...prev, [key]: newStuff };
+      set(ref(db, "stuff"), next);
+      return next;
+    });
   };
 
   const skyPersos  = skydroMeta?.persos || [];
   const cellPersos = cellMeta?.persos   || [];
-
-  const PERSOS = [
-    { key:"sky1",  label:skyPersos[0]?.name  || "Sky — Perso 1",  ...PLAYERS[0] },
-    { key:"sky2",  label:skyPersos[1]?.name  || "Sky — Perso 2",  ...PLAYERS[0] },
-    { key:"cell1", label:cellPersos[0]?.name || "Cell — Perso 1", ...PLAYERS[1] },
-    { key:"cell2", label:cellPersos[1]?.name || "Cell — Perso 2", ...PLAYERS[1] },
-  ];
 
   if (!loaded) return <div style={{ textAlign:"center", padding:"40px", color:C.textDim, fontSize:13 }}>Chargement…</div>;
 
@@ -413,22 +387,20 @@ export default function StuffTab({ db, skydroMeta, cellMeta }) {
         ⚔ Planificateur de Stuff
       </div>
 
-      {/* Sky en haut, Cell en bas */}
-      <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:16 }}>
-        {/* Ligne Sky */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-          {PERSOS.filter(p=>p.key.startsWith("sky")).map(p => (
-            <PersoStuff key={p.key} label={p.label} color={p.color} light={p.light} border={p.border}
-              stuff={stuff[p.key]||{}} onUpdate={(s)=>update(p.key,s)} />
-          ))}
-        </div>
-        {/* Ligne Cell */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-          {PERSOS.filter(p=>p.key.startsWith("cell")).map(p => (
-            <PersoStuff key={p.key} label={p.label} color={p.color} light={p.light} border={p.border}
-              stuff={stuff[p.key]||{}} onUpdate={(s)=>update(p.key,s)} />
-          ))}
-        </div>
+      {/* Ligne Sky */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:10 }}>
+        <PersoStuff persoKey="sky1" label={skyPersos[0]?.name || "Sky — Perso 1"} color="#2a4a8a" light="#e8f0f8" border="#4a6a9a"
+          stuff={stuff.sky1 || {}} onUpdate={updatePerso("sky1")} />
+        <PersoStuff persoKey="sky2" label={skyPersos[1]?.name || "Sky — Perso 2"} color="#2a4a8a" light="#e8f0f8" border="#4a6a9a"
+          stuff={stuff.sky2 || {}} onUpdate={updatePerso("sky2")} />
+      </div>
+
+      {/* Ligne Cell */}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:14 }}>
+        <PersoStuff persoKey="cell1" label={cellPersos[0]?.name || "Cell — Perso 1"} color="#7a2a1a" light="#f8ede8" border="#9a4a2a"
+          stuff={stuff.cell1 || {}} onUpdate={updatePerso("cell1")} />
+        <PersoStuff persoKey="cell2" label={cellPersos[1]?.name || "Cell — Perso 2"} color="#7a2a1a" light="#f8ede8" border="#9a4a2a"
+          stuff={stuff.cell2 || {}} onUpdate={updatePerso("cell2")} />
       </div>
 
       {/* Liste de courses */}
