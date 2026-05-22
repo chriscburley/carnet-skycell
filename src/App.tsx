@@ -2945,7 +2945,7 @@ export default function App() {
       {/* ── LAYOUT 3 COLONNES ── */}
       <div className="dofus-layout" style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:["stuff","metiers","map"].includes(tab)?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
 
-        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar" style={{ width: tab==="metiers" ? "130px" : "150px", flexShrink:0 }}
+        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar" style={{ width: tab==="metiers" ? "130px" : "150px", flexShrink:0 }}>
           {tab === "metiers"
             ? <MetiersColumn label="Sky" color="#2a4a8a" light="#e8f0f8" border="#4a6a9a" meta={skydroMeta} onUpdate={updateSkydroMeta} />
             : <RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" />
@@ -3110,7 +3110,7 @@ export default function App() {
           </div>
         </div>
 
-        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar" style={{ width: tab==="metiers" ? "130px" : "150px", flexShrink:0 }}
+        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar" style={{ width: tab==="metiers" ? "130px" : "150px", flexShrink:0 }}>
           {tab === "metiers"
             ? <MetiersColumn label="Cell" color="#7a2a1a" light="#f8ede8" border="#9a4a2a" meta={cellMeta} onUpdate={updateCellMeta} />
             : <RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" />
