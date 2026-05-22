@@ -2421,42 +2421,42 @@ function MetiersColumn({ label, color, light, border, meta, onUpdate }) {
   const pct = Math.round(totalActuel / totalMax * 100);
 
   return (
-    <div style={{ background:light, border:`2px solid ${border}`, borderRadius:8, padding:"12px 10px", position:"sticky", top:20 }}>
-      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:700, color, marginBottom:8, textAlign:"center", borderBottom:`1px solid ${border}44`, paddingBottom:6 }}>
+    <div style={{ background:light, border:`2px solid ${border}`, borderRadius:8, padding:"10px 8px", maxHeight:"82vh", overflowY:"auto", overflowX:"hidden" }}>
+      <div style={{ fontFamily:"'Cinzel',serif", fontSize:11, fontWeight:700, color, marginBottom:6, textAlign:"center", borderBottom:`1px solid ${border}44`, paddingBottom:5 }}>
         ◈ {label}
       </div>
       {/* Barre globale */}
-      <div style={{ marginBottom:10 }}>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:C.textDim, marginBottom:3, fontFamily:"'Cinzel',serif" }}>
-          <span>Progression globale</span><span>{pct}%</span>
+      <div style={{ marginBottom:8 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:9, color:C.textDim, marginBottom:2, fontFamily:"'Cinzel',serif" }}>
+          <span>Global</span><span>{pct}%</span>
         </div>
-        <div style={{ height:4, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
+        <div style={{ height:3, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
           <div style={{ height:"100%", width:`${pct}%`, background:color, borderRadius:2, transition:"width 0.3s" }} />
         </div>
       </div>
       {/* Groupes */}
       {METIERS_GROUPES.map(g => (
-        <div key={g.groupe} style={{ marginBottom:10 }}>
-          <div style={{ fontFamily:"'Cinzel',serif", fontSize:9, color, letterSpacing:1, textTransform:"uppercase", marginBottom:5, opacity:0.8 }}>
+        <div key={g.groupe} style={{ marginBottom:8 }}>
+          <div style={{ fontFamily:"'Cinzel',serif", fontSize:8, color, letterSpacing:1, textTransform:"uppercase", marginBottom:4, opacity:0.8 }}>
             {g.emoji} {g.groupe.replace(/^[^\s]+\s/, "")}
           </div>
           {g.metiers.map(m => {
             const lvl = metiers[m.id] || 0;
             const pctM = Math.round(lvl / 200 * 100);
             return (
-              <div key={m.id} style={{ marginBottom:5 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:4, marginBottom:2 }}>
-                  <span style={{ fontSize:11 }}>{m.emoji}</span>
-                  <span style={{ flex:1, fontSize:10, color:C.text, fontWeight: lvl >= 200 ? 700 : 400 }}>{m.name}</span>
+              <div key={m.id} style={{ marginBottom:4 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:3, marginBottom:1 }}>
+                  <span style={{ fontSize:10 }}>{m.emoji}</span>
+                  <span style={{ flex:1, fontSize:9, color:C.text, fontWeight: lvl >= 200 ? 700 : 400, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{m.name}</span>
                   <input
                     type="number" min={0} max={200}
                     value={lvl || ""}
                     placeholder="0"
                     onChange={e => setLevel(m.id, e.target.value)}
-                    style={{ width:38, padding:"1px 4px", border:`1px solid ${lvl>=200?"#2a6a2a":border}`, borderRadius:3, fontSize:10, textAlign:"center", background:lvl>=200?"#eef4ee":"white", color:lvl>=200?"#2a6a2a":C.text, outline:"none", fontFamily:"'Cinzel',serif", fontWeight:700 }}
+                    style={{ width:34, padding:"1px 3px", border:`1px solid ${lvl>=200?"#2a6a2a":border}`, borderRadius:3, fontSize:9, textAlign:"center", background:lvl>=200?"#eef4ee":"white", color:lvl>=200?"#2a6a2a":C.text, outline:"none", fontFamily:"'Cinzel',serif", fontWeight:700 }}
                   />
                 </div>
-                <div style={{ height:3, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
+                <div style={{ height:2, background:`${border}22`, borderRadius:2, overflow:"hidden" }}>
                   <div style={{ height:"100%", width:`${pctM}%`, background: lvl>=200?"#2a6a2a":lvl>=100?color:`${color}88`, borderRadius:2, transition:"width 0.3s" }} />
                 </div>
               </div>
@@ -2945,7 +2945,7 @@ export default function App() {
       {/* ── LAYOUT 3 COLONNES ── */}
       <div className="dofus-layout" style={{ display:"flex", alignItems:"flex-start", gap:12, maxWidth:["stuff","metiers","map"].includes(tab)?"1100px":"1200px", margin:"0 auto", padding:"20px 12px 48px" }}>
 
-        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar">
+        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar" style={{ width: tab==="metiers" ? "130px" : "150px", flexShrink:0 }}
           {tab === "metiers"
             ? <MetiersColumn label="Sky" color="#2a4a8a" light="#e8f0f8" border="#4a6a9a" meta={skydroMeta} onUpdate={updateSkydroMeta} />
             : <RecapCard label="Sky" meta={skydroMeta} color="#534ab7" colorLight="#f4f2fd" border="#c8c3f0" />
@@ -3110,7 +3110,7 @@ export default function App() {
           </div>
         </div>
 
-        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar">
+        {!["stuff","map","ocre"].includes(tab) && <div className="dofus-sidebar" style={{ width: tab==="metiers" ? "130px" : "150px", flexShrink:0 }}
           {tab === "metiers"
             ? <MetiersColumn label="Cell" color="#7a2a1a" light="#f8ede8" border="#9a4a2a" meta={cellMeta} onUpdate={updateCellMeta} />
             : <RecapCard label="Cell" meta={cellMeta} color="#7a2a1a" colorLight="#f8ede8" border="#9a4a2a" />
